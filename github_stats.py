@@ -28,6 +28,17 @@ def _delay_for_202(retry_after_header: Optional[str], attempt: int) -> float:
     return min(2.0 * (1.15 ** min(attempt - 1, 10)), 20.0)
 
 
+def _is_transient_status(status: int) -> bool:
+    return status in {403, 429, 500, 502, 503, 504}
+
+
+def _response_preview(text: str) -> str:
+    preview = text.strip().replace("\n", " ")
+    if len(preview) > 160:
+        return f"{preview[:157]}..."
+    return preview
+
+
 ###############################################################################
 # Main Classes
 ###############################################################################
@@ -61,28 +72,84 @@ class Queries(object):
         headers = {
             "Authorization": f"Bearer {self.access_token}",
         }
-        try:
-            async with self.semaphore:
-                r_async = await self.session.post(
-                    "https://api.github.com/graphql",
-                    headers=headers,
-                    json={"query": generated_query},
-                )
-            result = await r_async.json()
-            if result is not None:
-                return result
-        except:
-            print("aiohttp failed for GraphQL query")
-            # Fall back on non-async requests
-            async with self.semaphore:
-                r_requests = requests.post(
-                    "https://api.github.com/graphql",
-                    headers=headers,
-                    json={"query": generated_query},
-                )
+
+        deadline = time.monotonic() + 60.0
+        max_iterations = 4
+
+        for attempt in range(1, max_iterations + 1):
+            try:
+                async with self.semaphore:
+                    r_async = await self.session.post(
+                        "https://api.github.com/graphql",
+                        headers=headers,
+                        json={"query": generated_query},
+                    )
+
+                if _is_transient_status(r_async.status):
+                    delay = _delay_for_202(r_async.headers.get("Retry-After"), attempt)
+                    delay = min(delay, max(0.0, deadline - time.monotonic()))
+                    if delay <= 0:
+                        break
+                    print(
+                        f"GraphQL returned {r_async.status} "
+                        f"(attempt {attempt}); retry in {delay:.1f}s"
+                    )
+                    await asyncio.sleep(delay)
+                    continue
+
+                if r_async.status >= 400:
+                    print(f"GraphQL query failed with HTTP {r_async.status}")
+                    return dict()
+
+                result = await r_async.json()
+                if result is not None:
+                    return result
+            except Exception as error:
+                print(f"aiohttp failed for GraphQL query: {error}")
+
+            r_requests = None
+            try:
+                async with self.semaphore:
+                    r_requests = requests.post(
+                        "https://api.github.com/graphql",
+                        headers=headers,
+                        json={"query": generated_query},
+                    )
+
+                if _is_transient_status(r_requests.status_code):
+                    delay = _delay_for_202(
+                        r_requests.headers.get("Retry-After"), attempt
+                    )
+                    delay = min(delay, max(0.0, deadline - time.monotonic()))
+                    if delay <= 0:
+                        break
+                    print(
+                        f"GraphQL fallback returned {r_requests.status_code} "
+                        f"(attempt {attempt}); retry in {delay:.1f}s"
+                    )
+                    await asyncio.sleep(delay)
+                    continue
+
+                if r_requests.status_code >= 400:
+                    preview = _response_preview(r_requests.text)
+                    print(
+                        f"GraphQL fallback failed with HTTP "
+                        f"{r_requests.status_code}: {preview}"
+                    )
+                    return dict()
+
                 result = r_requests.json()
                 if result is not None:
                     return result
+            except ValueError as error:
+                preview = _response_preview(
+                    "" if r_requests is None else getattr(r_requests, "text", "")
+                )
+                print(f"GraphQL fallback returned non-JSON: {error}; {preview}")
+                return dict()
+            except Exception as error:
+                print(f"requests failed for GraphQL query: {error}")
+
         return dict()
 
     async def query_rest(self, path: str, params: Optional[Dict] = None) -> Any:
@@ -162,9 +229,17 @@ class Queries(object):
                     await asyncio.sleep(delay)
                     continue
                 elif r_requests.status_code == 200:
-                    result = r_requests.json()
-                    if result is not None:
-                        return result
+                    try:
+                        result = r_requests.json()
+                        if result is not None:
+                            return result
+                    except ValueError as error:
+                        preview = _response_preview(r_requests.text)
+                        print(
+                            f"{normalized} fallback returned non-JSON: "
+                            f"{error}; {preview}"
+                        )
+                        return _empty_rest_value(normalized)
 
         print(
             f"query_rest: too many 202 responses for {normalized}; "
