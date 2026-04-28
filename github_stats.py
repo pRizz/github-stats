@@ -2,10 +2,30 @@
 
 import asyncio
 import os
+import time
 from typing import Dict, List, Optional, Set, Tuple, Any, cast
 
 import aiohttp
 import requests
+
+
+def _empty_rest_value(normalized_path: str) -> Any:
+    """JSON shape GitHub would return for an empty successful response."""
+    if "stats/contributors" in normalized_path:
+        return []
+    return {}
+
+
+def _delay_for_202(retry_after_header: Optional[str], attempt: int) -> float:
+    """
+    Seconds to wait before retrying a 202. Prefer GitHub's Retry-After header.
+    """
+    if retry_after_header:
+        try:
+            return max(1.0, min(float(str(retry_after_header).strip()), 60.0))
+        except ValueError:
+            pass
+    return min(2.0 * (1.15 ** min(attempt - 1, 10)), 20.0)
 
 
 ###############################################################################
@@ -65,7 +85,7 @@ class Queries(object):
                     return result
         return dict()
 
-    async def query_rest(self, path: str, params: Optional[Dict] = None) -> Dict:
+    async def query_rest(self, path: str, params: Optional[Dict] = None) -> Any:
         """
         Make a request to the REST API
         :param path: API path to query
@@ -73,48 +93,84 @@ class Queries(object):
         :return: deserialized REST JSON output
         """
 
-        for _ in range(60):
+        if params is None:
+            params = dict()
+        normalized = path[1:] if path.startswith("/") else path
+
+        # GitHub returns 202 while statistics (e.g. contributors) are computed.
+        # Without a wall-clock cap, many repos × ~60 × 2s sleeps can run for hours in CI.
+        deadline = time.monotonic() + 90.0
+        max_iterations = 35
+
+        for attempt in range(1, max_iterations + 1):
             headers = {
                 "Authorization": f"token {self.access_token}",
             }
-            if params is None:
-                params = dict()
-            if path.startswith("/"):
-                path = path[1:]
+            if time.monotonic() > deadline:
+                print(
+                    f"query_rest: wait budget exhausted for {normalized}; "
+                    "using empty data for this endpoint."
+                )
+                return _empty_rest_value(normalized)
+
             try:
                 async with self.semaphore:
                     r_async = await self.session.get(
-                        f"https://api.github.com/{path}",
+                        f"https://api.github.com/{normalized}",
                         headers=headers,
                         params=tuple(params.items()),
                     )
                 if r_async.status == 202:
-                    # print(f"{path} returned 202. Retrying...")
-                    print(f"A path returned 202. Retrying...")
-                    await asyncio.sleep(2)
+                    delay = _delay_for_202(r_async.headers.get("Retry-After"), attempt)
+                    delay = min(delay, max(0.0, deadline - time.monotonic()))
+                    if delay <= 0:
+                        print(
+                            f"query_rest: no time left for 202 retries on {normalized}."
+                        )
+                        return _empty_rest_value(normalized)
+                    if attempt <= 2 or attempt % 6 == 0:
+                        print(
+                            f"{normalized} returned 202 (attempt {attempt}); "
+                            f"retry in {delay:.1f}s"
+                        )
+                    await asyncio.sleep(delay)
                     continue
 
                 result = await r_async.json()
                 if result is not None:
                     return result
-            except:
+            except Exception:
                 print("aiohttp failed for rest query")
-                # Fall back on non-async requests
                 async with self.semaphore:
                     r_requests = requests.get(
-                        f"https://api.github.com/{path}",
+                        f"https://api.github.com/{normalized}",
                         headers=headers,
                         params=tuple(params.items()),
                     )
-                    if r_requests.status_code == 202:
-                        print(f"A path returned 202. Retrying...")
-                        await asyncio.sleep(2)
-                        continue
-                    elif r_requests.status_code == 200:
-                        return r_requests.json()
-        # print(f"There were too many 202s. Data for {path} will be incomplete.")
-        print("There were too many 202s. Data for this repository will be incomplete.")
-        return dict()
+                if r_requests.status_code == 202:
+                    delay = _delay_for_202(
+                        r_requests.headers.get("Retry-After"), attempt
+                    )
+                    delay = min(delay, max(0.0, deadline - time.monotonic()))
+                    if delay <= 0:
+                        return _empty_rest_value(normalized)
+                    if attempt <= 2 or attempt % 6 == 0:
+                        print(
+                            f"{normalized} returned 202 via fallback "
+                            f"(attempt {attempt}); retry in {delay:.1f}s"
+                        )
+                    await asyncio.sleep(delay)
+                    continue
+                elif r_requests.status_code == 200:
+                    result = r_requests.json()
+                    if result is not None:
+                        return result
+
+        print(
+            f"query_rest: too many 202 responses for {normalized}; "
+            "data for this endpoint may be incomplete."
+        )
+        return _empty_rest_value(normalized)
 
     @staticmethod
     def repos_overview(
