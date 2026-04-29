@@ -3,6 +3,7 @@
 import asyncio
 import os
 import time
+from dataclasses import dataclass
 from typing import Dict, List, Optional, Set, Tuple, Any, cast
 
 import aiohttp
@@ -16,20 +17,111 @@ def _empty_rest_value(normalized_path: str) -> Any:
     return {}
 
 
+@dataclass(frozen=True)
+class _StatusDecision:
+    category: str
+    retryable: bool
+    message: str
+
+
+def _header_value(headers: Any, name: str) -> Optional[str]:
+    if headers is None:
+        return None
+    try:
+        value = headers.get(name)
+    except AttributeError:
+        return None
+    if value is None:
+        value = headers.get(name.lower())
+    if value is None:
+        return None
+    return str(value)
+
+
+def _parse_float_header(value: Optional[str]) -> Optional[float]:
+    if value is None:
+        return None
+    try:
+        return float(str(value).strip())
+    except ValueError:
+        return None
+
+
+def _retry_delay(headers: Any, attempt: int, default: float = 2.0) -> float:
+    """
+    Seconds to wait before retrying. Prefer GitHub's rate-limit headers.
+    """
+    retry_after = _parse_float_header(_header_value(headers, "Retry-After"))
+    if retry_after is not None:
+        return max(1.0, min(retry_after, 60.0))
+
+    reset_epoch = _parse_float_header(_header_value(headers, "x-ratelimit-reset"))
+    remaining = _header_value(headers, "x-ratelimit-remaining")
+    if reset_epoch is not None and remaining == "0":
+        return max(1.0, min(reset_epoch - time.time(), 60.0))
+
+    return min(default * (1.15 ** min(attempt - 1, 10)), 20.0)
+
+
 def _delay_for_202(retry_after_header: Optional[str], attempt: int) -> float:
     """
     Seconds to wait before retrying a 202. Prefer GitHub's Retry-After header.
     """
-    if retry_after_header:
-        try:
-            return max(1.0, min(float(str(retry_after_header).strip()), 60.0))
-        except ValueError:
-            pass
-    return min(2.0 * (1.15 ** min(attempt - 1, 10)), 20.0)
+    return _retry_delay({"Retry-After": retry_after_header}, attempt)
 
 
-def _is_transient_status(status: int) -> bool:
-    return status in {403, 429, 500, 502, 503, 504}
+def _looks_rate_limited(status: int, headers: Any, body_preview: str) -> bool:
+    if status not in {403, 429}:
+        return False
+    if _header_value(headers, "Retry-After") is not None:
+        return True
+    if _header_value(headers, "x-ratelimit-remaining") == "0":
+        return True
+
+    lowered_preview = body_preview.lower()
+    return "rate limit" in lowered_preview or "too many requests" in lowered_preview
+
+
+def _classify_status(
+    status: int,
+    headers: Any,
+    body_preview: str,
+    endpoint_kind: str,
+) -> _StatusDecision:
+    if status in {200, 201}:
+        return _StatusDecision("success_with_json", False, "response contains JSON")
+    if status in {204, 304}:
+        return _StatusDecision("success_empty", False, "response has no JSON body")
+    if status == 202:
+        return _StatusDecision("pending", True, "request accepted but still pending")
+    if 300 <= status <= 399:
+        location = _header_value(headers, "Location") or "missing Location header"
+        return _StatusDecision("redirect", False, f"redirect to {location}")
+    if _looks_rate_limited(status, headers, body_preview):
+        return _StatusDecision("rate_limited", True, "rate limit response")
+    if status == 401 or status == 403:
+        return _StatusDecision(
+            "auth_or_permission_error", False, "authentication or permission failure"
+        )
+    if status in {404, 410}:
+        return _StatusDecision(
+            "not_found_or_gone", False, "resource not found or gone"
+        )
+    if 400 <= status <= 499:
+        return _StatusDecision("client_error", False, "client request error")
+    if 500 <= status <= 599:
+        return _StatusDecision("server_error", True, "server error response")
+    return _StatusDecision(
+        "unknown_status", False, f"unexpected {endpoint_kind} HTTP status"
+    )
+
+
+def _is_success_with_json(decision: _StatusDecision) -> bool:
+    return decision.category == "success_with_json"
+
+
+def _is_success_empty(decision: _StatusDecision) -> bool:
+    return decision.category == "success_empty"
 
 
 def _response_preview(text: str) -> str:
@@ -37,6 +129,47 @@ def _response_preview(text: str) -> str:
     if len(preview) > 160:
         return f"{preview[:157]}..."
     return preview
+
+
+async def _async_response_preview(response: Any) -> str:
+    text_attr = getattr(response, "text", "")
+    if isinstance(text_attr, str):
+        return _response_preview(text_attr)
+    try:
+        return _response_preview(await response.text())
+    except Exception:
+        return ""
+
+
+def _sync_response_preview(response: Any) -> str:
+    return _response_preview(str(getattr(response, "text", "")))
+
+
+def _status_error_message(
+    endpoint_kind: str,
+    status: int,
+    decision: _StatusDecision,
+    body_preview: str,
+) -> str:
+    message = f"{endpoint_kind} returned HTTP {status}: {decision.message}"
+    if body_preview:
+        message = f"{message}; {body_preview}"
+    return message
+
+
+def _can_degrade_rest_status(normalized_path: str, decision: _StatusDecision) -> bool:
+    if "stats/contributors" in normalized_path:
+        return decision.category in {"pending", "not_found_or_gone"}
+    if "traffic/views" in normalized_path:
+        return decision.category == "not_found_or_gone"
+    return False
+
+
+def _can_degrade_rest_body(normalized_path: str) -> bool:
+    return (
+        "stats/contributors" in normalized_path
+        or "traffic/views" in normalized_path
+    )
 
 
 def _env_float(name: str, default: float) -> float:
@@ -100,26 +233,47 @@ class Queries(object):
                         json={"query": generated_query},
                     )
 
-                if _is_transient_status(r_async.status):
-                    delay = _delay_for_202(r_async.headers.get("Retry-After"), attempt)
+                preview = await _async_response_preview(r_async)
+                decision = _classify_status(
+                    r_async.status,
+                    r_async.headers,
+                    preview,
+                    "GraphQL",
+                )
+                if decision.retryable:
+                    delay = _retry_delay(r_async.headers, attempt)
                     delay = min(delay, max(0.0, deadline - time.monotonic()))
                     if delay <= 0:
                         break
                     print(
-                        f"GraphQL returned {r_async.status} "
-                        f"(attempt {attempt}); retry in {delay:.1f}s"
+                        f"GraphQL returned {r_async.status} ({decision.category}, "
+                        f"attempt {attempt}); retry in {delay:.1f}s"
                     )
                     await asyncio.sleep(delay)
                     continue
 
-                if r_async.status >= 400:
+                if _is_success_empty(decision):
                     raise GitHubQueryError(
-                        f"GraphQL query failed with HTTP {r_async.status}"
+                        f"GraphQL returned HTTP {r_async.status} without JSON data"
+                    )
+                if not _is_success_with_json(decision):
+                    raise GitHubQueryError(
+                        _status_error_message(
+                            "GraphQL", r_async.status, decision, preview
+                        )
                     )
 
                 result = await r_async.json()
+                if isinstance(result, dict) and result.get("errors") and not result.get(
+                    "data"
+                ):
+                    raise GitHubQueryError(
+                        f"GraphQL response contained errors: {result.get('errors')}"
+                    )
                 if result is not None:
                     return result
+            except GitHubQueryError:
+                raise
             except Exception as error:
                 print(f"aiohttp failed for GraphQL query: {error}")
 
@@ -132,37 +286,59 @@ class Queries(object):
                         json={"query": generated_query},
                     )
 
-                if _is_transient_status(r_requests.status_code):
-                    delay = _delay_for_202(
-                        r_requests.headers.get("Retry-After"), attempt
-                    )
+                preview = _sync_response_preview(r_requests)
+                decision = _classify_status(
+                    r_requests.status_code,
+                    r_requests.headers,
+                    preview,
+                    "GraphQL fallback",
+                )
+                if decision.retryable:
+                    delay = _retry_delay(r_requests.headers, attempt)
                     delay = min(delay, max(0.0, deadline - time.monotonic()))
                     if delay <= 0:
                         break
                     print(
                         f"GraphQL fallback returned {r_requests.status_code} "
-                        f"(attempt {attempt}); retry in {delay:.1f}s"
+                        f"({decision.category}, attempt {attempt}); "
+                        f"retry in {delay:.1f}s"
                     )
                     await asyncio.sleep(delay)
                     continue
 
-                if r_requests.status_code >= 400:
-                    preview = _response_preview(r_requests.text)
+                if _is_success_empty(decision):
                     raise GitHubQueryError(
-                        f"GraphQL fallback failed with HTTP "
-                        f"{r_requests.status_code}: {preview}"
+                        "GraphQL fallback returned no JSON data"
+                    )
+                if not _is_success_with_json(decision):
+                    raise GitHubQueryError(
+                        _status_error_message(
+                            "GraphQL fallback",
+                            r_requests.status_code,
+                            decision,
+                            preview,
+                        )
                     )
 
                 result = r_requests.json()
+                if isinstance(result, dict) and result.get("errors") and not result.get(
+                    "data"
+                ):
+                    raise GitHubQueryError(
+                        f"GraphQL fallback response contained errors: "
+                        f"{result.get('errors')}"
+                    )
                 if result is not None:
                     return result
             except ValueError as error:
-                preview = _response_preview(
-                    "" if r_requests is None else getattr(r_requests, "text", "")
+                preview = (
+                    "" if r_requests is None else _sync_response_preview(r_requests)
                 )
                 raise GitHubQueryError(
                     f"GraphQL fallback returned non-JSON: {error}; {preview}"
                 ) from error
+            except GitHubQueryError:
+                raise
             except Exception as error:
                 print(f"requests failed for GraphQL query: {error}")
 
@@ -188,22 +364,28 @@ class Queries(object):
 
         # GitHub returns 202 while statistics (e.g. contributors) are computed.
         # Without a wall-clock cap, many repos times repeated sleeps can run for hours in CI.
-        if max_wait_seconds <= 0:
-            print(f"query_rest: skipping 202 wait budget for {normalized}.")
-            return _empty_rest_value(normalized)
         deadline = time.monotonic() + max_wait_seconds
         max_iterations = 35
+        last_status = 0
+        last_decision = _StatusDecision("unknown_status", False, "no response yet")
+        last_preview = ""
 
         for attempt in range(1, max_iterations + 1):
             headers = {
                 "Authorization": f"token {self.access_token}",
             }
-            if time.monotonic() > deadline:
-                print(
-                    f"query_rest: wait budget exhausted for {normalized}; "
-                    "using empty data for this endpoint."
+            if max_wait_seconds > 0 and time.monotonic() > deadline:
+                if _can_degrade_rest_status(normalized, last_decision):
+                    print(
+                        f"query_rest: wait budget exhausted for {normalized}; "
+                        "using empty data for this endpoint."
+                    )
+                    return _empty_rest_value(normalized)
+                raise GitHubQueryError(
+                    _status_error_message(
+                        "REST", last_status, last_decision, last_preview
+                    )
                 )
-                return _empty_rest_value(normalized)
 
             try:
                 async with self.semaphore:
@@ -212,65 +394,162 @@ class Queries(object):
                         headers=headers,
                         params=tuple(params.items()),
                     )
-                if r_async.status == 202:
-                    delay = _delay_for_202(r_async.headers.get("Retry-After"), attempt)
+                preview = await _async_response_preview(r_async)
+                decision = _classify_status(
+                    r_async.status, r_async.headers, preview, "REST"
+                )
+                last_status = r_async.status
+                last_decision = decision
+                last_preview = preview
+
+                if decision.retryable:
+                    delay = _retry_delay(r_async.headers, attempt)
                     delay = min(delay, max(0.0, deadline - time.monotonic()))
                     if delay <= 0:
-                        print(
-                            f"query_rest: no time left for 202 retries on {normalized}."
+                        if _can_degrade_rest_status(normalized, decision):
+                            print(
+                                f"query_rest: no retry budget for {normalized}; "
+                                "using empty data for this endpoint."
+                            )
+                            return _empty_rest_value(normalized)
+                        raise GitHubQueryError(
+                            _status_error_message(
+                                "REST", r_async.status, decision, preview
+                            )
                         )
-                        return _empty_rest_value(normalized)
                     if attempt <= 2 or attempt % 6 == 0:
                         print(
-                            f"{normalized} returned 202 (attempt {attempt}); "
+                            f"{normalized} returned {r_async.status} "
+                            f"({decision.category}, attempt {attempt}); "
                             f"retry in {delay:.1f}s"
                         )
                     await asyncio.sleep(delay)
                     continue
 
-                result = await r_async.json()
+                if _is_success_empty(decision):
+                    return _empty_rest_value(normalized)
+                if not _is_success_with_json(decision):
+                    if _can_degrade_rest_status(normalized, decision):
+                        print(
+                            f"{normalized} returned {r_async.status} "
+                            f"({decision.category}); using empty endpoint data."
+                        )
+                        return _empty_rest_value(normalized)
+                    raise GitHubQueryError(
+                        _status_error_message(
+                            "REST", r_async.status, decision, preview
+                        )
+                    )
+
+                try:
+                    result = await r_async.json()
+                except ValueError as error:
+                    if _can_degrade_rest_body(normalized):
+                        print(
+                            f"{normalized} returned non-JSON: {error}; "
+                            "using empty endpoint data."
+                        )
+                        return _empty_rest_value(normalized)
+                    raise GitHubQueryError(
+                        f"{normalized} returned non-JSON: {error}; {preview}"
+                    ) from error
                 if result is not None:
                     return result
-            except Exception:
-                print("aiohttp failed for rest query")
+            except GitHubQueryError:
+                raise
+            except Exception as error:
+                print(f"aiohttp failed for rest query: {error}")
+
+            r_requests = None
+            try:
                 async with self.semaphore:
                     r_requests = requests.get(
                         f"https://api.github.com/{normalized}",
                         headers=headers,
                         params=tuple(params.items()),
                     )
-                if r_requests.status_code == 202:
-                    delay = _delay_for_202(
-                        r_requests.headers.get("Retry-After"), attempt
-                    )
+                preview = _sync_response_preview(r_requests)
+                decision = _classify_status(
+                    r_requests.status_code,
+                    r_requests.headers,
+                    preview,
+                    "REST fallback",
+                )
+                last_status = r_requests.status_code
+                last_decision = decision
+                last_preview = preview
+
+                if decision.retryable:
+                    delay = _retry_delay(r_requests.headers, attempt)
                     delay = min(delay, max(0.0, deadline - time.monotonic()))
                     if delay <= 0:
-                        return _empty_rest_value(normalized)
+                        if _can_degrade_rest_status(normalized, decision):
+                            return _empty_rest_value(normalized)
+                        raise GitHubQueryError(
+                            _status_error_message(
+                                "REST fallback",
+                                r_requests.status_code,
+                                decision,
+                                preview,
+                            )
+                        )
                     if attempt <= 2 or attempt % 6 == 0:
                         print(
-                            f"{normalized} returned 202 via fallback "
-                            f"(attempt {attempt}); retry in {delay:.1f}s"
+                            f"{normalized} returned {r_requests.status_code} "
+                            f"via fallback ({decision.category}, "
+                            f"attempt {attempt}); retry in {delay:.1f}s"
                         )
                     await asyncio.sleep(delay)
                     continue
-                elif r_requests.status_code == 200:
-                    try:
-                        result = r_requests.json()
-                        if result is not None:
-                            return result
-                    except ValueError as error:
-                        preview = _response_preview(r_requests.text)
+
+                if _is_success_empty(decision):
+                    return _empty_rest_value(normalized)
+                if not _is_success_with_json(decision):
+                    if _can_degrade_rest_status(normalized, decision):
+                        print(
+                            f"{normalized} returned {r_requests.status_code} "
+                            f"via fallback ({decision.category}); "
+                            "using empty endpoint data."
+                        )
+                        return _empty_rest_value(normalized)
+                    raise GitHubQueryError(
+                        _status_error_message(
+                            "REST fallback",
+                            r_requests.status_code,
+                            decision,
+                            preview,
+                        )
+                    )
+
+                try:
+                    result = r_requests.json()
+                except ValueError as error:
+                    if _can_degrade_rest_body(normalized):
                         print(
                             f"{normalized} fallback returned non-JSON: "
                             f"{error}; {preview}"
                         )
                         return _empty_rest_value(normalized)
+                    raise GitHubQueryError(
+                        f"{normalized} fallback returned non-JSON: "
+                        f"{error}; {preview}"
+                    ) from error
+                if result is not None:
+                    return result
+            except GitHubQueryError:
+                raise
+            except Exception as error:
+                print(f"requests failed for rest query: {error}")
 
-        print(
-            f"query_rest: too many 202 responses for {normalized}; "
-            "data for this endpoint may be incomplete."
+        if _can_degrade_rest_status(normalized, last_decision):
+            print(
+                f"query_rest: too many retryable responses for {normalized}; "
+                "data for this endpoint may be incomplete."
+            )
+            return _empty_rest_value(normalized)
+        raise GitHubQueryError(
+            _status_error_message("REST", last_status, last_decision, last_preview)
         )
-        return _empty_rest_value(normalized)
 
     @staticmethod
     def repos_overview(

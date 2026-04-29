@@ -63,12 +63,25 @@ class _FailingSession:
 
 
 class _FakeRequestsResponse:
-    def __init__(self, status_code=502):
+    def __init__(
+        self,
+        status_code=502,
+        payload=None,
+        json_error=None,
+        text="Bad Gateway",
+        headers=None,
+    ):
         self.status_code = status_code
-        self.text = "Bad Gateway"
-        self.headers = {}
+        self._payload = payload
+        self._json_error = json_error
+        self.text = text
+        self.headers = {} if headers is None else headers
 
     def json(self):
+        if self._json_error is not None:
+            raise self._json_error
+        if self._payload is not None:
+            return self._payload
         raise requests.exceptions.JSONDecodeError("Expecting value", "", 0)
 
 
@@ -119,6 +132,21 @@ class _FailingStats:
 
 
 class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
+    async def test_graphql_query_returns_json_for_success_status(self):
+        # Arrange
+        payload = {"data": {"viewer": {"login": "octocat"}}}
+        queries = Queries("octocat", "token", _FailingSession())
+
+        with mock.patch(
+            "github_stats.requests.post",
+            return_value=_FakeRequestsResponse(200, payload=payload),
+        ):
+            # Act
+            result = await queries.query("query { viewer { login } }")
+
+        # Assert
+        self.assertEqual(result, payload)
+
     async def test_graphql_query_raises_after_repeated_502_responses(self):
         # Arrange
         queries = Queries("octocat", "token", _FailingSession())
@@ -126,6 +154,52 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         with mock.patch(
             "github_stats.requests.post", return_value=_FakeRequestsResponse()
         ), mock.patch("github_stats.asyncio.sleep", mock.AsyncMock()):
+            # Act / Assert
+            with self.assertRaises(github_stats.GitHubQueryError):
+                await queries.query("query { viewer { login } }")
+
+    async def test_graphql_query_raises_for_common_non_retryable_statuses(self):
+        for status in (401, 403, 404, 422, 418):
+            with self.subTest(status=status):
+                # Arrange
+                queries = Queries("octocat", "token", _FailingSession())
+
+                with mock.patch(
+                    "github_stats.requests.post",
+                    return_value=_FakeRequestsResponse(
+                        status, text=f"status {status}"
+                    ),
+                ):
+                    # Act / Assert
+                    with self.assertRaises(github_stats.GitHubQueryError):
+                        await queries.query("query { viewer { login } }")
+
+    async def test_graphql_query_retries_rate_limit_status_with_retry_after(self):
+        # Arrange
+        queries = Queries("octocat", "token", _FailingSession())
+
+        with mock.patch(
+            "github_stats.requests.post",
+            return_value=_FakeRequestsResponse(
+                429,
+                text="secondary rate limit",
+                headers={"Retry-After": "7"},
+            ),
+        ), mock.patch("github_stats.asyncio.sleep", mock.AsyncMock()) as sleep:
+            # Act / Assert
+            with self.assertRaises(github_stats.GitHubQueryError):
+                await queries.query("query { viewer { login } }")
+
+        sleep.assert_any_await(7.0)
+
+    async def test_graphql_query_raises_for_non_json_success_response(self):
+        # Arrange
+        queries = Queries("octocat", "token", _FailingSession())
+
+        with mock.patch(
+            "github_stats.requests.post",
+            return_value=_FakeRequestsResponse(200, text="not json"),
+        ):
             # Act / Assert
             with self.assertRaises(github_stats.GitHubQueryError):
                 await queries.query("query { viewer { login } }")
@@ -187,6 +261,65 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
 
         with mock.patch(
             "github_stats.requests.get", return_value=_FakeRequestsResponse(200)
+        ):
+            # Act
+            result = await queries.query_rest("/repos/octocat/hello/traffic/views")
+
+        # Assert
+        self.assertEqual(result, {})
+
+    async def test_rest_query_returns_empty_for_optional_not_found_statuses(self):
+        for path, expected in (
+            ("/repos/octocat/hello/stats/contributors", []),
+            ("/repos/octocat/hello/traffic/views", {}),
+        ):
+            for status in (404, 410):
+                with self.subTest(path=path, status=status):
+                    # Arrange
+                    queries = Queries("octocat", "token", _FailingSession())
+
+                    with mock.patch(
+                        "github_stats.requests.get",
+                        return_value=_FakeRequestsResponse(
+                            status, text=f"status {status}"
+                        ),
+                    ):
+                        # Act
+                        result = await queries.query_rest(path)
+
+                    # Assert
+                    self.assertEqual(result, expected)
+
+    async def test_rest_query_raises_for_auth_rate_limit_and_unknown_statuses(self):
+        for status, headers in (
+            (401, {}),
+            (429, {"Retry-After": "5"}),
+            (418, {}),
+        ):
+            with self.subTest(status=status):
+                # Arrange
+                queries = Queries("octocat", "token", _FailingSession())
+
+                with mock.patch(
+                    "github_stats.requests.get",
+                    return_value=_FakeRequestsResponse(
+                        status, text=f"status {status}", headers=headers
+                    ),
+                ), mock.patch("github_stats.asyncio.sleep", mock.AsyncMock()):
+                    # Act / Assert
+                    with self.assertRaises(github_stats.GitHubQueryError):
+                        await queries.query_rest(
+                            "/repos/octocat/hello/traffic/views",
+                            max_wait_seconds=0.0,
+                        )
+
+    async def test_rest_query_returns_empty_value_for_success_without_body(self):
+        # Arrange
+        queries = Queries("octocat", "token", _FailingSession())
+
+        with mock.patch(
+            "github_stats.requests.get",
+            return_value=_FakeRequestsResponse(204, text=""),
         ):
             # Act
             result = await queries.query_rest("/repos/octocat/hello/traffic/views")
