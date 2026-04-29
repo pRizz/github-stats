@@ -290,6 +290,26 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                     # Assert
                     self.assertEqual(result, expected)
 
+    async def test_rest_query_returns_empty_for_inaccessible_traffic_views(self):
+        # Arrange
+        queries = Queries("octocat", "token", _FailingSession())
+
+        with mock.patch(
+            "github_stats.requests.get",
+            return_value=_FakeRequestsResponse(
+                403,
+                text=(
+                    '{"message":"Resource not accessible by personal access token",'
+                    '"status":"403"}'
+                ),
+            ),
+        ):
+            # Act
+            result = await queries.query_rest("/repos/octocat/hello/traffic/views")
+
+        # Assert
+        self.assertEqual(result, {})
+
     async def test_rest_query_raises_for_auth_rate_limit_and_unknown_statuses(self):
         for status, headers in (
             (401, {}),

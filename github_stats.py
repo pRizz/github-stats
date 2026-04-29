@@ -99,7 +99,11 @@ def _classify_status(
         return _StatusDecision("redirect", False, f"redirect to {location}")
     if _looks_rate_limited(status, headers, body_preview):
         return _StatusDecision("rate_limited", True, "rate limit response")
-    if status == 401 or status == 403:
+    if status == 401:
+        return _StatusDecision(
+            "unauthenticated", False, "missing, invalid, or expired token"
+        )
+    if status == 403:
         return _StatusDecision(
             "auth_or_permission_error", False, "authentication or permission failure"
         )
@@ -161,7 +165,10 @@ def _can_degrade_rest_status(normalized_path: str, decision: _StatusDecision) ->
     if "stats/contributors" in normalized_path:
         return decision.category in {"pending", "not_found_or_gone"}
     if "traffic/views" in normalized_path:
-        return decision.category == "not_found_or_gone"
+        return decision.category in {
+            "auth_or_permission_error",
+            "not_found_or_gone",
+        }
     return False
 
 
