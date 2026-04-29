@@ -96,19 +96,29 @@ class _ConcurrentContributorQueries:
         self.active_requests = 0
         self.max_active_requests = 0
 
-    async def query_rest(self, path, params=None, max_wait_seconds=None):
+    async def query_rest_with_outcome(self, path, params=None, max_wait_seconds=None):
         self.active_requests += 1
         self.max_active_requests = max(self.max_active_requests, self.active_requests)
         try:
             await generate_images.asyncio.sleep(0.01)
-            return [
-                {
-                    "author": {"login": "octocat"},
-                    "weeks": [{"a": 10, "d": 4}],
-                }
-            ]
+            return github_stats.RestQueryResult(
+                [
+                    {
+                        "author": {"login": "octocat"},
+                        "weeks": [{"a": 10, "d": 4}],
+                    }
+                ]
+            )
         finally:
             self.active_requests -= 1
+
+
+class _PathOutcomeQueries:
+    def __init__(self, outcomes):
+        self.outcomes = outcomes
+
+    async def query_rest_with_outcome(self, path, params=None, max_wait_seconds=None):
+        return self.outcomes[path]
 
 
 class _FakeStats:
@@ -310,6 +320,59 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         # Assert
         self.assertEqual(result, {})
 
+    async def test_views_records_repo_for_inaccessible_traffic_endpoint(self):
+        # Arrange
+        stats = Stats("octocat", "token", _FailingSession())
+        stats._repos = {"octocat/private"}
+        stats.queries = _PathOutcomeQueries(
+            {
+                "/repos/octocat/private/traffic/views": github_stats.RestQueryResult(
+                    {},
+                    degraded=True,
+                    status=403,
+                    category="auth_or_permission_error",
+                    message="traffic views inaccessible",
+                )
+            }
+        )
+
+        # Act
+        result = await stats.views
+
+        # Assert
+        self.assertEqual(result, 0)
+        self.assertEqual(len(stats.report.traffic_degraded), 1)
+        self.assertEqual(stats.report.traffic_degraded[0].repo, "octocat/private")
+        self.assertEqual(stats.report.traffic_degraded[0].endpoint, "traffic/views")
+
+    async def test_lines_changed_records_repo_for_contributor_degradation(self):
+        # Arrange
+        stats = Stats("octocat", "token", _FailingSession())
+        stats._repos = {"octocat/slow"}
+        stats.queries = _PathOutcomeQueries(
+            {
+                "/repos/octocat/slow/stats/contributors": github_stats.RestQueryResult(
+                    [],
+                    degraded=True,
+                    status=202,
+                    category="pending",
+                    message="stats still pending",
+                )
+            }
+        )
+
+        # Act
+        result = await stats.lines_changed
+
+        # Assert
+        self.assertEqual(result, (0, 0))
+        self.assertEqual(len(stats.report.contributors_degraded), 1)
+        self.assertEqual(stats.report.contributors_degraded[0].repo, "octocat/slow")
+        self.assertEqual(
+            stats.report.contributors_degraded[0].endpoint,
+            "stats/contributors",
+        )
+
     async def test_rest_query_raises_for_auth_rate_limit_and_unknown_statuses(self):
         for status, headers in (
             (401, {}),
@@ -397,11 +460,86 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
             "generate_images.generate_overview", assert_loaded_before_render
         ), mock.patch(
             "generate_images.validate_generated_output"
+        ), mock.patch(
+            "generate_images.build_run_report",
+            mock.AsyncMock(
+                return_value={
+                    "stats": {
+                        "name": "Octocat",
+                        "stargazers": 0,
+                        "forks": 0,
+                        "total_contributions": 0,
+                        "repos": 0,
+                        "lines_changed": 0,
+                        "views": 0,
+                    },
+                    "api": {
+                        "total_repos": 0,
+                        "contributors_degraded": [],
+                        "traffic_degraded": [],
+                        "critical_failures": [],
+                    },
+                }
+            ),
+        ), mock.patch(
+            "generate_images.write_run_report"
+        ), mock.patch(
+            "generate_images.write_action_summary"
         ):
             await generate_images.main()
 
         # Assert
         self.assertEqual(_FakeStats.get_stats_calls, 1)
+
+    def test_action_summary_includes_degraded_repo_names(self):
+        # Arrange
+        report = {
+            "stats": {
+                "name": "Octocat",
+                "stargazers": 1,
+                "forks": 2,
+                "total_contributions": 3,
+                "repos": 4,
+                "lines_changed": 5,
+                "views": 0,
+            },
+            "api": {
+                "total_repos": 4,
+                "contributors_degraded": [
+                    {
+                        "repo": "octocat/slow",
+                        "endpoint": "stats/contributors",
+                        "status": 202,
+                        "category": "pending",
+                        "message": "stats still pending",
+                    }
+                ],
+                "traffic_degraded": [
+                    {
+                        "repo": "octocat/private",
+                        "endpoint": "traffic/views",
+                        "status": 403,
+                        "category": "auth_or_permission_error",
+                        "message": "traffic views inaccessible",
+                    }
+                ],
+                "critical_failures": [],
+            },
+        }
+
+        # Act
+        summary = generate_images.render_action_summary(report)
+
+        # Assert
+        self.assertIn("octocat/private", summary)
+        self.assertIn("octocat/slow", summary)
+        self.assertIn("Traffic views degraded: 1", summary)
+        self.assertIn("Contributor stats degraded: 1", summary)
+
+    def test_action_summary_writer_allows_missing_github_step_summary(self):
+        # Act / Assert
+        with mock.patch.dict("os.environ", {}, clear=True):
+            generate_images.write_action_summary("# Summary")
 
 
 if __name__ == "__main__":

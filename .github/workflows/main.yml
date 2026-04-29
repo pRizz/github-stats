@@ -32,6 +32,11 @@ jobs:
         python3 -m pip install --upgrade pip setuptools wheel
         python3 -m pip install -r requirements.txt
 
+    # Run regression tests before making live API calls
+    - name: Run tests
+      run: |
+        python3 -m unittest test_github_stats.py
+
     # Generate all statistics images
     - name: Generate images
       run: |
@@ -44,13 +49,22 @@ jobs:
         EXCLUDED_LANGS: ${{ secrets.EXCLUDED_LANGS }}
         EXCLUDE_FORKED_REPOS: true
 
+    # Upload the structured report without committing it
+    - name: Upload run report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: github-stats-run-report
+        path: run-report.json
+        if-no-files-found: ignore
+
     # Commit all changed files to the repository
     - name: Commit to the repo
       run: |
         python3 -c "import generate_images; generate_images.validate_generated_output()"
         git config --global user.name "jstrieb/github-stats"
         git config --global user.email "github-stats[bot]@jstrieb.github.io"
-        git add .
+        git add generated
         # Force the build to succeed, even if no files were changed
         git commit -m 'Update generated files' || true
         git push

@@ -3,7 +3,7 @@
 import asyncio
 import os
 import time
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass, field
 from typing import Dict, List, Optional, Set, Tuple, Any, cast
 
 import aiohttp
@@ -22,6 +22,42 @@ class _StatusDecision:
     category: str
     retryable: bool
     message: str
+
+
+@dataclass(frozen=True)
+class ApiDegradation:
+    repo: str
+    endpoint: str
+    status: int
+    category: str
+    message: str
+
+
+@dataclass
+class StatsReport:
+    total_repos: int = 0
+    contributors_degraded: List[ApiDegradation] = field(default_factory=list)
+    traffic_degraded: List[ApiDegradation] = field(default_factory=list)
+    critical_failures: List[str] = field(default_factory=list)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "total_repos": self.total_repos,
+            "contributors_degraded": [
+                asdict(item) for item in self.contributors_degraded
+            ],
+            "traffic_degraded": [asdict(item) for item in self.traffic_degraded],
+            "critical_failures": self.critical_failures,
+        }
+
+
+@dataclass(frozen=True)
+class RestQueryResult:
+    payload: Any
+    degraded: bool = False
+    status: int = 0
+    category: str = "success"
+    message: str = ""
 
 
 def _header_value(headers: Any, name: str) -> Optional[str]:
@@ -176,6 +212,35 @@ def _can_degrade_rest_body(normalized_path: str) -> bool:
     return (
         "stats/contributors" in normalized_path
         or "traffic/views" in normalized_path
+    )
+
+
+def _degraded_rest_result(
+    normalized_path: str,
+    status: int,
+    decision: _StatusDecision,
+    body_preview: str = "",
+) -> RestQueryResult:
+    return RestQueryResult(
+        payload=_empty_rest_value(normalized_path),
+        degraded=True,
+        status=status,
+        category=decision.category,
+        message=_status_error_message("REST", status, decision, body_preview),
+    )
+
+
+def _success_rest_result(
+    payload: Any,
+    status: int,
+    decision: _StatusDecision,
+) -> RestQueryResult:
+    return RestQueryResult(
+        payload=payload,
+        degraded=False,
+        status=status,
+        category=decision.category,
+        message=decision.message,
     )
 
 
@@ -357,12 +422,21 @@ class Queries(object):
         params: Optional[Dict] = None,
         max_wait_seconds: float = 90.0,
     ) -> Any:
+        result = await self.query_rest_with_outcome(path, params, max_wait_seconds)
+        return result.payload
+
+    async def query_rest_with_outcome(
+        self,
+        path: str,
+        params: Optional[Dict] = None,
+        max_wait_seconds: float = 90.0,
+    ) -> RestQueryResult:
         """
         Make a request to the REST API
         :param path: API path to query
         :param params: Query parameters to be passed to the API
         :param max_wait_seconds: Maximum time to wait on retryable responses
-        :return: deserialized REST JSON output
+        :return: REST payload plus status/degradation metadata
         """
 
         if params is None:
@@ -387,7 +461,9 @@ class Queries(object):
                         f"query_rest: wait budget exhausted for {normalized}; "
                         "using empty data for this endpoint."
                     )
-                    return _empty_rest_value(normalized)
+                    return _degraded_rest_result(
+                        normalized, last_status, last_decision, last_preview
+                    )
                 raise GitHubQueryError(
                     _status_error_message(
                         "REST", last_status, last_decision, last_preview
@@ -418,7 +494,9 @@ class Queries(object):
                                 f"query_rest: no retry budget for {normalized}; "
                                 "using empty data for this endpoint."
                             )
-                            return _empty_rest_value(normalized)
+                            return _degraded_rest_result(
+                                normalized, r_async.status, decision, preview
+                            )
                         raise GitHubQueryError(
                             _status_error_message(
                                 "REST", r_async.status, decision, preview
@@ -434,14 +512,20 @@ class Queries(object):
                     continue
 
                 if _is_success_empty(decision):
-                    return _empty_rest_value(normalized)
+                    return _success_rest_result(
+                        _empty_rest_value(normalized),
+                        r_async.status,
+                        decision,
+                    )
                 if not _is_success_with_json(decision):
                     if _can_degrade_rest_status(normalized, decision):
                         print(
                             f"{normalized} returned {r_async.status} "
                             f"({decision.category}); using empty endpoint data."
                         )
-                        return _empty_rest_value(normalized)
+                        return _degraded_rest_result(
+                            normalized, r_async.status, decision, preview
+                        )
                     raise GitHubQueryError(
                         _status_error_message(
                             "REST", r_async.status, decision, preview
@@ -456,12 +540,14 @@ class Queries(object):
                             f"{normalized} returned non-JSON: {error}; "
                             "using empty endpoint data."
                         )
-                        return _empty_rest_value(normalized)
+                        return _degraded_rest_result(
+                            normalized, r_async.status, decision, preview
+                        )
                     raise GitHubQueryError(
                         f"{normalized} returned non-JSON: {error}; {preview}"
                     ) from error
                 if result is not None:
-                    return result
+                    return _success_rest_result(result, r_async.status, decision)
             except GitHubQueryError:
                 raise
             except Exception as error:
@@ -491,7 +577,12 @@ class Queries(object):
                     delay = min(delay, max(0.0, deadline - time.monotonic()))
                     if delay <= 0:
                         if _can_degrade_rest_status(normalized, decision):
-                            return _empty_rest_value(normalized)
+                            return _degraded_rest_result(
+                                normalized,
+                                r_requests.status_code,
+                                decision,
+                                preview,
+                            )
                         raise GitHubQueryError(
                             _status_error_message(
                                 "REST fallback",
@@ -510,7 +601,11 @@ class Queries(object):
                     continue
 
                 if _is_success_empty(decision):
-                    return _empty_rest_value(normalized)
+                    return _success_rest_result(
+                        _empty_rest_value(normalized),
+                        r_requests.status_code,
+                        decision,
+                    )
                 if not _is_success_with_json(decision):
                     if _can_degrade_rest_status(normalized, decision):
                         print(
@@ -518,7 +613,12 @@ class Queries(object):
                             f"via fallback ({decision.category}); "
                             "using empty endpoint data."
                         )
-                        return _empty_rest_value(normalized)
+                        return _degraded_rest_result(
+                            normalized,
+                            r_requests.status_code,
+                            decision,
+                            preview,
+                        )
                     raise GitHubQueryError(
                         _status_error_message(
                             "REST fallback",
@@ -536,13 +636,20 @@ class Queries(object):
                             f"{normalized} fallback returned non-JSON: "
                             f"{error}; {preview}"
                         )
-                        return _empty_rest_value(normalized)
+                        return _degraded_rest_result(
+                            normalized,
+                            r_requests.status_code,
+                            decision,
+                            preview,
+                        )
                     raise GitHubQueryError(
                         f"{normalized} fallback returned non-JSON: "
                         f"{error}; {preview}"
                     ) from error
                 if result is not None:
-                    return result
+                    return _success_rest_result(
+                        result, r_requests.status_code, decision
+                    )
             except GitHubQueryError:
                 raise
             except Exception as error:
@@ -553,7 +660,9 @@ class Queries(object):
                 f"query_rest: too many retryable responses for {normalized}; "
                 "data for this endpoint may be incomplete."
             )
-            return _empty_rest_value(normalized)
+            return _degraded_rest_result(
+                normalized, last_status, last_decision, last_preview
+            )
         raise GitHubQueryError(
             _status_error_message("REST", last_status, last_decision, last_preview)
         )
@@ -715,6 +824,25 @@ class Stats(object):
         self._repos: Optional[Set[str]] = None
         self._lines_changed: Optional[Tuple[int, int]] = None
         self._views: Optional[int] = None
+        self.report = StatsReport()
+
+    def _record_degradation(
+        self,
+        repo: str,
+        endpoint: str,
+        result: RestQueryResult,
+    ) -> None:
+        degradation = ApiDegradation(
+            repo=repo,
+            endpoint=endpoint,
+            status=result.status,
+            category=result.category,
+            message=result.message,
+        )
+        if endpoint == "stats/contributors":
+            self.report.contributors_degraded.append(degradation)
+        elif endpoint == "traffic/views":
+            self.report.traffic_degraded.append(degradation)
 
     async def to_str(self) -> str:
         """
@@ -825,6 +953,7 @@ Languages:
         self._forks = forks
         self._languages = languages
         self._repos = repos_set
+        self.report.total_repos = len(repos_set)
 
     @property
     async def name(self) -> str:
@@ -930,20 +1059,23 @@ Languages:
         contributor_stats_wait_seconds = _env_float(
             "CONTRIBUTOR_STATS_WAIT_SECONDS", 8.0
         )
+        repos = list(await self.repos)
         repo_stats = await asyncio.gather(
             *[
-                self.queries.query_rest(
+                self.queries.query_rest_with_outcome(
                     f"/repos/{repo}/stats/contributors",
                     max_wait_seconds=contributor_stats_wait_seconds,
                 )
-                for repo in await self.repos
+                for repo in repos
             ]
         )
 
         additions = 0
         deletions = 0
-        for repo_result in repo_stats:
-            for author_obj in repo_result:
+        for repo, repo_result in zip(repos, repo_stats):
+            if repo_result.degraded:
+                self._record_degradation(repo, "stats/contributors", repo_result)
+            for author_obj in repo_result.payload:
                 # Handle malformed response from the API by skipping this repo
                 if not isinstance(author_obj, dict) or not isinstance(
                     author_obj.get("author", {}), dict
@@ -971,8 +1103,12 @@ Languages:
 
         total = 0
         for repo in await self.repos:
-            r = await self.queries.query_rest(f"/repos/{repo}/traffic/views")
-            for view in r.get("views", []):
+            result = await self.queries.query_rest_with_outcome(
+                f"/repos/{repo}/traffic/views"
+            )
+            if result.degraded:
+                self._record_degradation(repo, "traffic/views", result)
+            for view in result.payload.get("views", []):
                 total += view.get("count", 0)
 
         self._views = total

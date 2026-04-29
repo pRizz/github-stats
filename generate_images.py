@@ -1,12 +1,14 @@
 #!/usr/bin/python3
 
 import asyncio
+import json
 import os
 import re
+from typing import Any, Dict, List
 
 import aiohttp
 
-from github_stats import Stats
+from github_stats import ApiDegradation, Stats
 
 
 ################################################################################
@@ -49,6 +51,101 @@ def validate_generated_output(output_folder: str = "generated") -> None:
         raise RuntimeError(
             "Generated SVG validation failed; refusing to commit corrupt stats."
         )
+
+
+def _format_degradation_items(items: List[ApiDegradation], limit: int = 20) -> str:
+    if not items:
+        return "- None\n"
+
+    lines = []
+    for item in items[:limit]:
+        lines.append(
+            f"- `{item.repo}` `{item.endpoint}`: HTTP {item.status} "
+            f"({item.category}) - {item.message}"
+        )
+    remaining = len(items) - limit
+    if remaining > 0:
+        lines.append(f"- ...and {remaining} more")
+    return "\n".join(lines) + "\n"
+
+
+def render_action_summary(report: Dict[str, Any]) -> str:
+    stats = report["stats"]
+    api = report["api"]
+    traffic_items = [
+        ApiDegradation(**item) for item in api["traffic_degraded"]
+    ]
+    contributor_items = [
+        ApiDegradation(**item) for item in api["contributors_degraded"]
+    ]
+
+    return f"""# GitHub Stats Image Generation
+
+## Generated Stats
+
+- Name: {stats["name"]}
+- Stargazers: {stats["stargazers"]:,}
+- Forks: {stats["forks"]:,}
+- All-time contributions: {stats["total_contributions"]:,}
+- Repositories: {stats["repos"]:,}
+- Lines changed: {stats["lines_changed"]:,}
+- Repository views: {stats["views"]:,}
+
+## API Degradations
+
+- Contributor stats degraded: {len(contributor_items)}
+- Traffic views degraded: {len(traffic_items)}
+
+### Traffic View Failures
+
+{_format_degradation_items(traffic_items)}
+### Contributor Stats Warnings
+
+{_format_degradation_items(contributor_items)}
+"""
+
+
+async def build_run_report(s: Stats) -> Dict[str, Any]:
+    lines = await s.lines_changed
+    return {
+        "stats": {
+            "name": await s.name,
+            "stargazers": await s.stargazers,
+            "forks": await s.forks,
+            "total_contributions": await s.total_contributions,
+            "repos": len(await s.repos),
+            "lines_added": lines[0],
+            "lines_deleted": lines[1],
+            "lines_changed": lines[0] + lines[1],
+            "views": await s.views,
+        },
+        "api": s.report.to_dict(),
+        "github": {
+            "run_id": os.getenv("GITHUB_RUN_ID", ""),
+            "sha": os.getenv("GITHUB_SHA", ""),
+            "ref": os.getenv("GITHUB_REF", ""),
+            "actor": os.getenv("GITHUB_ACTOR", ""),
+        },
+    }
+
+
+def write_run_report(
+    report: Dict[str, Any],
+    output_path: str = "run-report.json",
+) -> None:
+    with open(output_path, "w") as f:
+        json.dump(report, f, indent=2)
+        f.write("\n")
+
+
+def write_action_summary(summary: str) -> None:
+    print(summary)
+    summary_path = os.getenv("GITHUB_STEP_SUMMARY")
+    if not summary_path:
+        return
+    with open(summary_path, "a") as f:
+        f.write(summary)
+        f.write("\n")
 
 
 ################################################################################
@@ -162,6 +259,9 @@ async def main() -> None:
         await s.get_stats()
         await asyncio.gather(generate_languages(s), generate_overview(s))
         validate_generated_output()
+        report = await build_run_report(s)
+        write_run_report(report)
+        write_action_summary(render_action_summary(report))
 
 
 if __name__ == "__main__":
