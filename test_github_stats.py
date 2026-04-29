@@ -1,10 +1,13 @@
 #!/usr/bin/python3
 
 import unittest
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from unittest import mock
 
 import requests
 
+import github_stats
 import generate_images
 from github_stats import Queries, Stats
 
@@ -107,19 +110,76 @@ class _FakeStats:
         type(self).get_stats_calls += 1
 
 
+class _FailingStats:
+    def __init__(self, *args, **kwargs):
+        pass
+
+    async def get_stats(self):
+        raise RuntimeError("critical stats unavailable")
+
+
 class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
-    async def test_graphql_query_returns_empty_dict_for_non_json_fallback(self):
+    async def test_graphql_query_raises_after_repeated_502_responses(self):
         # Arrange
         queries = Queries("octocat", "token", _FailingSession())
 
         with mock.patch(
             "github_stats.requests.post", return_value=_FakeRequestsResponse()
         ), mock.patch("github_stats.asyncio.sleep", mock.AsyncMock()):
-            # Act
-            result = await queries.query("query { viewer { login } }")
+            # Act / Assert
+            with self.assertRaises(github_stats.GitHubQueryError):
+                await queries.query("query { viewer { login } }")
 
-        # Assert
-        self.assertEqual(result, {})
+    async def test_get_stats_rejects_missing_required_graphql_data(self):
+        # Arrange
+        stats = Stats("octocat", "token", _FailingSession())
+        stats.queries = mock.AsyncMock()
+        stats.queries.query.return_value = {}
+
+        # Act / Assert
+        with self.assertRaises(github_stats.GitHubQueryError):
+            await stats.get_stats()
+
+        self.assertIsNone(stats._repos)
+
+    async def test_generate_images_stops_before_rendering_when_stats_load_fails(self):
+        # Arrange
+        async def fail_if_called(stats):
+            raise AssertionError("rendering should not start")
+
+        # Act / Assert
+        with mock.patch.dict(
+            "os.environ",
+            {"ACCESS_TOKEN": "token", "GITHUB_ACTOR": "octocat"},
+            clear=True,
+        ), mock.patch("generate_images.Stats", _FailingStats), mock.patch(
+            "generate_images.generate_languages", fail_if_called
+        ), mock.patch(
+            "generate_images.generate_overview", fail_if_called
+        ):
+            with self.assertRaises(RuntimeError):
+                await generate_images.main()
+
+    def test_generated_output_validation_rejects_corrupt_sentinel_values(self):
+        # Arrange
+        with TemporaryDirectory() as tmpdir:
+            generated = Path(tmpdir) / "generated"
+            generated.mkdir()
+            (generated / "overview.svg").write_text(
+                "No Name's GitHub Statistics\n"
+                "Stars</td><td>0</td>\n"
+                "Forks</td><td>0</td>\n"
+                "Repositories with contributions</td><td>0</td>\n",
+                encoding="utf-8",
+            )
+            (generated / "languages.svg").write_text(
+                '<span class="progress">\n</span>\n<ul>\n\n</ul>\n',
+                encoding="utf-8",
+            )
+
+            # Act / Assert
+            with self.assertRaises(RuntimeError):
+                generate_images.validate_generated_output(str(generated))
 
     async def test_rest_query_returns_empty_dict_for_non_json_fallback(self):
         # Arrange
@@ -182,6 +242,8 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
             "generate_images.generate_languages", assert_loaded_before_render
         ), mock.patch(
             "generate_images.generate_overview", assert_loaded_before_render
+        ), mock.patch(
+            "generate_images.validate_generated_output"
         ):
             await generate_images.main()
 

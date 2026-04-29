@@ -22,6 +22,35 @@ def generate_output_folder() -> None:
         os.mkdir("generated")
 
 
+def validate_generated_output(output_folder: str = "generated") -> None:
+    """
+    Fail if generated badges contain known fallback/corruption sentinels.
+    """
+    overview_path = os.path.join(output_folder, "overview.svg")
+    languages_path = os.path.join(output_folder, "languages.svg")
+
+    with open(overview_path, "r") as f:
+        overview = f.read()
+    with open(languages_path, "r") as f:
+        languages = f.read()
+
+    overview_is_empty_fallback = (
+        "No Name's GitHub Statistics" in overview
+        and "Stars</td><td>0</td>" in overview
+        and "Forks</td><td>0</td>" in overview
+        and "Repositories with contributions</td><td>0</td>" in overview
+    )
+    languages_are_empty = (
+        'class="progress-item"' not in languages
+        and '<span class="lang">' not in languages
+    )
+
+    if overview_is_empty_fallback or languages_are_empty:
+        raise RuntimeError(
+            "Generated SVG validation failed; refusing to commit corrupt stats."
+        )
+
+
 ################################################################################
 # Individual Image Generation Functions
 ################################################################################
@@ -132,6 +161,7 @@ async def main() -> None:
         )
         await s.get_stats()
         await asyncio.gather(generate_languages(s), generate_overview(s))
+        validate_generated_output()
 
 
 if __name__ == "__main__":

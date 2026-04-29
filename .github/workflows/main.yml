@@ -47,6 +47,7 @@ jobs:
     # Commit all changed files to the repository
     - name: Commit to the repo
       run: |
+        python3 -c "import generate_images; generate_images.validate_generated_output()"
         git config --global user.name "jstrieb/github-stats"
         git config --global user.email "github-stats[bot]@jstrieb.github.io"
         git add .

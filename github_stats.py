@@ -50,6 +50,10 @@ def _env_float(name: str, default: float) -> float:
         return default
 
 
+class GitHubQueryError(RuntimeError):
+    """Raised when a required GitHub GraphQL query cannot return valid data."""
+
+
 ###############################################################################
 # Main Classes
 ###############################################################################
@@ -109,8 +113,9 @@ class Queries(object):
                     continue
 
                 if r_async.status >= 400:
-                    print(f"GraphQL query failed with HTTP {r_async.status}")
-                    return dict()
+                    raise GitHubQueryError(
+                        f"GraphQL query failed with HTTP {r_async.status}"
+                    )
 
                 result = await r_async.json()
                 if result is not None:
@@ -143,11 +148,10 @@ class Queries(object):
 
                 if r_requests.status_code >= 400:
                     preview = _response_preview(r_requests.text)
-                    print(
+                    raise GitHubQueryError(
                         f"GraphQL fallback failed with HTTP "
                         f"{r_requests.status_code}: {preview}"
                     )
-                    return dict()
 
                 result = r_requests.json()
                 if result is not None:
@@ -156,12 +160,13 @@ class Queries(object):
                 preview = _response_preview(
                     "" if r_requests is None else getattr(r_requests, "text", "")
                 )
-                print(f"GraphQL fallback returned non-JSON: {error}; {preview}")
-                return dict()
+                raise GitHubQueryError(
+                    f"GraphQL fallback returned non-JSON: {error}; {preview}"
+                ) from error
             except Exception as error:
                 print(f"requests failed for GraphQL query: {error}")
 
-        return dict()
+        raise GitHubQueryError("GraphQL query failed after retry budget was exhausted")
 
     async def query_rest(
         self,
@@ -450,10 +455,11 @@ Languages:
         """
         Get lots of summary statistics using one big query. Sets many attributes
         """
-        self._stargazers = 0
-        self._forks = 0
-        self._languages = dict()
-        self._repos = set()
+        stargazers = 0
+        forks = 0
+        languages: Dict[str, Any] = dict()
+        repos_set: Set[str] = set()
+        maybe_name: Optional[str] = None
 
         exclude_langs_lower = {x.lower() for x in self._exclude_langs}
 
@@ -465,24 +471,21 @@ Languages:
                     owned_cursor=next_owned, contrib_cursor=next_contrib
                 )
             )
-            raw_results = raw_results if raw_results is not None else {}
-
-            self._name = raw_results.get("data", {}).get("viewer", {}).get("name", None)
-            if self._name is None:
-                self._name = (
-                    raw_results.get("data", {})
-                    .get("viewer", {})
-                    .get("login", "No Name")
+            viewer = raw_results.get("data", {}).get("viewer")
+            if not isinstance(viewer, dict) or "repositories" not in viewer:
+                raise GitHubQueryError(
+                    "GraphQL response missing required viewer repository data"
                 )
 
-            contrib_repos = (
-                raw_results.get("data", {})
-                .get("viewer", {})
-                .get("repositoriesContributedTo", {})
-            )
-            owned_repos = (
-                raw_results.get("data", {}).get("viewer", {}).get("repositories", {})
-            )
+            maybe_name = viewer.get("name") or viewer.get("login") or maybe_name
+            contrib_repos = viewer.get("repositoriesContributedTo", {})
+            owned_repos = viewer.get("repositories", {})
+            if not isinstance(owned_repos, dict) or not isinstance(
+                contrib_repos, dict
+            ):
+                raise GitHubQueryError(
+                    "GraphQL response has malformed repository data"
+                )
 
             repos = owned_repos.get("nodes", [])
             if not self._ignore_forked_repos:
@@ -492,22 +495,21 @@ Languages:
                 if repo is None:
                     continue
                 name = repo.get("nameWithOwner")
-                if name in self._repos or name in self._exclude_repos:
+                if name in repos_set or name in self._exclude_repos:
                     continue
-                self._repos.add(name)
-                self._stargazers += repo.get("stargazers").get("totalCount", 0)
-                self._forks += repo.get("forkCount", 0)
+                repos_set.add(name)
+                stargazers += repo.get("stargazers").get("totalCount", 0)
+                forks += repo.get("forkCount", 0)
 
                 for lang in repo.get("languages", {}).get("edges", []):
-                    name = lang.get("node", {}).get("name", "Other")
-                    languages = await self.languages
-                    if name.lower() in exclude_langs_lower:
+                    language_name = lang.get("node", {}).get("name", "Other")
+                    if language_name.lower() in exclude_langs_lower:
                         continue
-                    if name in languages:
-                        languages[name]["size"] += lang.get("size", 0)
-                        languages[name]["occurrences"] += 1
+                    if language_name in languages:
+                        languages[language_name]["size"] += lang.get("size", 0)
+                        languages[language_name]["occurrences"] += 1
                     else:
-                        languages[name] = {
+                        languages[language_name] = {
                             "size": lang.get("size", 0),
                             "occurrences": 1,
                             "color": lang.get("node", {}).get("color"),
@@ -527,9 +529,16 @@ Languages:
 
         # TODO: Improve languages to scale by number of contributions to
         #       specific filetypes
-        langs_total = sum([v.get("size", 0) for v in self._languages.values()])
-        for k, v in self._languages.items():
-            v["prop"] = 100 * (v.get("size", 0) / langs_total)
+        langs_total = sum([v.get("size", 0) for v in languages.values()])
+        if langs_total > 0:
+            for k, v in languages.items():
+                v["prop"] = 100 * (v.get("size", 0) / langs_total)
+
+        self._name = maybe_name or "No Name"
+        self._stargazers = stargazers
+        self._forks = forks
+        self._languages = languages
+        self._repos = repos_set
 
     @property
     async def name(self) -> str:
