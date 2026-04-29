@@ -6,7 +6,7 @@ from unittest import mock
 import requests
 
 import generate_images
-from github_stats import Queries
+from github_stats import Queries, Stats
 
 
 class _FakeResponse:
@@ -69,6 +69,32 @@ class _FakeRequestsResponse:
         raise requests.exceptions.JSONDecodeError("Expecting value", "", 0)
 
 
+class _Always202Response:
+    status_code = 202
+    text = ""
+    headers = {}
+
+
+class _ConcurrentContributorQueries:
+    def __init__(self):
+        self.active_requests = 0
+        self.max_active_requests = 0
+
+    async def query_rest(self, path, params=None, max_wait_seconds=None):
+        self.active_requests += 1
+        self.max_active_requests = max(self.max_active_requests, self.active_requests)
+        try:
+            await generate_images.asyncio.sleep(0.01)
+            return [
+                {
+                    "author": {"login": "octocat"},
+                    "weeks": [{"a": 10, "d": 4}],
+                }
+            ]
+        finally:
+            self.active_requests -= 1
+
+
 class _FakeStats:
     loaded = False
     get_stats_calls = 0
@@ -107,6 +133,37 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
 
         # Assert
         self.assertEqual(result, {})
+
+    async def test_rest_query_can_skip_202_wait_for_contributor_stats(self):
+        # Arrange
+        queries = Queries("octocat", "token", _FailingSession())
+
+        with mock.patch(
+            "github_stats.requests.get", return_value=_Always202Response()
+        ), mock.patch("github_stats.asyncio.sleep", mock.AsyncMock()) as sleep:
+            # Act
+            result = await queries.query_rest(
+                "/repos/octocat/hello/stats/contributors",
+                max_wait_seconds=0.0,
+            )
+
+        # Assert
+        self.assertEqual(result, [])
+        sleep.assert_not_awaited()
+
+    async def test_lines_changed_fetches_contributor_stats_concurrently(self):
+        # Arrange
+        stats = Stats("octocat", "token", _FailingSession())
+        stats._repos = {"octocat/one", "octocat/two", "octocat/three"}
+        queries = _ConcurrentContributorQueries()
+        stats.queries = queries
+
+        # Act
+        result = await stats.lines_changed
+
+        # Assert
+        self.assertEqual(result, (30, 12))
+        self.assertGreater(queries.max_active_requests, 1)
 
     async def test_generate_images_preloads_stats_before_concurrent_rendering(self):
         # Arrange

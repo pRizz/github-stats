@@ -39,6 +39,17 @@ def _response_preview(text: str) -> str:
     return preview
 
 
+def _env_float(name: str, default: float) -> float:
+    raw_value = os.getenv(name)
+    if raw_value is None:
+        return default
+    try:
+        return float(raw_value)
+    except ValueError:
+        print(f"Invalid {name} value {raw_value!r}; using {default}.")
+        return default
+
+
 ###############################################################################
 # Main Classes
 ###############################################################################
@@ -152,11 +163,17 @@ class Queries(object):
 
         return dict()
 
-    async def query_rest(self, path: str, params: Optional[Dict] = None) -> Any:
+    async def query_rest(
+        self,
+        path: str,
+        params: Optional[Dict] = None,
+        max_wait_seconds: float = 90.0,
+    ) -> Any:
         """
         Make a request to the REST API
         :param path: API path to query
         :param params: Query parameters to be passed to the API
+        :param max_wait_seconds: Maximum time to wait on retryable responses
         :return: deserialized REST JSON output
         """
 
@@ -165,8 +182,11 @@ class Queries(object):
         normalized = path[1:] if path.startswith("/") else path
 
         # GitHub returns 202 while statistics (e.g. contributors) are computed.
-        # Without a wall-clock cap, many repos × ~60 × 2s sleeps can run for hours in CI.
-        deadline = time.monotonic() + 90.0
+        # Without a wall-clock cap, many repos times repeated sleeps can run for hours in CI.
+        if max_wait_seconds <= 0:
+            print(f"query_rest: skipping 202 wait budget for {normalized}.")
+            return _empty_rest_value(normalized)
+        deadline = time.monotonic() + max_wait_seconds
         max_iterations = 35
 
         for attempt in range(1, max_iterations + 1):
@@ -612,11 +632,23 @@ Languages:
         """
         if self._lines_changed is not None:
             return self._lines_changed
+        contributor_stats_wait_seconds = _env_float(
+            "CONTRIBUTOR_STATS_WAIT_SECONDS", 8.0
+        )
+        repo_stats = await asyncio.gather(
+            *[
+                self.queries.query_rest(
+                    f"/repos/{repo}/stats/contributors",
+                    max_wait_seconds=contributor_stats_wait_seconds,
+                )
+                for repo in await self.repos
+            ]
+        )
+
         additions = 0
         deletions = 0
-        for repo in await self.repos:
-            r = await self.queries.query_rest(f"/repos/{repo}/stats/contributors")
-            for author_obj in r:
+        for repo_result in repo_stats:
+            for author_obj in repo_result:
                 # Handle malformed response from the API by skipping this repo
                 if not isinstance(author_obj, dict) or not isinstance(
                     author_obj.get("author", {}), dict
