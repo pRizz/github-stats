@@ -8,7 +8,7 @@ from typing import Any, Dict, List
 
 import aiohttp
 
-from github_stats import ApiDegradation, Stats
+from github_stats import ApiDegradation, ApiWaitStat, Stats
 
 
 ################################################################################
@@ -69,6 +69,24 @@ def _format_degradation_items(items: List[ApiDegradation], limit: int = 20) -> s
     return "\n".join(lines) + "\n"
 
 
+def _format_wait_items(items: List[ApiWaitStat], limit: int = 10) -> str:
+    if not items:
+        return "- None\n"
+
+    lines = []
+    for item in items[:limit]:
+        lines.append(
+            f"- `{item.repo}` `{item.endpoint}`: waited "
+            f"{item.wait_seconds:.1f}s over {item.retry_count} retries "
+            f"({item.elapsed_seconds:.1f}s elapsed, HTTP {item.status} "
+            f"{item.category})"
+        )
+    remaining = len(items) - limit
+    if remaining > 0:
+        lines.append(f"- ...and {remaining} more")
+    return "\n".join(lines) + "\n"
+
+
 def render_action_summary(report: Dict[str, Any]) -> str:
     stats = report["stats"]
     api = report["api"]
@@ -77,6 +95,9 @@ def render_action_summary(report: Dict[str, Any]) -> str:
     ]
     contributor_items = [
         ApiDegradation(**item) for item in api["contributors_degraded"]
+    ]
+    slowest_items = [
+        ApiWaitStat(**item) for item in api["slowest_requests"]
     ]
 
     return f"""# GitHub Stats Image Generation
@@ -96,6 +117,17 @@ def render_action_summary(report: Dict[str, Any]) -> str:
 - Contributor stats degraded: {len(contributor_items)}
 - Traffic views degraded: {len(traffic_items)}
 
+## API Wait Summary
+
+- REST requests: {api["rest_requests_total"]:,}
+- REST retries: {api["rest_retries_total"]:,}
+- Total retry wait: {api["rest_wait_seconds_total"]:.1f}s
+- Contributor stats retry wait: {api["contributors_wait_seconds_total"]:.1f}s
+- Traffic views retry wait: {api["traffic_wait_seconds_total"]:.1f}s
+
+### Slowest API Waits
+
+{_format_wait_items(slowest_items)}
 ### Traffic View Failures
 
 {_format_degradation_items(traffic_items)}

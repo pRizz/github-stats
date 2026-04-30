@@ -31,6 +31,24 @@ class ApiDegradation:
     status: int
     category: str
     message: str
+    attempts: int = 1
+    retry_count: int = 0
+    wait_seconds: float = 0.0
+    elapsed_seconds: float = 0.0
+
+
+@dataclass(frozen=True)
+class ApiWaitStat:
+    repo: str
+    endpoint: str
+    status: int
+    category: str
+    degraded: bool
+    attempts: int
+    retry_count: int
+    wait_seconds: float
+    elapsed_seconds: float
+    message: str
 
 
 @dataclass
@@ -39,6 +57,28 @@ class StatsReport:
     contributors_degraded: List[ApiDegradation] = field(default_factory=list)
     traffic_degraded: List[ApiDegradation] = field(default_factory=list)
     critical_failures: List[str] = field(default_factory=list)
+    rest_requests_total: int = 0
+    rest_retries_total: int = 0
+    rest_wait_seconds_total: float = 0.0
+    contributors_wait_seconds_total: float = 0.0
+    traffic_wait_seconds_total: float = 0.0
+    slowest_requests: List[ApiWaitStat] = field(default_factory=list)
+
+    def record_rest_call(self, item: ApiWaitStat, limit: int = 10) -> None:
+        self.rest_requests_total += 1
+        self.rest_retries_total += item.retry_count
+        self.rest_wait_seconds_total += item.wait_seconds
+        if item.endpoint == "stats/contributors":
+            self.contributors_wait_seconds_total += item.wait_seconds
+        elif item.endpoint == "traffic/views":
+            self.traffic_wait_seconds_total += item.wait_seconds
+
+        self.slowest_requests.append(item)
+        self.slowest_requests.sort(
+            key=lambda stat: (stat.wait_seconds, stat.elapsed_seconds),
+            reverse=True,
+        )
+        del self.slowest_requests[limit:]
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -48,6 +88,14 @@ class StatsReport:
             ],
             "traffic_degraded": [asdict(item) for item in self.traffic_degraded],
             "critical_failures": self.critical_failures,
+            "rest_requests_total": self.rest_requests_total,
+            "rest_retries_total": self.rest_retries_total,
+            "rest_wait_seconds_total": self.rest_wait_seconds_total,
+            "contributors_wait_seconds_total": self.contributors_wait_seconds_total,
+            "traffic_wait_seconds_total": self.traffic_wait_seconds_total,
+            "slowest_requests": [
+                asdict(item) for item in self.slowest_requests
+            ],
         }
 
 
@@ -58,6 +106,10 @@ class RestQueryResult:
     status: int = 0
     category: str = "success"
     message: str = ""
+    attempts: int = 1
+    retry_count: int = 0
+    wait_seconds: float = 0.0
+    elapsed_seconds: float = 0.0
 
 
 def _header_value(headers: Any, name: str) -> Optional[str]:
@@ -220,13 +272,22 @@ def _degraded_rest_result(
     status: int,
     decision: _StatusDecision,
     body_preview: str = "",
+    attempts: int = 1,
+    retry_count: int = 0,
+    wait_seconds: float = 0.0,
+    started_at: Optional[float] = None,
 ) -> RestQueryResult:
+    elapsed_seconds = 0.0 if started_at is None else time.monotonic() - started_at
     return RestQueryResult(
         payload=_empty_rest_value(normalized_path),
         degraded=True,
         status=status,
         category=decision.category,
         message=_status_error_message("REST", status, decision, body_preview),
+        attempts=attempts,
+        retry_count=retry_count,
+        wait_seconds=wait_seconds,
+        elapsed_seconds=elapsed_seconds,
     )
 
 
@@ -234,13 +295,22 @@ def _success_rest_result(
     payload: Any,
     status: int,
     decision: _StatusDecision,
+    attempts: int = 1,
+    retry_count: int = 0,
+    wait_seconds: float = 0.0,
+    started_at: Optional[float] = None,
 ) -> RestQueryResult:
+    elapsed_seconds = 0.0 if started_at is None else time.monotonic() - started_at
     return RestQueryResult(
         payload=payload,
         degraded=False,
         status=status,
         category=decision.category,
         message=decision.message,
+        attempts=attempts,
+        retry_count=retry_count,
+        wait_seconds=wait_seconds,
+        elapsed_seconds=elapsed_seconds,
     )
 
 
@@ -445,11 +515,14 @@ class Queries(object):
 
         # GitHub returns 202 while statistics (e.g. contributors) are computed.
         # Without a wall-clock cap, many repos times repeated sleeps can run for hours in CI.
+        started_at = time.monotonic()
         deadline = time.monotonic() + max_wait_seconds
         max_iterations = 35
         last_status = 0
         last_decision = _StatusDecision("unknown_status", False, "no response yet")
         last_preview = ""
+        retry_count = 0
+        wait_seconds = 0.0
 
         for attempt in range(1, max_iterations + 1):
             headers = {
@@ -462,7 +535,14 @@ class Queries(object):
                         "using empty data for this endpoint."
                     )
                     return _degraded_rest_result(
-                        normalized, last_status, last_decision, last_preview
+                        normalized,
+                        last_status,
+                        last_decision,
+                        last_preview,
+                        attempts=attempt - 1,
+                        retry_count=retry_count,
+                        wait_seconds=wait_seconds,
+                        started_at=started_at,
                     )
                 raise GitHubQueryError(
                     _status_error_message(
@@ -495,7 +575,14 @@ class Queries(object):
                                 "using empty data for this endpoint."
                             )
                             return _degraded_rest_result(
-                                normalized, r_async.status, decision, preview
+                                normalized,
+                                r_async.status,
+                                decision,
+                                preview,
+                                attempts=attempt,
+                                retry_count=retry_count,
+                                wait_seconds=wait_seconds,
+                                started_at=started_at,
                             )
                         raise GitHubQueryError(
                             _status_error_message(
@@ -508,6 +595,8 @@ class Queries(object):
                             f"({decision.category}, attempt {attempt}); "
                             f"retry in {delay:.1f}s"
                         )
+                    retry_count += 1
+                    wait_seconds += delay
                     await asyncio.sleep(delay)
                     continue
 
@@ -516,6 +605,10 @@ class Queries(object):
                         _empty_rest_value(normalized),
                         r_async.status,
                         decision,
+                        attempts=attempt,
+                        retry_count=retry_count,
+                        wait_seconds=wait_seconds,
+                        started_at=started_at,
                     )
                 if not _is_success_with_json(decision):
                     if _can_degrade_rest_status(normalized, decision):
@@ -524,7 +617,14 @@ class Queries(object):
                             f"({decision.category}); using empty endpoint data."
                         )
                         return _degraded_rest_result(
-                            normalized, r_async.status, decision, preview
+                            normalized,
+                            r_async.status,
+                            decision,
+                            preview,
+                            attempts=attempt,
+                            retry_count=retry_count,
+                            wait_seconds=wait_seconds,
+                            started_at=started_at,
                         )
                     raise GitHubQueryError(
                         _status_error_message(
@@ -541,13 +641,28 @@ class Queries(object):
                             "using empty endpoint data."
                         )
                         return _degraded_rest_result(
-                            normalized, r_async.status, decision, preview
+                            normalized,
+                            r_async.status,
+                            decision,
+                            preview,
+                            attempts=attempt,
+                            retry_count=retry_count,
+                            wait_seconds=wait_seconds,
+                            started_at=started_at,
                         )
                     raise GitHubQueryError(
                         f"{normalized} returned non-JSON: {error}; {preview}"
                     ) from error
                 if result is not None:
-                    return _success_rest_result(result, r_async.status, decision)
+                    return _success_rest_result(
+                        result,
+                        r_async.status,
+                        decision,
+                        attempts=attempt,
+                        retry_count=retry_count,
+                        wait_seconds=wait_seconds,
+                        started_at=started_at,
+                    )
             except GitHubQueryError:
                 raise
             except Exception as error:
@@ -582,6 +697,10 @@ class Queries(object):
                                 r_requests.status_code,
                                 decision,
                                 preview,
+                                attempts=attempt,
+                                retry_count=retry_count,
+                                wait_seconds=wait_seconds,
+                                started_at=started_at,
                             )
                         raise GitHubQueryError(
                             _status_error_message(
@@ -597,6 +716,8 @@ class Queries(object):
                             f"via fallback ({decision.category}, "
                             f"attempt {attempt}); retry in {delay:.1f}s"
                         )
+                    retry_count += 1
+                    wait_seconds += delay
                     await asyncio.sleep(delay)
                     continue
 
@@ -605,6 +726,10 @@ class Queries(object):
                         _empty_rest_value(normalized),
                         r_requests.status_code,
                         decision,
+                        attempts=attempt,
+                        retry_count=retry_count,
+                        wait_seconds=wait_seconds,
+                        started_at=started_at,
                     )
                 if not _is_success_with_json(decision):
                     if _can_degrade_rest_status(normalized, decision):
@@ -618,6 +743,10 @@ class Queries(object):
                             r_requests.status_code,
                             decision,
                             preview,
+                            attempts=attempt,
+                            retry_count=retry_count,
+                            wait_seconds=wait_seconds,
+                            started_at=started_at,
                         )
                     raise GitHubQueryError(
                         _status_error_message(
@@ -641,6 +770,10 @@ class Queries(object):
                             r_requests.status_code,
                             decision,
                             preview,
+                            attempts=attempt,
+                            retry_count=retry_count,
+                            wait_seconds=wait_seconds,
+                            started_at=started_at,
                         )
                     raise GitHubQueryError(
                         f"{normalized} fallback returned non-JSON: "
@@ -648,7 +781,13 @@ class Queries(object):
                     ) from error
                 if result is not None:
                     return _success_rest_result(
-                        result, r_requests.status_code, decision
+                        result,
+                        r_requests.status_code,
+                        decision,
+                        attempts=attempt,
+                        retry_count=retry_count,
+                        wait_seconds=wait_seconds,
+                        started_at=started_at,
                     )
             except GitHubQueryError:
                 raise
@@ -661,7 +800,14 @@ class Queries(object):
                 "data for this endpoint may be incomplete."
             )
             return _degraded_rest_result(
-                normalized, last_status, last_decision, last_preview
+                normalized,
+                last_status,
+                last_decision,
+                last_preview,
+                attempts=max_iterations,
+                retry_count=retry_count,
+                wait_seconds=wait_seconds,
+                started_at=started_at,
             )
         raise GitHubQueryError(
             _status_error_message("REST", last_status, last_decision, last_preview)
@@ -838,11 +984,36 @@ class Stats(object):
             status=result.status,
             category=result.category,
             message=result.message,
+            attempts=result.attempts,
+            retry_count=result.retry_count,
+            wait_seconds=result.wait_seconds,
+            elapsed_seconds=result.elapsed_seconds,
         )
         if endpoint == "stats/contributors":
             self.report.contributors_degraded.append(degradation)
         elif endpoint == "traffic/views":
             self.report.traffic_degraded.append(degradation)
+
+    def _record_rest_call(
+        self,
+        repo: str,
+        endpoint: str,
+        result: RestQueryResult,
+    ) -> None:
+        self.report.record_rest_call(
+            ApiWaitStat(
+                repo=repo,
+                endpoint=endpoint,
+                status=result.status,
+                category=result.category,
+                degraded=result.degraded,
+                attempts=result.attempts,
+                retry_count=result.retry_count,
+                wait_seconds=result.wait_seconds,
+                elapsed_seconds=result.elapsed_seconds,
+                message=result.message,
+            )
+        )
 
     async def to_str(self) -> str:
         """
@@ -1073,6 +1244,7 @@ Languages:
         additions = 0
         deletions = 0
         for repo, repo_result in zip(repos, repo_stats):
+            self._record_rest_call(repo, "stats/contributors", repo_result)
             if repo_result.degraded:
                 self._record_degradation(repo, "stats/contributors", repo_result)
             for author_obj in repo_result.payload:
@@ -1106,6 +1278,7 @@ Languages:
             result = await self.queries.query_rest_with_outcome(
                 f"/repos/{repo}/traffic/views"
             )
+            self._record_rest_call(repo, "traffic/views", result)
             if result.degraded:
                 self._record_degradation(repo, "traffic/views", result)
             for view in result.payload.get("views", []):

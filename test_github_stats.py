@@ -107,7 +107,11 @@ class _ConcurrentContributorQueries:
                         "author": {"login": "octocat"},
                         "weeks": [{"a": 10, "d": 4}],
                     }
-                ]
+                ],
+                attempts=2,
+                retry_count=1,
+                wait_seconds=0.5,
+                elapsed_seconds=0.6,
             )
         finally:
             self.active_requests -= 1
@@ -332,6 +336,10 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                     status=403,
                     category="auth_or_permission_error",
                     message="traffic views inaccessible",
+                    attempts=1,
+                    retry_count=0,
+                    wait_seconds=0.0,
+                    elapsed_seconds=0.2,
                 )
             }
         )
@@ -344,6 +352,8 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(stats.report.traffic_degraded), 1)
         self.assertEqual(stats.report.traffic_degraded[0].repo, "octocat/private")
         self.assertEqual(stats.report.traffic_degraded[0].endpoint, "traffic/views")
+        self.assertEqual(stats.report.rest_requests_total, 1)
+        self.assertEqual(stats.report.slowest_requests[0].repo, "octocat/private")
 
     async def test_lines_changed_records_repo_for_contributor_degradation(self):
         # Arrange
@@ -357,6 +367,10 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                     status=202,
                     category="pending",
                     message="stats still pending",
+                    attempts=3,
+                    retry_count=2,
+                    wait_seconds=4.3,
+                    elapsed_seconds=4.5,
                 )
             }
         )
@@ -372,6 +386,11 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
             stats.report.contributors_degraded[0].endpoint,
             "stats/contributors",
         )
+        self.assertEqual(stats.report.rest_requests_total, 1)
+        self.assertEqual(stats.report.rest_retries_total, 2)
+        self.assertEqual(stats.report.rest_wait_seconds_total, 4.3)
+        self.assertEqual(stats.report.contributors_wait_seconds_total, 4.3)
+        self.assertEqual(stats.report.contributors_degraded[0].wait_seconds, 4.3)
 
     async def test_rest_query_raises_for_auth_rate_limit_and_unknown_statuses(self):
         for status, headers in (
@@ -427,6 +446,26 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result, [])
         sleep.assert_not_awaited()
 
+    async def test_rest_query_records_wait_stats_for_retryable_202(self):
+        # Arrange
+        queries = Queries("octocat", "token", _FailingSession())
+
+        with mock.patch(
+            "github_stats.requests.get", return_value=_Always202Response()
+        ), mock.patch("github_stats.asyncio.sleep", mock.AsyncMock()) as sleep:
+            # Act
+            result = await queries.query_rest_with_outcome(
+                "/repos/octocat/hello/stats/contributors",
+                max_wait_seconds=1.0,
+            )
+
+        # Assert
+        self.assertTrue(result.degraded)
+        self.assertGreater(result.retry_count, 0)
+        self.assertGreater(result.wait_seconds, 0)
+        self.assertGreaterEqual(result.attempts, 1)
+        sleep.assert_awaited()
+
     async def test_lines_changed_fetches_contributor_stats_concurrently(self):
         # Arrange
         stats = Stats("octocat", "token", _FailingSession())
@@ -478,6 +517,12 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                         "contributors_degraded": [],
                         "traffic_degraded": [],
                         "critical_failures": [],
+                        "rest_requests_total": 0,
+                        "rest_retries_total": 0,
+                        "rest_wait_seconds_total": 0.0,
+                        "contributors_wait_seconds_total": 0.0,
+                        "traffic_wait_seconds_total": 0.0,
+                        "slowest_requests": [],
                     },
                 }
             ),
@@ -512,6 +557,10 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                         "status": 202,
                         "category": "pending",
                         "message": "stats still pending",
+                        "attempts": 3,
+                        "retry_count": 2,
+                        "wait_seconds": 4.3,
+                        "elapsed_seconds": 4.5,
                     }
                 ],
                 "traffic_degraded": [
@@ -521,9 +570,32 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                         "status": 403,
                         "category": "auth_or_permission_error",
                         "message": "traffic views inaccessible",
+                        "attempts": 1,
+                        "retry_count": 0,
+                        "wait_seconds": 0.0,
+                        "elapsed_seconds": 0.2,
                     }
                 ],
                 "critical_failures": [],
+                "rest_requests_total": 2,
+                "rest_retries_total": 2,
+                "rest_wait_seconds_total": 4.3,
+                "contributors_wait_seconds_total": 4.3,
+                "traffic_wait_seconds_total": 0.0,
+                "slowest_requests": [
+                    {
+                        "repo": "octocat/slow",
+                        "endpoint": "stats/contributors",
+                        "status": 202,
+                        "category": "pending",
+                        "degraded": True,
+                        "attempts": 3,
+                        "retry_count": 2,
+                        "wait_seconds": 4.3,
+                        "elapsed_seconds": 4.5,
+                        "message": "stats still pending",
+                    }
+                ],
             },
         }
 
@@ -535,6 +607,9 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("octocat/slow", summary)
         self.assertIn("Traffic views degraded: 1", summary)
         self.assertIn("Contributor stats degraded: 1", summary)
+        self.assertIn("API Wait Summary", summary)
+        self.assertIn("Slowest API Waits", summary)
+        self.assertIn("4.3s", summary)
 
     def test_action_summary_writer_allows_missing_github_step_summary(self):
         # Act / Assert
