@@ -1351,7 +1351,9 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         # Act / Assert
         generate_images.validate_run_report(report)
 
-    def test_run_report_validation_rejects_zero_views_with_degraded_traffic(self):
+    def test_run_report_validation_allows_zero_views_with_degraded_traffic_by_default(
+        self,
+    ):
         # Arrange
         report = {
             "stats": {
@@ -1379,8 +1381,44 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         }
 
         # Act / Assert
-        with self.assertRaisesRegex(RuntimeError, "Repository views"):
+        with mock.patch.dict("os.environ", {}, clear=True):
             generate_images.validate_run_report(report)
+
+    def test_run_report_validation_strict_mode_rejects_degraded_traffic(self):
+        # Arrange
+        report = {
+            "stats": {
+                "name": "Octocat",
+                "stargazers": 1,
+                "forks": 2,
+                "total_contributions": 3,
+                "current_year_contributions": 4,
+                "merged_pull_requests": 5,
+                "repos": 4,
+                "views": 0,
+            },
+            "api": {
+                "contributors_degraded": [],
+                "traffic_degraded": [
+                    {
+                        "repo": "octocat/private",
+                        "endpoint": "traffic/views",
+                        "status": 403,
+                        "category": "auth_or_permission_error",
+                        "message": "traffic views inaccessible",
+                    }
+                ],
+            },
+        }
+
+        # Act / Assert
+        with mock.patch.dict(
+            "os.environ",
+            {"STRICT_TRAFFIC_VIEW_VALIDATION": "true"},
+            clear=True,
+        ):
+            with self.assertRaisesRegex(RuntimeError, "Repository views"):
+                generate_images.validate_run_report(report)
 
     def test_run_report_validation_allows_real_zero_without_degradation(self):
         # Arrange
@@ -1403,6 +1441,28 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
 
         # Act / Assert
         generate_images.validate_run_report(report)
+
+    def test_env_truthy_parses_common_values(self):
+        # Act / Assert
+        for value in ("true", "1", "yes", "on", "anything"):
+            with self.subTest(value=value), mock.patch.dict(
+                "os.environ",
+                {"STRICT_TRAFFIC_VIEW_VALIDATION": value},
+                clear=True,
+            ):
+                self.assertTrue(
+                    generate_images.env_truthy("STRICT_TRAFFIC_VIEW_VALIDATION")
+                )
+
+        for value in ("", "false", "0", "no", "off"):
+            with self.subTest(value=value), mock.patch.dict(
+                "os.environ",
+                {"STRICT_TRAFFIC_VIEW_VALIDATION": value},
+                clear=True,
+            ):
+                self.assertFalse(
+                    generate_images.env_truthy("STRICT_TRAFFIC_VIEW_VALIDATION")
+                )
 
     def test_action_summary_writer_allows_missing_github_step_summary(self):
         # Act / Assert

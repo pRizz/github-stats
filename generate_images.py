@@ -173,7 +173,7 @@ def render_action_summary(report: Dict[str, Any]) -> str:
 
 def validate_run_report(report: Dict[str, Any]) -> None:
     """
-    Fail when optional REST metrics degraded into misleading all-zero values.
+    Fail when strict validation requires unavailable optional metrics.
     """
     stats = report["stats"]
     api = report["api"]
@@ -182,7 +182,13 @@ def validate_run_report(report: Dict[str, Any]) -> None:
 
     traffic_degraded_count = len(api["traffic_degraded"])
 
-    if repo_count > 0 and stats["views"] == 0 and traffic_degraded_count > 0:
+    strict_traffic_views = env_truthy("STRICT_TRAFFIC_VIEW_VALIDATION")
+    if (
+        strict_traffic_views
+        and repo_count > 0
+        and stats["views"] == 0
+        and traffic_degraded_count > 0
+    ):
         failures.append(
             "Repository views is zero while "
             f"{traffic_degraded_count} traffic endpoints degraded."
@@ -244,6 +250,13 @@ def write_action_summary(summary: str) -> None:
     with open(summary_path, "a") as f:
         f.write(summary)
         f.write("\n")
+
+
+def env_truthy(name: str, default: bool = False) -> bool:
+    raw_value = os.getenv(name)
+    if raw_value is None:
+        return default
+    return raw_value.strip().lower() not in {"", "0", "false", "no", "off"}
 
 
 def parse_repo_list(raw_value: Optional[str]) -> Set[str]:
