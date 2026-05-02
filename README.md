@@ -6,8 +6,10 @@ https://github.community/t/support-theme-context-for-images-in-light-vs-dark-mod
 <a href="https://github.com/pRizz/github-stats">
 <img src="generated/overview.svg#gh-dark-mode-only" />
 <img src="generated/languages.svg#gh-dark-mode-only" />
+<img src="generated/monthly-commits.svg#gh-dark-mode-only" />
 <img src="generated/overview.svg#gh-light-mode-only" />
 <img src="generated/languages.svg#gh-light-mode-only" />
+<img src="generated/monthly-commits.svg#gh-light-mode-only" />
 </a>
 
 Generate visualizations of GitHub user and repository statistics with GitHub
@@ -127,6 +129,10 @@ ACCESS_TOKEN=$(gh auth token) bun scripts/probe-lines-changed.ts pRizz/github-st
    ```md
    ![](https://raw.githubusercontent.com/username/github-stats/master/generated/languages.svg#gh-dark-mode-only)
    ![](https://raw.githubusercontent.com/username/github-stats/master/generated/languages.svg#gh-light-mode-only)
+   ```
+   ```md
+   ![](https://raw.githubusercontent.com/username/github-stats/master/generated/monthly-commits.svg#gh-dark-mode-only)
+   ![](https://raw.githubusercontent.com/username/github-stats/master/generated/monthly-commits.svg#gh-light-mode-only)
    ```
 9. Link back to this repository so that others can generate their own
    statistics images.

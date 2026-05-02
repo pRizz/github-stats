@@ -1,0 +1,100 @@
+<svg id="gh-dark-mode-only" width="360" height="210" xmlns="http://www.w3.org/2000/svg">
+<style>
+svg {
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+  font-size: 14px;
+}
+
+#background {
+  width: calc(100% - 10px);
+  height: calc(100% - 10px);
+  fill: white;
+  stroke: rgb(225, 228, 232);
+  stroke-width: 1px;
+  rx: 6px;
+  ry: 6px;
+}
+
+#gh-dark-mode-only:target #background {
+  fill: #0d1117;
+  stroke-width: 0.5px;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  fill: rgb(36, 41, 46);
+}
+
+#gh-dark-mode-only:target .title {
+  fill: #c9d1d9;
+}
+
+.subtitle,
+.month,
+.count {
+  fill: rgb(88, 96, 105);
+}
+
+#gh-dark-mode-only:target .subtitle,
+#gh-dark-mode-only:target .month,
+#gh-dark-mode-only:target .count {
+  fill: #8b949e;
+}
+
+.subtitle {
+  font-size: 11px;
+}
+
+.month {
+  font-size: 8px;
+}
+
+.count {
+  font-size: 9px;
+}
+
+.axis {
+  stroke: rgb(225, 228, 232);
+  stroke-width: 1px;
+}
+
+#gh-dark-mode-only:target .axis {
+  stroke: #30363d;
+}
+
+.bar {
+  fill: #2da44e;
+}
+
+#gh-dark-mode-only:target .bar {
+  fill: #3fb950;
+}
+
+.bar.current {
+  fill: #0969da;
+}
+
+#gh-dark-mode-only:target .bar.current {
+  fill: #58a6ff;
+}
+
+g {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: riseIn 700ms ease-out forwards;
+}
+
+@keyframes riseIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>
+<rect x="5" y="5" id="background" />
+<text class="title" x="21" y="36">Monthly Commits</text>
+<text class="subtitle" x="21" y="55">{{ total }} commits over 13 months; {{ current_month }} has {{ current_count }}</text>
+<line class="axis" x1="21" y1="154" x2="339" y2="154" />
+{{ bars }}
+</svg>

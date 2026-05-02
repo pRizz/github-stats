@@ -13,7 +13,9 @@ import requests
 
 def _empty_rest_value(normalized_path: str) -> Any:
     """JSON shape GitHub would return for an empty successful response."""
-    if "stats/contributors" in normalized_path:
+    if "stats/contributors" in normalized_path or normalized_path.endswith(
+        "/commits"
+    ):
         return []
     return {}
 
@@ -57,12 +59,14 @@ class StatsReport:
     total_repos: int = 0
     contributors_degraded: List[ApiDegradation] = field(default_factory=list)
     traffic_degraded: List[ApiDegradation] = field(default_factory=list)
+    monthly_commits_degraded: List[ApiDegradation] = field(default_factory=list)
     critical_failures: List[str] = field(default_factory=list)
     rest_requests_total: int = 0
     rest_retries_total: int = 0
     rest_wait_seconds_total: float = 0.0
     contributors_wait_seconds_total: float = 0.0
     traffic_wait_seconds_total: float = 0.0
+    monthly_commits_wait_seconds_total: float = 0.0
     slowest_requests: List[ApiWaitStat] = field(default_factory=list)
 
     def record_rest_call(self, item: ApiWaitStat, limit: int = 10) -> None:
@@ -73,6 +77,8 @@ class StatsReport:
             self.contributors_wait_seconds_total += item.wait_seconds
         elif item.endpoint == "traffic/views":
             self.traffic_wait_seconds_total += item.wait_seconds
+        elif item.endpoint == "commits":
+            self.monthly_commits_wait_seconds_total += item.wait_seconds
 
         self.slowest_requests.append(item)
         self.slowest_requests.sort(
@@ -88,16 +94,48 @@ class StatsReport:
                 asdict(item) for item in self.contributors_degraded
             ],
             "traffic_degraded": [asdict(item) for item in self.traffic_degraded],
+            "monthly_commits_degraded": [
+                asdict(item) for item in self.monthly_commits_degraded
+            ],
             "critical_failures": self.critical_failures,
             "rest_requests_total": self.rest_requests_total,
             "rest_retries_total": self.rest_retries_total,
             "rest_wait_seconds_total": self.rest_wait_seconds_total,
             "contributors_wait_seconds_total": self.contributors_wait_seconds_total,
             "traffic_wait_seconds_total": self.traffic_wait_seconds_total,
+            "monthly_commits_wait_seconds_total": (
+                self.monthly_commits_wait_seconds_total
+            ),
             "slowest_requests": [
                 asdict(item) for item in self.slowest_requests
             ],
         }
+
+
+@dataclass(frozen=True)
+class MonthWindow:
+    key: str
+    label: str
+    since: str
+    until: str
+    is_current: bool = False
+
+
+@dataclass(frozen=True)
+class MonthlyCommitRecord:
+    key: str
+    label: str
+    count: int
+    is_current: bool
+
+
+@dataclass(frozen=True)
+class MonthlyCommitScanResult:
+    counts: Dict[str, int]
+    repo_count: int
+    scanned_months: int
+    identity_patterns: List[str]
+    degraded_months: Set[str] = field(default_factory=set)
 
 
 @dataclass(frozen=True)
@@ -200,6 +238,8 @@ def _classify_status(
         return _StatusDecision(
             "not_found_or_gone", False, "resource not found or gone"
         )
+    if status == 409:
+        return _StatusDecision("conflict", False, "resource conflict")
     if 400 <= status <= 499:
         return _StatusDecision("client_error", False, "client request error")
     if 500 <= status <= 599:
@@ -258,6 +298,13 @@ def _can_degrade_rest_status(normalized_path: str, decision: _StatusDecision) ->
             "auth_or_permission_error",
             "not_found_or_gone",
         }
+    if normalized_path.endswith("/commits"):
+        return decision.category in {
+            "auth_or_permission_error",
+            "conflict",
+            "not_found_or_gone",
+            "rate_limited",
+        }
     return False
 
 
@@ -265,6 +312,7 @@ def _can_degrade_rest_body(normalized_path: str) -> bool:
     return (
         "stats/contributors" in normalized_path
         or "traffic/views" in normalized_path
+        or normalized_path.endswith("/commits")
     )
 
 
@@ -328,6 +376,130 @@ def _env_float(name: str, default: float) -> float:
 
 def _current_utc_year() -> int:
     return dt.datetime.now(dt.timezone.utc).year
+
+
+def _utc_now() -> dt.datetime:
+    return dt.datetime.now(dt.timezone.utc)
+
+
+def _add_months(value: dt.datetime, months: int) -> dt.datetime:
+    month_index = value.month - 1 + months
+    year = value.year + month_index // 12
+    month = month_index % 12 + 1
+    return value.replace(year=year, month=month)
+
+
+def _parse_github_datetime(value: str) -> Optional[dt.datetime]:
+    if not value:
+        return None
+    try:
+        parsed = dt.datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return parsed.replace(tzinfo=dt.timezone.utc)
+    return parsed.astimezone(dt.timezone.utc)
+
+
+def _format_github_datetime(value: dt.datetime) -> str:
+    return value.astimezone(dt.timezone.utc).replace(microsecond=0).isoformat().replace(
+        "+00:00", "Z"
+    )
+
+
+def rolling_month_windows(
+    now: Optional[dt.datetime] = None,
+    month_count: int = 13,
+) -> List[MonthWindow]:
+    current_time = _utc_now() if now is None else now.astimezone(dt.timezone.utc)
+    current_start = current_time.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    first_start = _add_months(current_start, -(month_count - 1))
+    windows = []
+
+    for index in range(month_count):
+        start = _add_months(first_start, index)
+        next_start = _add_months(start, 1)
+        is_current = start.year == current_start.year and start.month == current_start.month
+        until = current_time if is_current else next_start
+        windows.append(
+            MonthWindow(
+                key=start.strftime("%Y-%m"),
+                label=start.strftime("%b '%y"),
+                since=_format_github_datetime(start),
+                until=_format_github_datetime(until),
+                is_current=is_current,
+            )
+        )
+
+    return windows
+
+
+def monthly_commit_identity_patterns(username: Optional[str] = None) -> List[str]:
+    raw_patterns = os.getenv("MONTHLY_COMMIT_IDENTITY_PATTERNS")
+    if raw_patterns:
+        candidates = [item.strip() for item in raw_patterns.split(",")]
+    else:
+        candidates = ["Peter Ryszkiewicz", "prizz", "pRizz"]
+        if username:
+            candidates.append(username)
+
+    patterns = []
+    seen = set()
+    for candidate in candidates:
+        if not candidate:
+            continue
+        if candidate in seen:
+            continue
+        seen.add(candidate)
+        patterns.append(candidate)
+    return patterns
+
+
+def _field_matches(value: Any, patterns: List[str]) -> bool:
+    if not isinstance(value, str) or not value:
+        return False
+    lowered = value.casefold()
+    return any(pattern.casefold() in lowered for pattern in patterns)
+
+
+def _commit_identity_match_date(
+    commit: Dict[str, Any],
+    patterns: List[str],
+) -> Optional[dt.datetime]:
+    commit_data = commit.get("commit", {})
+    if not isinstance(commit_data, dict):
+        return None
+
+    author_data = commit_data.get("author", {})
+    committer_data = commit_data.get("committer", {})
+    rest_author = commit.get("author", {})
+    rest_committer = commit.get("committer", {})
+    if rest_author is None:
+        rest_author = {}
+    if rest_committer is None:
+        rest_committer = {}
+
+    author_fields = []
+    committer_fields = []
+    if isinstance(author_data, dict):
+        author_fields.extend([author_data.get("name"), author_data.get("email")])
+    if isinstance(rest_author, dict):
+        author_fields.append(rest_author.get("login"))
+    if isinstance(committer_data, dict):
+        committer_fields.extend(
+            [committer_data.get("name"), committer_data.get("email")]
+        )
+    if isinstance(rest_committer, dict):
+        committer_fields.append(rest_committer.get("login"))
+
+    if any(_field_matches(field, patterns) for field in author_fields):
+        if isinstance(author_data, dict):
+            return _parse_github_datetime(str(author_data.get("date", "")))
+        return None
+    if any(_field_matches(field, patterns) for field in committer_fields):
+        if isinstance(committer_data, dict):
+            return _parse_github_datetime(str(committer_data.get("date", "")))
+    return None
 
 
 class GitHubQueryError(RuntimeError):
@@ -954,6 +1126,27 @@ query {{
 """
 
     @staticmethod
+    def monthly_commit_audit(windows: List[MonthWindow]) -> str:
+        by_month = "\n".join(
+            f"""
+    m{index}: contributionsCollection(
+        from: "{window.since}",
+        to: "{window.until}"
+    ) {{
+      totalCommitContributions
+    }}
+"""
+            for index, window in enumerate(windows)
+        )
+        return f"""
+query {{
+  viewer {{
+    {by_month}
+  }}
+}}
+"""
+
+    @staticmethod
     def contribs_by_year(year: str) -> str:
         """
         :param year: year to query for
@@ -1039,6 +1232,8 @@ class Stats(object):
             self.report.contributors_degraded.append(degradation)
         elif endpoint == "traffic/views":
             self.report.traffic_degraded.append(degradation)
+        elif endpoint == "commits":
+            self.report.monthly_commits_degraded.append(degradation)
 
     def _record_rest_call(
         self,
@@ -1348,6 +1543,110 @@ Languages:
 
         self._lines_changed = (additions, deletions)
         return self._lines_changed
+
+    async def scan_monthly_commits(
+        self,
+        windows: List[MonthWindow],
+        identity_patterns: Optional[List[str]] = None,
+        extra_repos: Optional[Set[str]] = None,
+    ) -> MonthlyCommitScanResult:
+        """
+        Count commits by month using raw commit metadata identity matching.
+        """
+        patterns = (
+            monthly_commit_identity_patterns(self.username)
+            if identity_patterns is None
+            else identity_patterns
+        )
+        repos = set(await self.repos)
+        if extra_repos is not None:
+            repos.update(extra_repos)
+
+        counts: Dict[str, int] = {window.key: 0 for window in windows}
+        seen_by_month: Dict[str, Set[str]] = {window.key: set() for window in windows}
+        degraded_months: Set[str] = set()
+        max_wait_seconds = _env_float("MONTHLY_COMMITS_WAIT_SECONDS", 12.0)
+
+        async def scan_repo_window(repo: str, window: MonthWindow) -> None:
+            page = 1
+            while True:
+                result = await self.queries.query_rest_with_outcome(
+                    f"/repos/{repo}/commits",
+                    params={
+                        "since": window.since,
+                        "until": window.until,
+                        "per_page": "100",
+                        "page": str(page),
+                    },
+                    max_wait_seconds=max_wait_seconds,
+                )
+                self._record_rest_call(repo, "commits", result)
+                if result.degraded:
+                    self._record_degradation(repo, "commits", result)
+                    if result.category in {
+                        "auth_or_permission_error",
+                        "rate_limited",
+                    }:
+                        degraded_months.add(window.key)
+                    return
+
+                payload = result.payload if isinstance(result.payload, list) else []
+                for item in payload:
+                    if not isinstance(item, dict):
+                        continue
+                    match_date = _commit_identity_match_date(item, patterns)
+                    if match_date is None or match_date.strftime("%Y-%m") != window.key:
+                        continue
+                    sha = item.get("sha")
+                    if not isinstance(sha, str) or not sha:
+                        continue
+                    if sha in seen_by_month[window.key]:
+                        continue
+                    seen_by_month[window.key].add(sha)
+                    counts[window.key] += 1
+
+                if len(payload) < 100:
+                    return
+                page += 1
+
+        await asyncio.gather(
+            *[
+                scan_repo_window(repo, window)
+                for repo in sorted(repos)
+                for window in windows
+            ]
+        )
+
+        return MonthlyCommitScanResult(
+            counts=counts,
+            repo_count=len(repos),
+            scanned_months=len(windows),
+            identity_patterns=patterns,
+            degraded_months=degraded_months,
+        )
+
+    async def audit_monthly_commit_counts(
+        self,
+        windows: List[MonthWindow],
+    ) -> Dict[str, int]:
+        """
+        Return GitHub-attributed commit contribution counts for comparison only.
+        """
+        raw_results = await self.queries.query(Queries.monthly_commit_audit(windows))
+        viewer = raw_results.get("data", {}).get("viewer", {})
+        if not isinstance(viewer, dict):
+            raise GitHubQueryError(
+                "GraphQL response missing monthly commit audit data"
+            )
+
+        counts = {}
+        for index, window in enumerate(windows):
+            month_data = viewer.get(f"m{index}", {})
+            if not isinstance(month_data, dict):
+                counts[window.key] = 0
+                continue
+            counts[window.key] = int(month_data.get("totalCommitContributions", 0))
+        return counts
 
     @property
     async def views(self) -> int:

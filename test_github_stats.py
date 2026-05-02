@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import datetime as dt
 import unittest
 import os
 from pathlib import Path
@@ -126,6 +127,17 @@ class _PathOutcomeQueries:
         return self.outcomes[path]
 
 
+class _MonthlyCommitQueries:
+    def __init__(self, outcomes):
+        self.outcomes = outcomes
+        self.calls = []
+
+    async def query_rest_with_outcome(self, path, params=None, max_wait_seconds=None):
+        params = {} if params is None else params
+        self.calls.append((path, dict(params)))
+        return self.outcomes[(path, params.get("page", "1"))]
+
+
 class _FakeStats:
     loaded = False
     get_stats_calls = 0
@@ -224,7 +236,122 @@ class _ReportStats:
         raise AssertionError("report should not read lines_changed")
 
 
+class _MonthlyCacheStats:
+    username = "octocat"
+
+    def __init__(self):
+        self.report = github_stats.StatsReport()
+        self.scanned_window_keys = []
+
+    @property
+    async def repos(self):
+        return {"octocat/hello"}
+
+    async def scan_monthly_commits(
+        self,
+        windows,
+        identity_patterns=None,
+        extra_repos=None,
+    ):
+        self.scanned_window_keys = [window.key for window in windows]
+        return github_stats.MonthlyCommitScanResult(
+            counts={window.key: 7 for window in windows},
+            repo_count=1,
+            scanned_months=len(windows),
+            identity_patterns=identity_patterns or [],
+        )
+
+    async def audit_monthly_commit_counts(self, windows):
+        return {window.key: 3 for window in windows}
+
+
+class _DegradedMonthlyCacheStats(_MonthlyCacheStats):
+    async def scan_monthly_commits(
+        self,
+        windows,
+        identity_patterns=None,
+        extra_repos=None,
+    ):
+        self.scanned_window_keys = [window.key for window in windows]
+        return github_stats.MonthlyCommitScanResult(
+            counts={window.key: 0 for window in windows},
+            repo_count=1,
+            scanned_months=len(windows),
+            identity_patterns=identity_patterns or [],
+            degraded_months={window.key for window in windows},
+        )
+
+
+def _commit(
+    sha,
+    author_name="Other",
+    author_email="other@example.com",
+    author_date="2026-05-01T12:00:00Z",
+    committer_name="Other",
+    committer_email="other@example.com",
+    committer_date="2026-05-01T12:00:00Z",
+    author_login=None,
+    committer_login=None,
+):
+    return {
+        "sha": sha,
+        "commit": {
+            "author": {
+                "name": author_name,
+                "email": author_email,
+                "date": author_date,
+            },
+            "committer": {
+                "name": committer_name,
+                "email": committer_email,
+                "date": committer_date,
+            },
+        },
+        "author": None if author_login is None else {"login": author_login},
+        "committer": None if committer_login is None else {"login": committer_login},
+    }
+
+
 class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
+    def test_rolling_month_windows_include_current_plus_prior_12_months(self):
+        # Arrange
+        now = dt.datetime(2026, 5, 2, 10, 30, tzinfo=dt.timezone.utc)
+
+        # Act
+        windows = github_stats.rolling_month_windows(now)
+
+        # Assert
+        self.assertEqual(len(windows), 13)
+        self.assertEqual(windows[0].key, "2025-05")
+        self.assertEqual(windows[0].label, "May '25")
+        self.assertEqual(windows[-1].key, "2026-05")
+        self.assertTrue(windows[-1].is_current)
+        self.assertEqual(windows[-1].until, "2026-05-02T10:30:00Z")
+
+    def test_monthly_commit_identity_matching_checks_expected_fields(self):
+        # Arrange
+        patterns = ["Peter Ryszkiewicz", "prizz"]
+        cases = [
+            _commit("a", author_name="Peter Ryszkiewicz"),
+            _commit("b", author_email="dev+prizz@example.com"),
+            _commit("c", committer_name="pRizz"),
+            _commit("d", author_login="pRizz"),
+            _commit("e", committer_login="prizz"),
+        ]
+        non_match = _commit("f", author_name="Octo Cat")
+
+        # Act
+        matched = [
+            github_stats._commit_identity_match_date(item, patterns)
+            for item in cases
+        ]
+
+        # Assert
+        self.assertTrue(all(item is not None for item in matched))
+        self.assertIsNone(
+            github_stats._commit_identity_match_date(non_match, patterns)
+        )
+
     async def test_graphql_query_returns_json_for_success_status(self):
         # Arrange
         payload = {"data": {"viewer": {"login": "octocat"}}}
@@ -350,6 +477,44 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn('query: "author:octocat is:pr is:merged"', query)
         self.assertIn("issueCount", query)
 
+    async def test_monthly_commit_audit_reads_graphql_commit_contribution_counts(self):
+        # Arrange
+        windows = [
+            github_stats.MonthWindow(
+                key="2026-04",
+                label="Apr '26",
+                since="2026-04-01T00:00:00Z",
+                until="2026-05-01T00:00:00Z",
+                is_current=False,
+            ),
+            github_stats.MonthWindow(
+                key="2026-05",
+                label="May '26",
+                since="2026-05-01T00:00:00Z",
+                until="2026-05-02T00:00:00Z",
+                is_current=True,
+            ),
+        ]
+        stats = Stats("octocat", "token", _FailingSession())
+        stats.queries = mock.AsyncMock()
+        stats.queries.query.return_value = {
+            "data": {
+                "viewer": {
+                    "m0": {"totalCommitContributions": 4},
+                    "m1": {"totalCommitContributions": 5},
+                }
+            }
+        }
+
+        # Act
+        result = await stats.audit_monthly_commit_counts(windows)
+
+        # Assert
+        self.assertEqual(result, {"2026-04": 4, "2026-05": 5})
+        query = stats.queries.query.await_args.args[0]
+        self.assertIn("totalCommitContributions", query)
+        self.assertIn('from: "2026-04-01T00:00:00Z"', query)
+
     async def test_generate_images_stops_before_rendering_when_stats_load_fails(self):
         # Arrange
         async def fail_if_called(stats):
@@ -384,6 +549,10 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                 '<span class="progress">\n</span>\n<ul>\n\n</ul>\n',
                 encoding="utf-8",
             )
+            (generated / "monthly-commits.svg").write_text(
+                'Monthly Commits\n<rect class="bar" />\n',
+                encoding="utf-8",
+            )
 
             # Act / Assert
             with self.assertRaises(RuntimeError):
@@ -406,6 +575,7 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         for path, expected in (
             ("/repos/octocat/hello/stats/contributors", []),
             ("/repos/octocat/hello/traffic/views", {}),
+            ("/repos/octocat/hello/commits", []),
         ):
             for status in (404, 410):
                 with self.subTest(path=path, status=status):
@@ -423,6 +593,51 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
 
                     # Assert
                     self.assertEqual(result, expected)
+
+    async def test_rest_query_returns_empty_for_unavailable_commit_listing(self):
+        # Arrange
+        queries = Queries("octocat", "token", _FailingSession())
+
+        with mock.patch(
+            "github_stats.requests.get",
+            return_value=_FakeRequestsResponse(409, text="repository is empty"),
+        ):
+            # Act
+            result = await queries.query_rest("/repos/octocat/hello/commits")
+
+        # Assert
+        self.assertEqual(result, [])
+
+    async def test_rest_query_returns_empty_for_inaccessible_commit_listing(self):
+        # Arrange
+        queries = Queries("octocat", "token", _FailingSession())
+
+        with mock.patch(
+            "github_stats.requests.get",
+            return_value=_FakeRequestsResponse(403, text="forbidden"),
+        ):
+            # Act
+            result = await queries.query_rest("/repos/octocat/private/commits")
+
+        # Assert
+        self.assertEqual(result, [])
+
+    async def test_rest_query_degrades_rate_limited_commit_listing(self):
+        # Arrange
+        queries = Queries("octocat", "token", _FailingSession())
+
+        with mock.patch(
+            "github_stats.requests.get",
+            return_value=_FakeRequestsResponse(403, text="rate limit exceeded"),
+        ):
+            # Act
+            result = await queries.query_rest(
+                "/repos/octocat/private/commits",
+                max_wait_seconds=0.0,
+            )
+
+        # Assert
+        self.assertEqual(result, [])
 
     async def test_rest_query_returns_empty_for_inaccessible_traffic_views(self):
         # Arrange
@@ -600,6 +815,92 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result, (30, 12))
         self.assertGreater(queries.max_active_requests, 1)
 
+    async def test_monthly_commit_scan_paginates_matches_and_dedupes_sha(self):
+        # Arrange
+        window = github_stats.MonthWindow(
+            key="2026-05",
+            label="May '26",
+            since="2026-05-01T00:00:00Z",
+            until="2026-05-02T00:00:00Z",
+            is_current=True,
+        )
+        first_page = [
+            _commit("match-1", author_name="Peter Ryszkiewicz"),
+            *[
+                _commit(f"other-{index}", author_name="Octocat")
+                for index in range(99)
+            ],
+        ]
+        second_page = [
+            _commit("match-1", author_name="Peter Ryszkiewicz"),
+            _commit("match-2", committer_login="pRizz"),
+            _commit(
+                "old",
+                author_name="Peter Ryszkiewicz",
+                author_date="2026-04-30T23:00:00Z",
+            ),
+        ]
+        stats = Stats("octocat", "token", _FailingSession())
+        stats._repos = {"octocat/hello"}
+        stats.queries = _MonthlyCommitQueries(
+            {
+                ("/repos/octocat/hello/commits", "1"): github_stats.RestQueryResult(
+                    first_page
+                ),
+                ("/repos/octocat/hello/commits", "2"): github_stats.RestQueryResult(
+                    second_page
+                ),
+            }
+        )
+
+        # Act
+        result = await stats.scan_monthly_commits(
+            [window],
+            identity_patterns=["Peter Ryszkiewicz", "prizz"],
+        )
+
+        # Assert
+        self.assertEqual(result.counts, {"2026-05": 2})
+        self.assertEqual(len(stats.queries.calls), 2)
+        self.assertEqual(stats.queries.calls[0][1]["per_page"], "100")
+        self.assertEqual(stats.report.rest_requests_total, 2)
+
+    async def test_monthly_commit_scan_records_degraded_repo_month(self):
+        # Arrange
+        window = github_stats.MonthWindow(
+            key="2026-05",
+            label="May '26",
+            since="2026-05-01T00:00:00Z",
+            until="2026-05-02T00:00:00Z",
+            is_current=True,
+        )
+        stats = Stats("octocat", "token", _FailingSession())
+        stats._repos = {"octocat/missing"}
+        stats.queries = _MonthlyCommitQueries(
+            {
+                ("/repos/octocat/missing/commits", "1"): github_stats.RestQueryResult(
+                    [],
+                    degraded=True,
+                    status=404,
+                    category="not_found_or_gone",
+                    message="missing",
+                    attempts=1,
+                    retry_count=0,
+                    wait_seconds=0.0,
+                    elapsed_seconds=0.1,
+                )
+            }
+        )
+
+        # Act
+        result = await stats.scan_monthly_commits([window])
+
+        # Assert
+        self.assertEqual(result.counts, {"2026-05": 0})
+        self.assertEqual(len(stats.report.monthly_commits_degraded), 1)
+        self.assertEqual(stats.report.monthly_commits_degraded[0].repo, "octocat/missing")
+        self.assertEqual(stats.report.monthly_commits_degraded[0].endpoint, "commits")
+
     async def test_generate_images_preloads_stats_before_concurrent_rendering(self):
         # Arrange
         _FakeStats.loaded = False
@@ -617,6 +918,8 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
             "generate_images.generate_languages", assert_loaded_before_render
         ), mock.patch(
             "generate_images.generate_overview", assert_loaded_before_render
+        ), mock.patch(
+            "generate_images.generate_monthly_commits", assert_loaded_before_render
         ), mock.patch(
             "generate_images.validate_generated_output"
         ), mock.patch(
@@ -637,13 +940,20 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                         "total_repos": 0,
                         "contributors_degraded": [],
                         "traffic_degraded": [],
+                        "monthly_commits_degraded": [],
                         "critical_failures": [],
                         "rest_requests_total": 0,
                         "rest_retries_total": 0,
                         "rest_wait_seconds_total": 0.0,
                         "contributors_wait_seconds_total": 0.0,
                         "traffic_wait_seconds_total": 0.0,
+                        "monthly_commits_wait_seconds_total": 0.0,
                         "slowest_requests": [],
+                    },
+                    "monthly_commits": {
+                        "total": 0,
+                        "current_month": {},
+                        "month_count": 0,
                     },
                 }
             ),
@@ -684,6 +994,119 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                 self.assertFalse(_OverviewStats.lines_changed_accessed)
             finally:
                 os.chdir(previous_cwd)
+
+    async def test_monthly_commit_cache_refreshes_current_month_only(self):
+        # Arrange
+        now = dt.datetime(2026, 5, 2, 10, 30, tzinfo=dt.timezone.utc)
+        windows = github_stats.rolling_month_windows(now)
+        with TemporaryDirectory() as tmpdir:
+            cache_path = Path(tmpdir) / "generated" / "monthly-commits.json"
+            cache_path.parent.mkdir()
+            cached_months = [
+                {
+                    "key": window.key,
+                    "label": window.label,
+                    "count": 1,
+                    "is_current": window.is_current,
+                }
+                for window in windows[:-1]
+            ]
+            cache_path.write_text(
+                generate_images.json.dumps({"months": cached_months}),
+                encoding="utf-8",
+            )
+            stats = _MonthlyCacheStats()
+
+            # Act
+            result = await generate_images.build_monthly_commit_cache(
+                stats,
+                now=now,
+                cache_path=str(cache_path),
+            )
+
+            # Assert
+            self.assertEqual(stats.scanned_window_keys, ["2026-05"])
+            self.assertEqual(result["months"][0]["count"], 1)
+            self.assertEqual(result["months"][-1]["count"], 7)
+            self.assertEqual(result["months"][-1]["github_attributed_count"], 3)
+
+    async def test_monthly_commit_cache_preserves_count_when_refresh_degrades(self):
+        # Arrange
+        now = dt.datetime(2026, 5, 2, 10, 30, tzinfo=dt.timezone.utc)
+        windows = github_stats.rolling_month_windows(now)
+        with TemporaryDirectory() as tmpdir:
+            cache_path = Path(tmpdir) / "generated" / "monthly-commits.json"
+            cache_path.parent.mkdir()
+            cache_path.write_text(
+                generate_images.json.dumps(
+                    {
+                        "months": [
+                            {
+                                "key": window.key,
+                                "label": window.label,
+                                "count": 42 if window.is_current else 1,
+                                "is_current": window.is_current,
+                                "github_attributed_count": 5,
+                            }
+                            for window in windows
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+            stats = _DegradedMonthlyCacheStats()
+
+            # Act
+            result = await generate_images.build_monthly_commit_cache(
+                stats,
+                now=now,
+                cache_path=str(cache_path),
+            )
+
+            # Assert
+            self.assertEqual(result["months"][-1]["count"], 42)
+            self.assertTrue(result["months"][-1]["scan_degraded"])
+            self.assertEqual(result["source"]["degraded_months"], 1)
+
+    async def test_monthly_commit_cache_force_backfill_scans_all_months(self):
+        # Arrange
+        now = dt.datetime(2026, 5, 2, 10, 30, tzinfo=dt.timezone.utc)
+        with TemporaryDirectory() as tmpdir:
+            cache_path = Path(tmpdir) / "generated" / "monthly-commits.json"
+            stats = _MonthlyCacheStats()
+
+            # Act
+            result = await generate_images.build_monthly_commit_cache(
+                stats,
+                force_backfill=True,
+                now=now,
+                cache_path=str(cache_path),
+            )
+
+            # Assert
+            self.assertEqual(len(stats.scanned_window_keys), 13)
+            self.assertEqual(result["source"]["scanned_months"], 13)
+            self.assertEqual(
+                result["source"]["audit_counting"],
+                "graphql_total_commit_contributions",
+            )
+            self.assertTrue(cache_path.exists())
+
+    def test_monthly_commit_bar_renderer_handles_zero_and_current_month(self):
+        # Arrange
+        months = [
+            {"key": "2026-04", "label": "Apr '26", "count": 0, "is_current": False},
+            {"key": "2026-05", "label": "May '26", "count": 12, "is_current": True},
+        ]
+
+        # Act
+        output = generate_images._monthly_commit_bars(months)
+
+        # Assert
+        self.assertIn('class="bar"', output)
+        self.assertIn('class="bar current"', output)
+        self.assertIn("Apr &#x27;26", output)
+        self.assertIn("12", output)
 
     async def test_build_run_report_includes_new_metrics_without_lines_changed(self):
         # Act

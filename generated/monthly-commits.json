@@ -1,0 +1,127 @@
+{
+  "generated_at": "2026-05-02T15:53:03Z",
+  "window": {
+    "months": 13,
+    "timezone": "UTC",
+    "mode": "current_plus_12"
+  },
+  "source": {
+    "counting": "rest_commits_identity_scan",
+    "audit_counting": "graphql_total_commit_contributions",
+    "identity_patterns": [
+      "Peter Ryszkiewicz",
+      "prizz",
+      "pRizz"
+    ],
+    "repo_count": 175,
+    "scanned_months": 13,
+    "degraded_months": 0,
+    "degraded_repo_months": 13
+  },
+  "months": [
+    {
+      "key": "2025-05",
+      "label": "May '25",
+      "count": 10,
+      "is_current": false,
+      "scan_degraded": false,
+      "github_attributed_count": 9
+    },
+    {
+      "key": "2025-06",
+      "label": "Jun '25",
+      "count": 161,
+      "is_current": false,
+      "scan_degraded": false,
+      "github_attributed_count": 113
+    },
+    {
+      "key": "2025-07",
+      "label": "Jul '25",
+      "count": 95,
+      "is_current": false,
+      "scan_degraded": false,
+      "github_attributed_count": 44
+    },
+    {
+      "key": "2025-08",
+      "label": "Aug '25",
+      "count": 20,
+      "is_current": false,
+      "scan_degraded": false,
+      "github_attributed_count": 0
+    },
+    {
+      "key": "2025-09",
+      "label": "Sep '25",
+      "count": 49,
+      "is_current": false,
+      "scan_degraded": false,
+      "github_attributed_count": 0
+    },
+    {
+      "key": "2025-10",
+      "label": "Oct '25",
+      "count": 34,
+      "is_current": false,
+      "scan_degraded": false,
+      "github_attributed_count": 0
+    },
+    {
+      "key": "2025-11",
+      "label": "Nov '25",
+      "count": 13,
+      "is_current": false,
+      "scan_degraded": false,
+      "github_attributed_count": 2
+    },
+    {
+      "key": "2025-12",
+      "label": "Dec '25",
+      "count": 106,
+      "is_current": false,
+      "scan_degraded": false,
+      "github_attributed_count": 126
+    },
+    {
+      "key": "2026-01",
+      "label": "Jan '26",
+      "count": 1867,
+      "is_current": false,
+      "scan_degraded": false,
+      "github_attributed_count": 1727
+    },
+    {
+      "key": "2026-02",
+      "label": "Feb '26",
+      "count": 651,
+      "is_current": false,
+      "scan_degraded": false,
+      "github_attributed_count": 615
+    },
+    {
+      "key": "2026-03",
+      "label": "Mar '26",
+      "count": 713,
+      "is_current": false,
+      "scan_degraded": false,
+      "github_attributed_count": 839
+    },
+    {
+      "key": "2026-04",
+      "label": "Apr '26",
+      "count": 442,
+      "is_current": false,
+      "scan_degraded": false,
+      "github_attributed_count": 1136
+    },
+    {
+      "key": "2026-05",
+      "label": "May '26",
+      "count": 145,
+      "is_current": true,
+      "scan_degraded": false,
+      "github_attributed_count": 150
+    }
+  ]
+}
