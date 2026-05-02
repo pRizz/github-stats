@@ -60,6 +60,15 @@ For more information on inaccuracies, see issue
 [#3](https://github.com/jstrieb/github-stats/issues/3), and
 [#13](https://github.com/jstrieb/github-stats/issues/13).
 
+## Debugging
+
+To probe how long GitHub takes to compute contributor line-change statistics
+for a single repository, run:
+
+```sh
+ACCESS_TOKEN=$(gh auth token) bun scripts/probe-lines-changed.ts pRizz/github-stats pRizz --timeout 3600 --interval 10
+```
+
 # Installation
 
 <!-- TODO: Add details and screenshots -->
