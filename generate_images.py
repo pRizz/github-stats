@@ -108,8 +108,9 @@ def render_action_summary(report: Dict[str, Any]) -> str:
 - Stargazers: {stats["stargazers"]:,}
 - Forks: {stats["forks"]:,}
 - All-time contributions: {stats["total_contributions"]:,}
+- Current-year contributions: {stats["current_year_contributions"]:,}
+- Merged pull requests: {stats["merged_pull_requests"]:,}
 - Repositories: {stats["repos"]:,}
-- Lines changed: {stats["lines_changed"]:,}
 - Repository views: {stats["views"]:,}
 
 ## API Degradations
@@ -137,18 +138,39 @@ def render_action_summary(report: Dict[str, Any]) -> str:
 """
 
 
+def validate_run_report(report: Dict[str, Any]) -> None:
+    """
+    Fail when optional REST metrics degraded into misleading all-zero values.
+    """
+    stats = report["stats"]
+    api = report["api"]
+    repo_count = stats["repos"]
+    failures = []
+
+    traffic_degraded_count = len(api["traffic_degraded"])
+
+    if repo_count > 0 and stats["views"] == 0 and traffic_degraded_count > 0:
+        failures.append(
+            "Repository views is zero while "
+            f"{traffic_degraded_count} traffic endpoints degraded."
+        )
+
+    if failures:
+        raise RuntimeError(
+            "Generated metrics failed validation:\n- " + "\n- ".join(failures)
+        )
+
+
 async def build_run_report(s: Stats) -> Dict[str, Any]:
-    lines = await s.lines_changed
     return {
         "stats": {
             "name": await s.name,
             "stargazers": await s.stargazers,
             "forks": await s.forks,
             "total_contributions": await s.total_contributions,
+            "current_year_contributions": await s.current_year_contributions,
+            "merged_pull_requests": await s.merged_pull_requests,
             "repos": len(await s.repos),
-            "lines_added": lines[0],
-            "lines_deleted": lines[1],
-            "lines_changed": lines[0] + lines[1],
             "views": await s.views,
         },
         "api": s.report.to_dict(),
@@ -197,9 +219,9 @@ async def generate_overview(s: Stats) -> None:
     output = re.sub("{{ stars }}", f"{await s.stargazers:,}", output)
     output = re.sub("{{ forks }}", f"{await s.forks:,}", output)
     output = re.sub("{{ contributions }}", f"{await s.total_contributions:,}", output)
-    lines = await s.lines_changed
-    changed = lines[0] + lines[1]
-    output = re.sub("{{ lines_changed }}", f"{changed:,}", output)
+    output = re.sub(
+        "{{ merged_pull_requests }}", f"{await s.merged_pull_requests:,}", output
+    )
     output = re.sub("{{ views }}", f"{await s.views:,}", output)
     output = re.sub("{{ repos }}", f"{len(await s.repos):,}", output)
 
@@ -294,6 +316,7 @@ async def main() -> None:
         report = await build_run_report(s)
         write_run_report(report)
         write_action_summary(render_action_summary(report))
+        validate_run_report(report)
 
 
 if __name__ == "__main__":

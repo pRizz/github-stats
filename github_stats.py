@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import asyncio
+import datetime as dt
 import os
 import time
 from dataclasses import asdict, dataclass, field
@@ -323,6 +324,10 @@ def _env_float(name: str, default: float) -> float:
     except ValueError:
         print(f"Invalid {name} value {raw_value!r}; using {default}.")
         return default
+
+
+def _current_utc_year() -> int:
+    return dt.datetime.now(dt.timezone.utc).year
 
 
 class GitHubQueryError(RuntimeError):
@@ -910,6 +915,45 @@ query {
 """
 
     @staticmethod
+    def current_year_contribs(year: int) -> str:
+        """
+        :param year: year to query for
+        :return: query to retrieve contribution information for the given year
+        """
+        return f"""
+query {{
+  viewer {{
+    contributionsCollection(
+        from: "{year}-01-01T00:00:00Z",
+        to: "{year + 1}-01-01T00:00:00Z"
+    ) {{
+      contributionCalendar {{
+        totalContributions
+      }}
+    }}
+  }}
+}}
+"""
+
+    @staticmethod
+    def merged_pull_requests(username: str) -> str:
+        """
+        :param username: GitHub username to search for
+        :return: query to count merged pull requests authored by the user
+        """
+        return f"""
+query {{
+  search(
+      query: "author:{username} is:pr is:merged",
+      type: ISSUE,
+      first: 1
+  ) {{
+    issueCount
+  }}
+}}
+"""
+
+    @staticmethod
     def contribs_by_year(year: str) -> str:
         """
         :param year: year to query for
@@ -966,6 +1010,8 @@ class Stats(object):
         self._stargazers: Optional[int] = None
         self._forks: Optional[int] = None
         self._total_contributions: Optional[int] = None
+        self._current_year_contributions: Optional[int] = None
+        self._merged_pull_requests: Optional[int] = None
         self._languages: Optional[Dict[str, Any]] = None
         self._repos: Optional[Set[str]] = None
         self._lines_changed: Optional[Tuple[int, int]] = None
@@ -1028,6 +1074,8 @@ class Stats(object):
 Stargazers: {await self.stargazers:,}
 Forks: {await self.forks:,}
 All-time contributions: {await self.total_contributions:,}
+Current-year contributions: {await self.current_year_contributions:,}
+Merged pull requests: {await self.merged_pull_requests:,}
 Repositories with contributions: {len(await self.repos)}
 Lines of code added: {lines_changed[0]:,}
 Lines of code deleted: {lines_changed[1]:,}
@@ -1219,6 +1267,43 @@ Languages:
                 "totalContributions", 0
             )
         return cast(int, self._total_contributions)
+
+    @property
+    async def current_year_contributions(self) -> int:
+        """
+        :return: count of the user's GitHub contributions in the current UTC year
+        """
+        if self._current_year_contributions is not None:
+            return self._current_year_contributions
+
+        year = _current_utc_year()
+        result = (
+            (await self.queries.query(Queries.current_year_contribs(year)))
+            .get("data", {})
+            .get("viewer", {})
+            .get("contributionsCollection", {})
+            .get("contributionCalendar", {})
+            .get("totalContributions", 0)
+        )
+        self._current_year_contributions = int(result)
+        return self._current_year_contributions
+
+    @property
+    async def merged_pull_requests(self) -> int:
+        """
+        :return: count of merged pull requests authored by the user
+        """
+        if self._merged_pull_requests is not None:
+            return self._merged_pull_requests
+
+        result = (
+            (await self.queries.query(Queries.merged_pull_requests(self.username)))
+            .get("data", {})
+            .get("search", {})
+            .get("issueCount", 0)
+        )
+        self._merged_pull_requests = int(result)
+        return self._merged_pull_requests
 
     @property
     async def lines_changed(self) -> Tuple[int, int]:

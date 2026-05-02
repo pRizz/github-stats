@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import unittest
+import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import mock
@@ -145,6 +146,84 @@ class _FailingStats:
         raise RuntimeError("critical stats unavailable")
 
 
+class _OverviewStats:
+    lines_changed_accessed = False
+
+    @property
+    async def name(self):
+        return "Octocat"
+
+    @property
+    async def stargazers(self):
+        return 1
+
+    @property
+    async def forks(self):
+        return 2
+
+    @property
+    async def total_contributions(self):
+        return 3
+
+    @property
+    async def merged_pull_requests(self):
+        return 42
+
+    @property
+    async def lines_changed(self):
+        type(self).lines_changed_accessed = True
+        raise AssertionError("overview should not read lines_changed")
+
+    @property
+    async def views(self):
+        return 4
+
+    @property
+    async def repos(self):
+        return {"octocat/hello", "octocat/world"}
+
+
+class _ReportStats:
+    def __init__(self):
+        self.report = github_stats.StatsReport()
+
+    @property
+    async def name(self):
+        return "Octocat"
+
+    @property
+    async def stargazers(self):
+        return 1
+
+    @property
+    async def forks(self):
+        return 2
+
+    @property
+    async def total_contributions(self):
+        return 3
+
+    @property
+    async def current_year_contributions(self):
+        return 4
+
+    @property
+    async def merged_pull_requests(self):
+        return 5
+
+    @property
+    async def repos(self):
+        return {"octocat/hello", "octocat/world"}
+
+    @property
+    async def views(self):
+        return 6
+
+    @property
+    async def lines_changed(self):
+        raise AssertionError("report should not read lines_changed")
+
+
 class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
     async def test_graphql_query_returns_json_for_success_status(self):
         # Arrange
@@ -229,6 +308,47 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
             await stats.get_stats()
 
         self.assertIsNone(stats._repos)
+
+    async def test_current_year_contributions_uses_current_utc_year(self):
+        # Arrange
+        stats = Stats("octocat", "token", _FailingSession())
+        stats.queries = mock.AsyncMock()
+        stats.queries.query.return_value = {
+            "data": {
+                "viewer": {
+                    "contributionsCollection": {
+                        "contributionCalendar": {"totalContributions": 123}
+                    }
+                }
+            }
+        }
+
+        # Act
+        with mock.patch("github_stats._current_utc_year", return_value=2026):
+            result = await stats.current_year_contributions
+
+        # Assert
+        self.assertEqual(result, 123)
+        query = stats.queries.query.await_args.args[0]
+        self.assertIn('from: "2026-01-01T00:00:00Z"', query)
+        self.assertIn('to: "2027-01-01T00:00:00Z"', query)
+
+    async def test_merged_pull_requests_reads_graphql_search_count(self):
+        # Arrange
+        stats = Stats("octocat", "token", _FailingSession())
+        stats.queries = mock.AsyncMock()
+        stats.queries.query.return_value = {
+            "data": {"search": {"issueCount": 42}}
+        }
+
+        # Act
+        result = await stats.merged_pull_requests
+
+        # Assert
+        self.assertEqual(result, 42)
+        query = stats.queries.query.await_args.args[0]
+        self.assertIn('query: "author:octocat is:pr is:merged"', query)
+        self.assertIn("issueCount", query)
 
     async def test_generate_images_stops_before_rendering_when_stats_load_fails(self):
         # Arrange
@@ -508,8 +628,9 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                         "stargazers": 0,
                         "forks": 0,
                         "total_contributions": 0,
+                        "current_year_contributions": 0,
+                        "merged_pull_requests": 0,
                         "repos": 0,
-                        "lines_changed": 0,
                         "views": 0,
                     },
                     "api": {
@@ -536,6 +657,44 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         # Assert
         self.assertEqual(_FakeStats.get_stats_calls, 1)
 
+    async def test_generate_overview_uses_merged_prs_without_lines_changed(self):
+        # Arrange
+        with TemporaryDirectory() as tmpdir:
+            tmp_path = Path(tmpdir)
+            (tmp_path / "templates").mkdir()
+            (tmp_path / "templates" / "overview.svg").write_text(
+                "{{ name }} {{ stars }} {{ forks }} {{ contributions }} "
+                "{{ merged_pull_requests }} {{ views }} {{ repos }}",
+                encoding="utf-8",
+            )
+            previous_cwd = Path.cwd()
+            _OverviewStats.lines_changed_accessed = False
+
+            try:
+                os.chdir(tmp_path)
+
+                # Act
+                await generate_images.generate_overview(_OverviewStats())
+
+                # Assert
+                output = (tmp_path / "generated" / "overview.svg").read_text(
+                    encoding="utf-8"
+                )
+                self.assertIn("Octocat 1 2 3 42 4 2", output)
+                self.assertFalse(_OverviewStats.lines_changed_accessed)
+            finally:
+                os.chdir(previous_cwd)
+
+    async def test_build_run_report_includes_new_metrics_without_lines_changed(self):
+        # Act
+        report = await generate_images.build_run_report(_ReportStats())
+
+        # Assert
+        self.assertEqual(report["stats"]["current_year_contributions"], 4)
+        self.assertEqual(report["stats"]["merged_pull_requests"], 5)
+        self.assertNotIn("lines_changed", report["stats"])
+        self.assertEqual(report["stats"]["views"], 6)
+
     def test_action_summary_includes_degraded_repo_names(self):
         # Arrange
         report = {
@@ -544,8 +703,9 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                 "stargazers": 1,
                 "forks": 2,
                 "total_contributions": 3,
+                "current_year_contributions": 4,
+                "merged_pull_requests": 5,
                 "repos": 4,
-                "lines_changed": 5,
                 "views": 0,
             },
             "api": {
@@ -607,9 +767,94 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("octocat/slow", summary)
         self.assertIn("Traffic views degraded: 1", summary)
         self.assertIn("Contributor stats degraded: 1", summary)
+        self.assertIn("Current-year contributions", summary)
+        self.assertIn("Merged pull requests", summary)
         self.assertIn("API Wait Summary", summary)
         self.assertIn("Slowest API Waits", summary)
         self.assertIn("4.3s", summary)
+
+    def test_run_report_validation_allows_contributor_degradation(self):
+        # Arrange
+        report = {
+            "stats": {
+                "name": "Octocat",
+                "stargazers": 1,
+                "forks": 2,
+                "total_contributions": 3,
+                "current_year_contributions": 4,
+                "merged_pull_requests": 5,
+                "repos": 4,
+                "views": 7,
+            },
+            "api": {
+                "contributors_degraded": [
+                    {
+                        "repo": "octocat/slow",
+                        "endpoint": "stats/contributors",
+                        "status": 202,
+                        "category": "pending",
+                        "message": "stats still pending",
+                    }
+                ],
+                "traffic_degraded": [],
+            },
+        }
+
+        # Act / Assert
+        generate_images.validate_run_report(report)
+
+    def test_run_report_validation_rejects_zero_views_with_degraded_traffic(self):
+        # Arrange
+        report = {
+            "stats": {
+                "name": "Octocat",
+                "stargazers": 1,
+                "forks": 2,
+                "total_contributions": 3,
+                "current_year_contributions": 4,
+                "merged_pull_requests": 5,
+                "repos": 4,
+                "views": 0,
+            },
+            "api": {
+                "contributors_degraded": [],
+                "traffic_degraded": [
+                    {
+                        "repo": "octocat/private",
+                        "endpoint": "traffic/views",
+                        "status": 403,
+                        "category": "auth_or_permission_error",
+                        "message": "traffic views inaccessible",
+                    }
+                ],
+            },
+        }
+
+        # Act / Assert
+        with self.assertRaisesRegex(RuntimeError, "Repository views"):
+            generate_images.validate_run_report(report)
+
+    def test_run_report_validation_allows_real_zero_without_degradation(self):
+        # Arrange
+        report = {
+            "stats": {
+                "name": "Octocat",
+                "stargazers": 0,
+                "forks": 0,
+                "total_contributions": 0,
+                "current_year_contributions": 0,
+                "merged_pull_requests": 0,
+                "repos": 1,
+                "views": 0,
+            },
+            "api": {
+                "contributors_degraded": [],
+                "traffic_degraded": [],
+            },
+        }
+
+        # Act / Assert
+        generate_images.validate_run_report(report)
 
     def test_action_summary_writer_allows_missing_github_step_summary(self):
         # Act / Assert
