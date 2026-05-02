@@ -374,6 +374,17 @@ def _env_float(name: str, default: float) -> float:
         return default
 
 
+def _env_int(name: str, default: int) -> int:
+    raw_value = os.getenv(name)
+    if raw_value is None:
+        return default
+    try:
+        return int(raw_value)
+    except ValueError:
+        print(f"Invalid {name} value {raw_value!r}; using {default}.")
+        return default
+
+
 def _current_utc_year() -> int:
     return dt.datetime.now(dt.timezone.utc).year
 
@@ -500,6 +511,24 @@ def _commit_identity_match_date(
         if isinstance(committer_data, dict):
             return _parse_github_datetime(str(committer_data.get("date", "")))
     return None
+
+
+class _AsyncRequestThrottle:
+    def __init__(self, delay_seconds: float, max_concurrent: int):
+        self.delay_seconds = max(0.0, delay_seconds)
+        self.semaphore = asyncio.Semaphore(max(1, max_concurrent))
+        self.lock = asyncio.Lock()
+        self.next_request_at = 0.0
+
+    async def run(self, request_factory: Any) -> Any:
+        async with self.semaphore:
+            async with self.lock:
+                now = time.monotonic()
+                wait_seconds = self.next_request_at - now
+                if wait_seconds > 0:
+                    await asyncio.sleep(wait_seconds)
+                self.next_request_at = time.monotonic() + self.delay_seconds
+            return await request_factory()
 
 
 class GitHubQueryError(RuntimeError):
@@ -1566,19 +1595,33 @@ Languages:
         seen_by_month: Dict[str, Set[str]] = {window.key: set() for window in windows}
         degraded_months: Set[str] = set()
         max_wait_seconds = _env_float("MONTHLY_COMMITS_WAIT_SECONDS", 12.0)
+        request_delay_seconds = _env_float(
+            "MONTHLY_COMMITS_REQUEST_DELAY_SECONDS",
+            0.75,
+        )
+        max_concurrent_requests = _env_int(
+            "MONTHLY_COMMITS_MAX_CONCURRENT_REQUESTS",
+            1,
+        )
+        commit_request_throttle = _AsyncRequestThrottle(
+            request_delay_seconds,
+            max_concurrent_requests,
+        )
 
         async def scan_repo_window(repo: str, window: MonthWindow) -> None:
             page = 1
             while True:
-                result = await self.queries.query_rest_with_outcome(
-                    f"/repos/{repo}/commits",
-                    params={
-                        "since": window.since,
-                        "until": window.until,
-                        "per_page": "100",
-                        "page": str(page),
-                    },
-                    max_wait_seconds=max_wait_seconds,
+                result = await commit_request_throttle.run(
+                    lambda: self.queries.query_rest_with_outcome(
+                        f"/repos/{repo}/commits",
+                        params={
+                            "since": window.since,
+                            "until": window.until,
+                            "per_page": "100",
+                            "page": str(page),
+                        },
+                        max_wait_seconds=max_wait_seconds,
+                    )
                 )
                 self._record_rest_call(repo, "commits", result)
                 if result.degraded:

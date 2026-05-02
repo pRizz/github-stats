@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import asyncio
 import datetime as dt
 import unittest
 import os
@@ -131,11 +132,31 @@ class _MonthlyCommitQueries:
     def __init__(self, outcomes):
         self.outcomes = outcomes
         self.calls = []
+        self.active_requests = 0
+        self.max_active_requests = 0
 
     async def query_rest_with_outcome(self, path, params=None, max_wait_seconds=None):
         params = {} if params is None else params
         self.calls.append((path, dict(params)))
-        return self.outcomes[(path, params.get("page", "1"))]
+        self.active_requests += 1
+        self.max_active_requests = max(self.max_active_requests, self.active_requests)
+        try:
+            return self.outcomes[(path, params.get("page", "1"))]
+        finally:
+            self.active_requests -= 1
+
+
+class _SlowMonthlyCommitQueries(_MonthlyCommitQueries):
+    async def query_rest_with_outcome(self, path, params=None, max_wait_seconds=None):
+        params = {} if params is None else params
+        self.calls.append((path, dict(params)))
+        self.active_requests += 1
+        self.max_active_requests = max(self.max_active_requests, self.active_requests)
+        try:
+            await asyncio.sleep(0.01)
+            return self.outcomes[(path, params.get("page", "1"))]
+        finally:
+            self.active_requests -= 1
 
 
 class _FakeStats:
@@ -815,6 +836,41 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result, (30, 12))
         self.assertGreater(queries.max_active_requests, 1)
 
+    def test_monthly_commit_throttle_env_defaults_and_overrides(self):
+        # Act / Assert
+        with mock.patch.dict("os.environ", {}, clear=True):
+            self.assertEqual(
+                github_stats._env_float(
+                    "MONTHLY_COMMITS_REQUEST_DELAY_SECONDS",
+                    0.75,
+                ),
+                0.75,
+            )
+            self.assertEqual(
+                github_stats._env_int("MONTHLY_COMMITS_MAX_CONCURRENT_REQUESTS", 1),
+                1,
+            )
+
+        with mock.patch.dict(
+            "os.environ",
+            {
+                "MONTHLY_COMMITS_REQUEST_DELAY_SECONDS": "0.25",
+                "MONTHLY_COMMITS_MAX_CONCURRENT_REQUESTS": "2",
+            },
+            clear=True,
+        ):
+            self.assertEqual(
+                github_stats._env_float(
+                    "MONTHLY_COMMITS_REQUEST_DELAY_SECONDS",
+                    0.75,
+                ),
+                0.25,
+            )
+            self.assertEqual(
+                github_stats._env_int("MONTHLY_COMMITS_MAX_CONCURRENT_REQUESTS", 1),
+                2,
+            )
+
     async def test_monthly_commit_scan_paginates_matches_and_dedupes_sha(self):
         # Arrange
         window = github_stats.MonthWindow(
@@ -854,16 +910,81 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         )
 
         # Act
-        result = await stats.scan_monthly_commits(
-            [window],
-            identity_patterns=["Peter Ryszkiewicz", "prizz"],
-        )
+        with mock.patch.dict(
+            "os.environ",
+            {"MONTHLY_COMMITS_REQUEST_DELAY_SECONDS": "0"},
+        ):
+            result = await stats.scan_monthly_commits(
+                [window],
+                identity_patterns=["Peter Ryszkiewicz", "prizz"],
+            )
 
         # Assert
         self.assertEqual(result.counts, {"2026-05": 2})
         self.assertEqual(len(stats.queries.calls), 2)
         self.assertEqual(stats.queries.calls[0][1]["per_page"], "100")
         self.assertEqual(stats.report.rest_requests_total, 2)
+
+    async def test_monthly_commit_scan_uses_global_request_delay(self):
+        # Arrange
+        window = github_stats.MonthWindow(
+            key="2026-05",
+            label="May '26",
+            since="2026-05-01T00:00:00Z",
+            until="2026-05-02T00:00:00Z",
+            is_current=True,
+        )
+        stats = Stats("octocat", "token", _FailingSession())
+        stats._repos = {"octocat/one", "octocat/two"}
+        stats.queries = _MonthlyCommitQueries(
+            {
+                ("/repos/octocat/one/commits", "1"): github_stats.RestQueryResult([]),
+                ("/repos/octocat/two/commits", "1"): github_stats.RestQueryResult([]),
+            }
+        )
+
+        # Act
+        with mock.patch.dict("os.environ", {}, clear=True), mock.patch(
+            "github_stats.asyncio.sleep",
+            mock.AsyncMock(),
+        ) as sleep:
+            await stats.scan_monthly_commits([window])
+
+        # Assert
+        sleep.assert_awaited_once()
+        self.assertGreaterEqual(sleep.await_args.args[0], 0.7)
+
+    async def test_monthly_commit_scan_serializes_default_concurrency(self):
+        # Arrange
+        window = github_stats.MonthWindow(
+            key="2026-05",
+            label="May '26",
+            since="2026-05-01T00:00:00Z",
+            until="2026-05-02T00:00:00Z",
+            is_current=True,
+        )
+        stats = Stats("octocat", "token", _FailingSession())
+        stats._repos = {"octocat/one", "octocat/two", "octocat/three"}
+        stats.queries = _SlowMonthlyCommitQueries(
+            {
+                ("/repos/octocat/one/commits", "1"): github_stats.RestQueryResult([]),
+                ("/repos/octocat/two/commits", "1"): github_stats.RestQueryResult([]),
+                ("/repos/octocat/three/commits", "1"): github_stats.RestQueryResult(
+                    []
+                ),
+            }
+        )
+
+        # Act
+        with mock.patch.dict(
+            "os.environ",
+            {"MONTHLY_COMMITS_REQUEST_DELAY_SECONDS": "0"},
+            clear=True,
+        ):
+            await stats.scan_monthly_commits([window])
+
+        # Assert
+        self.assertEqual(stats.queries.max_active_requests, 1)
 
     async def test_monthly_commit_scan_records_degraded_repo_month(self):
         # Arrange
@@ -893,7 +1014,11 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         )
 
         # Act
-        result = await stats.scan_monthly_commits([window])
+        with mock.patch.dict(
+            "os.environ",
+            {"MONTHLY_COMMITS_REQUEST_DELAY_SECONDS": "0"},
+        ):
+            result = await stats.scan_monthly_commits([window])
 
         # Assert
         self.assertEqual(result.counts, {"2026-05": 0})
