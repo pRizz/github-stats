@@ -823,7 +823,7 @@ async def generate_languages(s: Stats) -> None:
         )
         lang_list += f"""
 <li style="animation-delay: {i * delay_between}ms;">
-{render_language_icon(lang, color)}
+{render_language_icon(lang, color, contrast_halo=True)}
 <span class="lang">{_svg_text(lang)}</span>
 <span class="percent">{data.get("prop", 0):0.2f}%</span>
 </li>
@@ -961,6 +961,7 @@ def _experimental_rows(
                 size=value_icon_size,
                 x=value_icon_x,
                 y=_experimental_icon_y_for_text_baseline(y, value_icon_size),
+                contrast_halo=True,
             )
         output.append(
             f'<g class="row" style="animation-delay: {index * 80}ms">'
@@ -1015,6 +1016,7 @@ def _experimental_horizontal_bars(
                 size=label_icon_size,
                 x=21,
                 y=_experimental_icon_y_for_text_baseline(y, label_icon_size),
+                contrast_halo=True,
             )
             label_x = 41
         value_text = (

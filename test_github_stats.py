@@ -1320,8 +1320,23 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("<svg", icon)
         self.assertIn('class="language-icon"', icon)
         self.assertNotIn("language-icon-fallback", icon)
+        self.assertNotIn("language-icon-contrast-halo", icon)
         self.assertNotIn("href=", icon)
         self.assertNotIn("cdn.", icon)
+
+    def test_language_icon_renderer_can_add_contrast_halo_to_vendored_svg(self):
+        # Act
+        icon = language_icons.render_language_icon(
+            "Rust",
+            "#dea584",
+            contrast_halo=True,
+        )
+
+        # Assert
+        self.assertIn("language-icon-contrast-halo", icon)
+        self.assertIn('fill="transparent"', icon)
+        self.assertIn('stroke="transparent"', icon)
+        self.assertNotIn("language-icon-fallback", icon)
 
     def test_all_vendored_language_icons_pass_sanitization(self):
         # Arrange
@@ -1343,8 +1358,23 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
 
         # Assert
         self.assertIn("language-icon-fallback", icon)
+        self.assertNotIn("language-icon-contrast-halo", icon)
         self.assertIn("fill:#384d54", icon)
         self.assertIn("M8 4a4 4", icon)
+
+    def test_language_icon_renderer_can_add_contrast_halo_to_fallback_svg(self):
+        # Act
+        icon = language_icons.render_language_icon(
+            "Just",
+            "#384d54",
+            contrast_halo=True,
+        )
+
+        # Assert
+        self.assertIn("language-icon-fallback", icon)
+        self.assertIn("language-icon-contrast-halo", icon)
+        self.assertIn('fill="transparent"', icon)
+        self.assertIn('stroke="transparent"', icon)
 
     def test_language_icon_sanitizer_rejects_unsafe_svg(self):
         # Arrange
@@ -1391,6 +1421,7 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                 )
                 self.assertIn('class="language-icon"', output)
                 self.assertIn("language-icon-fallback", output)
+                self.assertIn("language-icon-contrast-halo", output)
                 self.assertIn("<span class=\"lang\">Rust</span>", output)
                 self.assertNotIn("href=", output)
                 self.assertNotIn("cdn.", output)
@@ -1736,6 +1767,8 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                 ).read_text(encoding="utf-8")
                 self.assertIn("experimental-language-icon", language_momentum)
                 self.assertIn("experimental-language-icon", trading_card)
+                self.assertIn("language-icon-contrast-halo", language_momentum)
+                self.assertIn("language-icon-contrast-halo", trading_card)
                 self.assertNotIn("href=", language_momentum)
                 self.assertNotIn("href=", trading_card)
                 metrics = (

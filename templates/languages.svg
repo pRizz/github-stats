@@ -82,6 +82,17 @@ div.ellipsis {
   margin-right: 0.5ch;
   flex: 0 0 16px;
   vertical-align: top;
+  overflow: visible;
+}
+
+.language-icon-contrast-halo {
+  fill: transparent;
+  stroke: transparent;
+}
+
+#gh-dark-mode-only:target .language-icon-contrast-halo {
+  fill: rgba(240, 246, 252, 0.12);
+  stroke: rgba(240, 246, 252, 0.34);
 }
 
 #gh-dark-mode-only:target .octicon {
