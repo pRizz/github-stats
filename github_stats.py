@@ -593,6 +593,10 @@ class Queries(object):
     API. Also includes functions to dynamically generate GraphQL queries.
     """
 
+    GRAPHQL_RETRY_SECONDS = 120.0
+    GRAPHQL_MAX_ITERATIONS = 6
+    REPOSITORY_OVERVIEW_PAGE_SIZE = 25
+
     def __init__(
         self,
         username: str,
@@ -616,8 +620,8 @@ class Queries(object):
             "Authorization": f"Bearer {self.access_token}",
         }
 
-        deadline = time.monotonic() + 60.0
-        max_iterations = 4
+        deadline = time.monotonic() + self.GRAPHQL_RETRY_SECONDS
+        max_iterations = self.GRAPHQL_MAX_ITERATIONS
 
         for attempt in range(1, max_iterations + 1):
             try:
@@ -1077,7 +1081,7 @@ class Queries(object):
     login,
     name,
     repositories(
-        first: 100,
+        first: {Queries.REPOSITORY_OVERVIEW_PAGE_SIZE},
         orderBy: {{
             field: UPDATED_AT,
             direction: DESC
@@ -1121,7 +1125,7 @@ class Queries(object):
       }}
     }}
     repositoriesContributedTo(
-        first: 100,
+        first: {Queries.REPOSITORY_OVERVIEW_PAGE_SIZE},
         includeUserRepositories: false,
         orderBy: {{
             field: UPDATED_AT,
@@ -1184,7 +1188,7 @@ class Queries(object):
     login,
     name,
     repositories(
-        first: 100,
+        first: {Queries.REPOSITORY_OVERVIEW_PAGE_SIZE},
         orderBy: {{
             field: UPDATED_AT,
             direction: DESC
@@ -1241,7 +1245,7 @@ class Queries(object):
     login,
     name,
     repositoriesContributedTo(
-        first: 100,
+        first: {Queries.REPOSITORY_OVERVIEW_PAGE_SIZE},
         includeUserRepositories: false,
         orderBy: {{
             field: UPDATED_AT,

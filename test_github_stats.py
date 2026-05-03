@@ -666,6 +666,20 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                     # Assert
                     self.assertEqual(result, expected)
 
+    def test_repository_overview_queries_use_bounded_page_size(self):
+        # Arrange
+        expected = f"first: {github_stats.Queries.REPOSITORY_OVERVIEW_PAGE_SIZE}"
+
+        # Act
+        owned_query = github_stats.Queries.owned_repos_overview()
+        contributed_query = github_stats.Queries.contributed_repos_overview()
+
+        # Assert
+        self.assertIn(expected, owned_query)
+        self.assertIn(expected, contributed_query)
+        self.assertNotIn("first: 100", owned_query)
+        self.assertNotIn("first: 100", contributed_query)
+
     async def test_rest_query_returns_empty_for_unavailable_commit_listing(self):
         # Arrange
         queries = Queries("octocat", "token", _FailingSession())
