@@ -18,8 +18,8 @@ svg { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial
 <rect x="5" y="5" id="background" />
 <text class="title" x="21" y="36">Language Momentum</text>
 <text class="subtitle" x="21" y="55">Estimated from recent repo activity</text>
-<g class="row" style="animation-delay: 0ms"><text class="label" x="21" y="74">Rust</text><text class="value" x="170" y="74" text-anchor="end">42.2%</text><rect class="metric-bar" x="182" y="64" width="96" height="10" rx="2" style="fill:#dea584" /></g>
-<g class="row" style="animation-delay: 80ms"><text class="label" x="21" y="94">TypeScript</text><text class="value" x="170" y="94" text-anchor="end">27.9%</text><rect class="metric-bar" x="182" y="84" width="64" height="10" rx="2" style="fill:#3178c6" /></g>
+<g class="row" style="animation-delay: 0ms"><text class="label" x="21" y="74">Rust</text><text class="value" x="170" y="74" text-anchor="end">42.1%</text><rect class="metric-bar" x="182" y="64" width="96" height="10" rx="2" style="fill:#dea584" /></g>
+<g class="row" style="animation-delay: 80ms"><text class="label" x="21" y="94">TypeScript</text><text class="value" x="170" y="94" text-anchor="end">28.0%</text><rect class="metric-bar" x="182" y="84" width="64" height="10" rx="2" style="fill:#3178c6" /></g>
 <g class="row" style="animation-delay: 160ms"><text class="label" x="21" y="114">HTML</text><text class="value" x="170" y="114" text-anchor="end">26.1%</text><rect class="metric-bar" x="182" y="104" width="59" height="10" rx="2" style="fill:#e34c26" /></g>
 <g class="row" style="animation-delay: 240ms"><text class="label" x="21" y="134">Shell</text><text class="value" x="170" y="134" text-anchor="end">1.2%</text><rect class="metric-bar" x="182" y="124" width="3" height="10" rx="2" style="fill:#89e051" /></g>
 <g class="row" style="animation-delay: 320ms"><text class="label" x="21" y="154">JavaScript</text><text class="value" x="170" y="154" text-anchor="end">1.1%</text><rect class="metric-bar" x="182" y="144" width="3" height="10" rx="2" style="fill:#f1e05a" /></g>
