@@ -17,16 +17,17 @@ svg { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial
 </style>
 <rect x="5" y="5" id="background" />
 <text class="title" x="21" y="36">Contribution Mix</text>
-<text class="subtitle" x="21" y="55">Current year total: 4,956</text>
-<title>Commits: 4,613</title><rect class="metric-bar" x="21" y="78" width="296" height="14" rx="3" style="fill:#2da44e" />
-<title>Pull requests: 217</title><rect class="metric-bar" x="317" y="78" width="14" height="14" rx="3" style="fill:#0969da" />
-<title>Repositories: 101</title><rect class="metric-bar" x="331" y="78" width="6" height="14" rx="3" style="fill:#1f6feb" />
+<text class="subtitle" x="21" y="55">Current year total: 4,960</text>
+<title>Commits: 4,290</title><rect class="metric-bar" x="21" y="78" width="275" height="14" rx="3" style="fill:#2da44e" />
+<title>Restricted: 346</title><rect class="metric-bar" x="296" y="78" width="22" height="14" rx="3" style="fill:#8b949e" />
+<title>Pull requests: 215</title><rect class="metric-bar" x="318" y="78" width="14" height="14" rx="3" style="fill:#0969da" />
+<title>Repositories: 84</title><rect class="metric-bar" x="332" y="78" width="5" height="14" rx="3" style="fill:#1f6feb" />
 <title>Issues: 23</title><rect class="metric-bar" x="337" y="78" width="1" height="14" rx="3" style="fill:#bf8700" />
 <title>Reviews: 2</title><rect class="metric-bar" x="338" y="78" width="1" height="14" rx="3" style="fill:#8250df" />
-<g class="row" style="animation-delay: 0ms"><text class="label" x="21" y="108">Commits</text><text class="value" x="330" y="108" text-anchor="end">4,613</text></g>
-<g class="row" style="animation-delay: 80ms"><text class="label" x="21" y="124">Pull requests</text><text class="value" x="330" y="124" text-anchor="end">217</text></g>
-<g class="row" style="animation-delay: 160ms"><text class="label" x="21" y="140">Repositories</text><text class="value" x="330" y="140" text-anchor="end">101</text></g>
-<g class="row" style="animation-delay: 240ms"><text class="label" x="21" y="156">Issues</text><text class="value" x="330" y="156" text-anchor="end">23</text></g>
-<g class="row" style="animation-delay: 320ms"><text class="label" x="21" y="172">Reviews</text><text class="value" x="330" y="172" text-anchor="end">2</text></g>
-<g class="row" style="animation-delay: 400ms"><text class="label" x="21" y="188">Restricted</text><text class="value" x="330" y="188" text-anchor="end">0</text></g>
+<g class="row" style="animation-delay: 0ms"><text class="label" x="21" y="108">Commits</text><text class="value" x="330" y="108" text-anchor="end">4,290</text></g>
+<g class="row" style="animation-delay: 80ms"><text class="label" x="21" y="124">Restricted</text><text class="value" x="330" y="124" text-anchor="end">346</text></g>
+<g class="row" style="animation-delay: 160ms"><text class="label" x="21" y="140">Pull requests</text><text class="value" x="330" y="140" text-anchor="end">215</text></g>
+<g class="row" style="animation-delay: 240ms"><text class="label" x="21" y="156">Repositories</text><text class="value" x="330" y="156" text-anchor="end">84</text></g>
+<g class="row" style="animation-delay: 320ms"><text class="label" x="21" y="172">Issues</text><text class="value" x="330" y="172" text-anchor="end">23</text></g>
+<g class="row" style="animation-delay: 400ms"><text class="label" x="21" y="188">Reviews</text><text class="value" x="330" y="188" text-anchor="end">2</text></g>
 </svg>
