@@ -1089,7 +1089,7 @@ def _generate_experimental_contribution_pulse(metrics: Dict[str, Any]) -> None:
     _render_experimental_template(
         "contribution-pulse",
         "Contribution Pulse",
-        f"Recent activity; {_limited_suffix(metrics)}",
+        "Recent activity — last 13 months",
         _experimental_rows(rows),
     )
 
@@ -1188,7 +1188,7 @@ def _generate_experimental_collaboration(metrics: Dict[str, Any]) -> None:
     _render_experimental_template(
         "collaboration",
         "Collaboration",
-        f"Current-year contribution signals; {_limited_suffix(metrics)}",
+        "Current-year contribution signals",
         _experimental_rows(rows),
     )
 

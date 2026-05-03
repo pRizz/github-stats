@@ -1433,6 +1433,62 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("<rect", output)
         self.assertNotIn("<title>Restricted:", output)
 
+    def test_limited_data_suffix_removed_from_selected_experimental_cards(self):
+        # Arrange
+        template = """<svg id="gh-dark-mode-only" width="360" height="210" xmlns="http://www.w3.org/2000/svg">
+<text>{{ title }}</text><text>{{ subtitle }}</text>{{ body }}</svg>"""
+        metrics = {
+            "limited_data": ["monthly commit scan data degraded"],
+            "contribution_pulse": {
+                "total": 42,
+                "active_months": 3,
+                "month_count": 13,
+                "average_monthly": 3.2,
+                "best_month": "Apr '26",
+                "best_month_count": 20,
+                "current_month": "May '26",
+                "current_month_count": 7,
+                "active_streak_months": 2,
+            },
+            "collaboration": {
+                "merged_pull_requests": 5,
+                "pull_request_reviews": 8,
+                "issues": 13,
+                "owned_repositories": 21,
+                "external_repositories": 3,
+            },
+        }
+        with TemporaryDirectory() as tmpdir:
+            tmp_path = Path(tmpdir)
+            (tmp_path / "templates").mkdir()
+            for name in ("contribution-pulse", "collaboration"):
+                (tmp_path / "templates" / f"experimental-{name}.svg").write_text(
+                    template,
+                    encoding="utf-8",
+                )
+            previous_cwd = Path.cwd()
+
+            try:
+                os.chdir(tmp_path)
+
+                # Act
+                generate_images._generate_experimental_contribution_pulse(metrics)
+                generate_images._generate_experimental_collaboration(metrics)
+                contribution_pulse = (
+                    tmp_path / "generated" / "experimental-contribution-pulse.svg"
+                ).read_text(encoding="utf-8")
+                collaboration = (
+                    tmp_path / "generated" / "experimental-collaboration.svg"
+                ).read_text(encoding="utf-8")
+            finally:
+                os.chdir(previous_cwd)
+
+        # Assert
+        self.assertIn("Recent activity — last 13 months", contribution_pulse)
+        self.assertIn("Current-year contribution signals", collaboration)
+        self.assertNotIn("; limited data", contribution_pulse)
+        self.assertNotIn("; limited data", collaboration)
+
     async def test_generate_experimental_renders_all_cards_without_placeholders(self):
         # Arrange
         template = """<svg id="gh-dark-mode-only" width="360" height="210" xmlns="http://www.w3.org/2000/svg">
