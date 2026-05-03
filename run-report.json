@@ -1,0 +1,193 @@
+{
+  "stats": {
+    "name": "Peter Ryszkiewicz",
+    "stargazers": 178,
+    "forks": 351,
+    "total_contributions": 8564,
+    "current_year_contributions": 4951,
+    "merged_pull_requests": 232,
+    "repos": 175,
+    "views": 195
+  },
+  "monthly_commits": {
+    "total": 4319,
+    "current_month": {
+      "key": "2026-05",
+      "label": "May '26",
+      "count": 158,
+      "is_current": true,
+      "scan_degraded": false,
+      "github_attributed_count": 173
+    },
+    "month_count": 13
+  },
+  "experimental": {
+    "enabled": true,
+    "cards": [
+      "experimental-contribution-pulse.svg",
+      "experimental-contribution-mix.svg",
+      "experimental-impact.svg",
+      "experimental-language-momentum.svg",
+      "experimental-collaboration.svg",
+      "experimental-maintainer-health.svg",
+      "experimental-personal-bests.svg",
+      "experimental-trading-card.svg",
+      "experimental-repo-portfolio.svg"
+    ],
+    "private_repositories": 73,
+    "limited_data": [
+      "monthly commit scan data degraded"
+    ]
+  },
+  "api": {
+    "total_repos": 175,
+    "traffic_degraded": [],
+    "monthly_commits_degraded": [
+      {
+        "repo": "pRizz/IotaSeedGeneratoriOS",
+        "endpoint": "commits",
+        "status": 409,
+        "category": "conflict",
+        "message": "REST returned HTTP 409: resource conflict; {\"message\":\"Git Repository is empty.\",\"documentation_url\":\"https://docs.github.com/rest/commits/commits#list-commits\",\"status\":\"409\"}",
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.14732416700280737
+      }
+    ],
+    "critical_failures": [],
+    "rest_requests_total": 526,
+    "rest_retries_total": 0,
+    "rest_wait_seconds_total": 0.0,
+    "traffic_wait_seconds_total": 0.0,
+    "monthly_commits_wait_seconds_total": 0.0,
+    "slowest_requests": [
+      {
+        "repo": "pRizz/word-weave",
+        "endpoint": "commits",
+        "status": 200,
+        "category": "success_with_json",
+        "degraded": false,
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.39482795799995074,
+        "message": "response contains JSON"
+      },
+      {
+        "repo": "pRizz/av-denoiser",
+        "endpoint": "commits",
+        "status": 200,
+        "category": "success_with_json",
+        "degraded": false,
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.3651619170050253,
+        "message": "response contains JSON"
+      },
+      {
+        "repo": "pRizz/text-2-audiobook",
+        "endpoint": "commits",
+        "status": 200,
+        "category": "success_with_json",
+        "degraded": false,
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.33504687499953434,
+        "message": "response contains JSON"
+      },
+      {
+        "repo": "pRizz/iota-web-wallet",
+        "endpoint": "commits",
+        "status": 200,
+        "category": "success_with_json",
+        "degraded": false,
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.3334090419957647,
+        "message": "response contains JSON"
+      },
+      {
+        "repo": "pRizz/P-Rizz-Ventures-LLC-Website",
+        "endpoint": "commits",
+        "status": 200,
+        "category": "success_with_json",
+        "degraded": false,
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.33106620900070993,
+        "message": "response contains JSON"
+      },
+      {
+        "repo": "pRizz/av-denoiser",
+        "endpoint": "commits",
+        "status": 200,
+        "category": "success_with_json",
+        "degraded": false,
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.33044241700554267,
+        "message": "response contains JSON"
+      },
+      {
+        "repo": "pRizz/go2rtc-security-cli",
+        "endpoint": "commits",
+        "status": 200,
+        "category": "success_with_json",
+        "degraded": false,
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.32358445799764013,
+        "message": "response contains JSON"
+      },
+      {
+        "repo": "pRizz/Easy-File-Encryptor-Decryptor",
+        "endpoint": "commits",
+        "status": 200,
+        "category": "success_with_json",
+        "degraded": false,
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.32323570900189225,
+        "message": "response contains JSON"
+      },
+      {
+        "repo": "pRizz/apple-notes-exporter-ts",
+        "endpoint": "commits",
+        "status": 200,
+        "category": "success_with_json",
+        "degraded": false,
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.30773437499738066,
+        "message": "response contains JSON"
+      },
+      {
+        "repo": "pRizz/twitter-feels",
+        "endpoint": "commits",
+        "status": 200,
+        "category": "success_with_json",
+        "degraded": false,
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.3043896660019527,
+        "message": "response contains JSON"
+      }
+    ]
+  },
+  "github": {
+    "run_id": "",
+    "sha": "",
+    "ref": "",
+    "actor": "pRizz"
+  }
+}

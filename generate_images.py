@@ -22,6 +22,18 @@ from github_stats import (
 
 
 MONTHLY_COMMITS_CACHE = os.path.join("generated", "monthly-commits.json")
+EXPERIMENTAL_METRICS_CACHE = os.path.join("generated", "experimental-metrics.json")
+EXPERIMENTAL_CARD_NAMES = [
+    "contribution-pulse",
+    "contribution-mix",
+    "impact",
+    "language-momentum",
+    "collaboration",
+    "maintainer-health",
+    "personal-bests",
+    "trading-card",
+    "repo-portfolio",
+]
 
 
 ################################################################################
@@ -44,6 +56,10 @@ def validate_generated_output(output_folder: str = "generated") -> None:
     overview_path = os.path.join(output_folder, "overview.svg")
     languages_path = os.path.join(output_folder, "languages.svg")
     monthly_commits_path = os.path.join(output_folder, "monthly-commits.svg")
+    experimental_paths = [
+        os.path.join(output_folder, f"experimental-{name}.svg")
+        for name in EXPERIMENTAL_CARD_NAMES
+    ]
 
     with open(overview_path, "r") as f:
         overview = f.read()
@@ -71,6 +87,25 @@ def validate_generated_output(output_folder: str = "generated") -> None:
         raise RuntimeError(
             "Generated SVG validation failed; refusing to commit corrupt stats."
         )
+
+    if env_truthy("GENERATE_EXPERIMENTAL", default=True):
+        missing = [path for path in experimental_paths if not os.path.exists(path)]
+        if missing:
+            raise RuntimeError(
+                "Generated experimental SVG validation failed; missing "
+                + ", ".join(missing)
+            )
+        unresolved = []
+        for path in experimental_paths:
+            with open(path, "r") as f:
+                content = f.read()
+            if "{{" in content or "}}" in content or "<svg" not in content:
+                unresolved.append(path)
+        if unresolved:
+            raise RuntimeError(
+                "Generated experimental SVG validation failed; corrupt "
+                + ", ".join(unresolved)
+            )
 
 
 def _format_degradation_items(items: List[ApiDegradation], limit: int = 20) -> str:
@@ -113,9 +148,6 @@ def render_action_summary(report: Dict[str, Any]) -> str:
     traffic_items = [
         ApiDegradation(**item) for item in api["traffic_degraded"]
     ]
-    contributor_items = [
-        ApiDegradation(**item) for item in api["contributors_degraded"]
-    ]
     monthly_commit_items = [
         ApiDegradation(**item) for item in api.get("monthly_commits_degraded", [])
     ]
@@ -125,6 +157,8 @@ def render_action_summary(report: Dict[str, Any]) -> str:
     monthly = report.get("monthly_commits", {})
     monthly_total = monthly.get("total", 0)
     monthly_current = monthly.get("current_month", {})
+    experimental = report.get("experimental", {})
+    experimental_limited = experimental.get("limited_data", [])
 
     return f"""# GitHub Stats Image Generation
 
@@ -141,9 +175,15 @@ def render_action_summary(report: Dict[str, Any]) -> str:
 - Repositories: {stats["repos"]:,}
 - Repository views: {stats["views"]:,}
 
+## Experimental Stats
+
+- Experimental metrics enabled: {experimental.get("enabled", False)}
+- Experimental cards: {len(experimental.get("cards", [])):,}
+- Private repositories redacted: {experimental.get("private_repositories", 0):,}
+- Limited experimental data: {len(experimental_limited):,}
+
 ## API Degradations
 
-- Contributor stats degraded: {len(contributor_items)}
 - Traffic views degraded: {len(traffic_items)}
 - Monthly commit scans degraded: {len(monthly_commit_items)}
 
@@ -152,7 +192,6 @@ def render_action_summary(report: Dict[str, Any]) -> str:
 - REST requests: {api["rest_requests_total"]:,}
 - REST retries: {api["rest_retries_total"]:,}
 - Total retry wait: {api["rest_wait_seconds_total"]:.1f}s
-- Contributor stats retry wait: {api["contributors_wait_seconds_total"]:.1f}s
 - Traffic views retry wait: {api["traffic_wait_seconds_total"]:.1f}s
 - Monthly commit scan retry wait: {api.get("monthly_commits_wait_seconds_total", 0.0):.1f}s
 
@@ -162,9 +201,6 @@ def render_action_summary(report: Dict[str, Any]) -> str:
 ### Traffic View Failures
 
 {_format_degradation_items(traffic_items)}
-### Contributor Stats Warnings
-
-{_format_degradation_items(contributor_items)}
 ### Monthly Commit Scan Warnings
 
 {_format_degradation_items(monthly_commit_items)}
@@ -202,6 +238,7 @@ def validate_run_report(report: Dict[str, Any]) -> None:
 
 async def build_run_report(s: Stats) -> Dict[str, Any]:
     monthly_cache = load_monthly_commits_cache()
+    experimental_cache = load_monthly_commits_cache(EXPERIMENTAL_METRICS_CACHE)
     months = monthly_cache.get("months", [])
     current_month = next(
         (item for item in months if item.get("is_current")),
@@ -222,6 +259,19 @@ async def build_run_report(s: Stats) -> Dict[str, Any]:
             "total": sum(int(item.get("count", 0)) for item in months),
             "current_month": current_month,
             "month_count": len(months),
+        },
+        "experimental": {
+            "enabled": env_truthy("GENERATE_EXPERIMENTAL", default=True),
+            "cards": [
+                f"experimental-{name}.svg" for name in EXPERIMENTAL_CARD_NAMES
+            ]
+            if experimental_cache
+            else [],
+            "private_repositories": experimental_cache.get("privacy", {}).get(
+                "private_repositories",
+                0,
+            ),
+            "limited_data": experimental_cache.get("limited_data", []),
         },
         "api": s.report.to_dict(),
         "github": {
@@ -259,6 +309,41 @@ def env_truthy(name: str, default: bool = False) -> bool:
     return raw_value.strip().lower() not in {"", "0", "false", "no", "off"}
 
 
+def _strip_env_value(raw_value: str) -> str:
+    value = raw_value.strip()
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in {"'", '"'}:
+        return value[1:-1]
+    return value
+
+
+def load_env_file(path: str = ".env") -> None:
+    """
+    Load simple KEY=value pairs from a local env file.
+
+    Existing process environment values win so CI secrets and shell overrides
+    remain authoritative.
+    """
+    if not os.path.exists(path):
+        return
+
+    with open(path, "r") as f:
+        for line_number, raw_line in enumerate(f, start=1):
+            line = raw_line.strip()
+            if not line or line.startswith("#"):
+                continue
+            if "=" not in line:
+                raise RuntimeError(
+                    f"{path}:{line_number} is not a KEY=value assignment."
+                )
+            key, raw_value = line.split("=", 1)
+            key = key.strip()
+            if not key:
+                raise RuntimeError(f"{path}:{line_number} has an empty key.")
+            if key in os.environ:
+                continue
+            os.environ[key] = _strip_env_value(raw_value)
+
+
 def parse_repo_list(raw_value: Optional[str]) -> Set[str]:
     if not raw_value:
         return set()
@@ -278,6 +363,19 @@ def load_monthly_commits_cache(
 def write_monthly_commits_cache(
     data: Dict[str, Any],
     path: str = MONTHLY_COMMITS_CACHE,
+) -> None:
+    generate_output_folder()
+    parent = os.path.dirname(path)
+    if parent and not os.path.isdir(parent):
+        os.makedirs(parent)
+    with open(path, "w") as f:
+        json.dump(data, f, indent=2)
+        f.write("\n")
+
+
+def write_experimental_metrics_cache(
+    data: Dict[str, Any],
+    path: str = EXPERIMENTAL_METRICS_CACHE,
 ) -> None:
     generate_output_folder()
     parent = os.path.dirname(path)
@@ -385,6 +483,290 @@ async def build_monthly_commit_cache(
     }
     write_monthly_commits_cache(cache, cache_path)
     return cache
+
+
+def _parse_iso_datetime(value: str) -> Optional[dt.datetime]:
+    if not value:
+        return None
+    normalized = value.replace("Z", "+00:00")
+    try:
+        return dt.datetime.fromisoformat(normalized)
+    except ValueError:
+        return None
+
+
+def _repo_age_days(value: str, now: dt.datetime) -> Optional[int]:
+    parsed = _parse_iso_datetime(value)
+    if parsed is None:
+        return None
+    return max(0, (now - parsed).days)
+
+
+def _active_month_streak(months: List[Dict[str, Any]]) -> int:
+    streak = 0
+    for item in reversed(months):
+        if int(item.get("count", 0)) <= 0:
+            break
+        streak += 1
+    return streak
+
+
+def _bounded_score(value: float, maximum: float) -> int:
+    if maximum <= 0:
+        return 0
+    return max(0, min(100, round((value / maximum) * 100)))
+
+
+async def _optional_metric(awaitable: Any, label: str) -> Any:
+    try:
+        return await awaitable
+    except Exception as error:
+        return {"limited": label, "error": str(error)}
+
+
+def _repo_score(repo: Dict[str, Any]) -> int:
+    return (
+        int(repo.get("stargazers", 0))
+        + (2 * int(repo.get("forks", 0)))
+        + int(repo.get("open_issues", 0))
+        + int(repo.get("open_pull_requests", 0))
+    )
+
+
+def _top_repositories(repos: List[Dict[str, Any]], limit: int = 6) -> List[Dict[str, Any]]:
+    ranked = sorted(
+        repos,
+        key=lambda repo: (_repo_score(repo), repo.get("display_name", "")),
+        reverse=True,
+    )
+    return [
+        {
+            "display_name": repo.get("display_name", "Unknown"),
+            "is_private": bool(repo.get("is_private", False)),
+            "score": _repo_score(repo),
+            "stars": int(repo.get("stargazers", 0)),
+            "forks": int(repo.get("forks", 0)),
+        }
+        for repo in ranked[:limit]
+    ]
+
+
+async def build_experimental_metrics(
+    s: Stats,
+    now: Optional[dt.datetime] = None,
+) -> Dict[str, Any]:
+    """
+    Build redacted, approximate data for experimental SVG cards.
+    """
+    current_time = now or dt.datetime.now(dt.timezone.utc)
+    monthly_cache = load_monthly_commits_cache()
+    months = [
+        item for item in monthly_cache.get("months", []) if isinstance(item, dict)
+    ]
+    monthly_total = sum(int(item.get("count", 0)) for item in months)
+    active_months = sum(1 for item in months if int(item.get("count", 0)) > 0)
+    best_month = max(months, key=lambda item: int(item.get("count", 0)), default={})
+    current_month = next((item for item in months if item.get("is_current")), {})
+    average_monthly = round(monthly_total / len(months), 1) if months else 0.0
+    active_streak = _active_month_streak(months)
+
+    repo_values = [repo.to_safe_dict() for repo in (await s.repo_metrics).values()]
+    private_repo_count = sum(1 for repo in repo_values if repo["is_private"])
+    public_repo_count = len(repo_values) - private_repo_count
+    archived_repo_count = sum(1 for repo in repo_values if repo["is_archived"])
+    recently_updated_count = sum(
+        1
+        for repo in repo_values
+        if (maybe_age := _repo_age_days(repo.get("pushed_at", ""), current_time))
+        is not None
+        and maybe_age <= 90
+    )
+    stale_repo_count = sum(
+        1
+        for repo in repo_values
+        if (maybe_age := _repo_age_days(repo.get("pushed_at", ""), current_time))
+        is not None
+        and maybe_age > 365
+    )
+    release_repo_count = sum(
+        1 for repo in repo_values if int(repo.get("releases", 0)) > 0
+    )
+    tag_repo_count = sum(1 for repo in repo_values if int(repo.get("tags", 0)) > 0)
+    owned_repo_count = sum(1 for repo in repo_values if not repo["is_fork"])
+    external_repo_count = len(repo_values) - owned_repo_count
+
+    breakdown = await _optional_metric(
+        s.current_year_contribution_breakdown,
+        "current-year contribution breakdown unavailable",
+    )
+    if isinstance(breakdown, dict):
+        contribution_breakdown = {
+            "commits": 0,
+            "issues": 0,
+            "pull_requests": 0,
+            "pull_request_reviews": 0,
+            "repositories": 0,
+            "restricted": 0,
+            "total": 0,
+        }
+        limited_data = [breakdown["limited"]]
+    else:
+        contribution_breakdown = breakdown.to_dict()
+        limited_data = []
+
+    views = await _optional_metric(s.views, "repository traffic views unavailable")
+    if isinstance(views, dict):
+        views_total = 0
+        limited_data.append(views["limited"])
+    else:
+        views_total = int(views)
+
+    clones = await _optional_metric(s.clones, "repository traffic clones unavailable")
+    if isinstance(clones, dict):
+        clones_total = 0
+        limited_data.append(clones["limited"])
+    else:
+        clones_total = int(clones)
+    if s.report.traffic_degraded:
+        limited_data.append("repository traffic data degraded")
+    if s.report.monthly_commits_degraded:
+        limited_data.append("monthly commit scan data degraded")
+
+    languages: Dict[str, Dict[str, Any]] = {}
+    for repo in repo_values:
+        maybe_age = _repo_age_days(repo.get("pushed_at", ""), current_time)
+        if maybe_age is None:
+            recency_weight = 1.0
+        elif maybe_age <= 30:
+            recency_weight = 4.0
+        elif maybe_age <= 90:
+            recency_weight = 2.5
+        elif maybe_age <= 365:
+            recency_weight = 1.25
+        else:
+            recency_weight = 0.5
+        for lang, data in repo.get("languages", {}).items():
+            weighted_size = int(data.get("size", 0)) * recency_weight
+            if lang not in languages:
+                languages[lang] = {
+                    "score": 0.0,
+                    "color": data.get("color"),
+                    "repos": 0,
+                }
+            languages[lang]["score"] += weighted_size
+            languages[lang]["repos"] += 1
+    language_total = sum(item["score"] for item in languages.values())
+    language_momentum = [
+        {
+            "language": lang,
+            "percent": round(100 * data["score"] / language_total, 2)
+            if language_total
+            else 0.0,
+            "color": data.get("color") or "#8b949e",
+            "repos": data["repos"],
+        }
+        for lang, data in sorted(
+            languages.items(),
+            key=lambda item: item[1]["score"],
+            reverse=True,
+        )[:8]
+    ]
+
+    top_repositories = _top_repositories(repo_values)
+    top_public_repo = next(
+        (repo for repo in top_repositories if not repo["is_private"]),
+        {"display_name": "No public repo", "score": 0, "stars": 0, "forks": 0},
+    )
+    issue_total = sum(int(repo.get("open_issues", 0)) for repo in repo_values)
+    pr_total = sum(int(repo.get("open_pull_requests", 0)) for repo in repo_values)
+
+    activity_score = _bounded_score(
+        monthly_total + contribution_breakdown["total"], 1000
+    )
+    impact_score = _bounded_score(
+        (await s.stargazers) + (2 * await s.forks) + views_total + clones_total,
+        2000,
+    )
+    collaboration_score = _bounded_score(
+        contribution_breakdown["pull_requests"]
+        + contribution_breakdown["pull_request_reviews"]
+        + contribution_breakdown["issues"],
+        500,
+    )
+    breadth_score = _bounded_score(len(repo_values) + active_months, 200)
+
+    metrics = {
+        "generated_at": current_time.replace(microsecond=0)
+        .isoformat()
+        .replace("+00:00", "Z"),
+        "limited_data": sorted(set(limited_data)),
+        "privacy": {
+            "private_repository_names": "redacted",
+            "private_repositories": private_repo_count,
+        },
+        "contribution_pulse": {
+            "total": monthly_total,
+            "active_months": active_months,
+            "month_count": len(months),
+            "average_monthly": average_monthly,
+            "best_month": best_month.get("label", "None"),
+            "best_month_count": int(best_month.get("count", 0)),
+            "current_month": current_month.get("label", "None"),
+            "current_month_count": int(current_month.get("count", 0)),
+            "active_streak_months": active_streak,
+        },
+        "contribution_mix": contribution_breakdown,
+        "impact": {
+            "stars": await s.stargazers,
+            "forks": await s.forks,
+            "views_14_days": views_total,
+            "clones_14_days": clones_total,
+            "top_public_repo": top_public_repo,
+        },
+        "language_momentum": language_momentum,
+        "collaboration": {
+            "merged_pull_requests": await s.merged_pull_requests,
+            "pull_request_reviews": contribution_breakdown[
+                "pull_request_reviews"
+            ],
+            "issues": contribution_breakdown["issues"],
+            "owned_repositories": owned_repo_count,
+            "external_repositories": external_repo_count,
+        },
+        "maintainer_health": {
+            "open_issues": issue_total,
+            "open_pull_requests": pr_total,
+            "recently_updated": recently_updated_count,
+            "stale_repositories": stale_repo_count,
+            "archived_repositories": archived_repo_count,
+            "release_repositories": release_repo_count,
+            "tagged_repositories": tag_repo_count,
+        },
+        "personal_bests": {
+            "best_month": best_month.get("label", "None"),
+            "best_month_count": int(best_month.get("count", 0)),
+            "active_streak_months": active_streak,
+            "top_public_repo": top_public_repo["display_name"],
+            "top_public_repo_score": top_public_repo["score"],
+        },
+        "trading_card": {
+            "activity_score": activity_score,
+            "impact_score": impact_score,
+            "collaboration_score": collaboration_score,
+            "breadth_score": breadth_score,
+            "primary_language": language_momentum[0]["language"]
+            if language_momentum
+            else "Unknown",
+        },
+        "repo_portfolio": {
+            "repositories": top_repositories,
+            "public_repositories": public_repo_count,
+            "private_repositories": private_repo_count,
+        },
+        "repositories": repo_values,
+    }
+    write_experimental_metrics_cache(metrics)
+    return metrics
 
 
 ################################################################################
@@ -528,6 +910,298 @@ async def generate_monthly_commits(
         f.write(output)
 
 
+def _svg_text(value: Any) -> str:
+    return html.escape(str(value))
+
+
+def _format_number(value: Any) -> str:
+    try:
+        return f"{int(value):,}"
+    except (TypeError, ValueError):
+        return str(value)
+
+
+def _experimental_rows(rows: List[Tuple[str, Any]], start_y: int = 76) -> str:
+    output = []
+    for index, (label, value) in enumerate(rows[:7]):
+        y = start_y + (index * 18)
+        output.append(
+            f'<g class="row" style="animation-delay: {index * 80}ms">'
+            f'<text class="label" x="21" y="{y}">{_svg_text(label)}</text>'
+            f'<text class="value" x="330" y="{y}" text-anchor="end">'
+            f"{_svg_text(value)}</text></g>"
+        )
+    return "\n".join(output)
+
+
+def _experimental_horizontal_bars(
+    items: List[Dict[str, Any]],
+    label_key: str,
+    value_key: str,
+    start_y: int = 74,
+    color_key: Optional[str] = None,
+) -> str:
+    max_value = max([float(item.get(value_key, 0)) for item in items] + [1.0])
+    output = []
+    for index, item in enumerate(items[:6]):
+        y = start_y + (index * 20)
+        value = float(item.get(value_key, 0))
+        width = max(2, round((value / max_value) * 130))
+        color = item.get(color_key or "color", "#2da44e")
+        output.append(
+            f'<g class="row" style="animation-delay: {index * 80}ms">'
+            f'<text class="label" x="21" y="{y}">'
+            f'{_svg_text(item.get(label_key, "Unknown"))}</text>'
+            f'<rect class="metric-bar" x="182" y="{y - 10}" width="{width}" '
+            f'height="10" rx="2" style="fill:{_svg_text(color)}" />'
+            f'<text class="value" x="330" y="{y}" text-anchor="end">'
+            f'{_svg_text(item.get("display_value", item.get(value_key, 0)))}</text></g>'
+        )
+    return "\n".join(output)
+
+
+def _experimental_stack_bar(values: List[Tuple[str, int, str]]) -> str:
+    total = sum(value for _, value, _ in values)
+    if total <= 0:
+        return '<rect class="empty-bar" x="21" y="78" width="318" height="14" rx="3" />'
+    x = 21
+    output = []
+    for label, value, color in values:
+        width = round((value / total) * 318)
+        if width <= 0:
+            continue
+        output.append(
+            f"<title>{_svg_text(label)}: {_format_number(value)}</title>"
+            f'<rect x="{x}" y="78" width="{width}" height="14" rx="3" '
+            f'style="fill:{_svg_text(color)}" />'
+        )
+        x += width
+    return "\n".join(output)
+
+
+def _render_experimental_template(
+    name: str,
+    title: str,
+    subtitle: str,
+    body: str,
+) -> None:
+    with open(f"templates/experimental-{name}.svg", "r") as f:
+        output = f.read()
+    output = re.sub(r"{{ title }}", _svg_text(title), output)
+    output = re.sub(r"{{ subtitle }}", _svg_text(subtitle), output)
+    output = re.sub(r"{{ body }}", body, output)
+    generate_output_folder()
+    with open(f"generated/experimental-{name}.svg", "w") as f:
+        f.write(output)
+
+
+def _limited_suffix(metrics: Dict[str, Any]) -> str:
+    return "limited data" if metrics.get("limited_data") else "experimental"
+
+
+def _generate_experimental_contribution_pulse(metrics: Dict[str, Any]) -> None:
+    pulse = metrics["contribution_pulse"]
+    rows = [
+        ("Total commits shown", _format_number(pulse["total"])),
+        ("Active months", f'{pulse["active_months"]}/{pulse["month_count"]}'),
+        ("Average per month", pulse["average_monthly"]),
+        ("Best month", f'{pulse["best_month"]} ({_format_number(pulse["best_month_count"])})'),
+        (
+            "Current month",
+            f'{pulse["current_month"]} ({_format_number(pulse["current_month_count"])})',
+        ),
+        ("Active streak", f'{pulse["active_streak_months"]} months'),
+    ]
+    _render_experimental_template(
+        "contribution-pulse",
+        "Contribution Pulse",
+        f"Recent activity; {_limited_suffix(metrics)}",
+        _experimental_rows(rows),
+    )
+
+
+def _generate_experimental_contribution_mix(metrics: Dict[str, Any]) -> None:
+    mix = metrics["contribution_mix"]
+    stack = _experimental_stack_bar(
+        [
+            ("Commits", int(mix["commits"]), "#2da44e"),
+            ("PRs", int(mix["pull_requests"]), "#0969da"),
+            ("Reviews", int(mix["pull_request_reviews"]), "#8250df"),
+            ("Issues", int(mix["issues"]), "#bf8700"),
+            ("Restricted", int(mix["restricted"]), "#8b949e"),
+        ]
+    )
+    rows = _experimental_rows(
+        [
+            ("Commits", _format_number(mix["commits"])),
+            ("Pull requests", _format_number(mix["pull_requests"])),
+            ("Reviews", _format_number(mix["pull_request_reviews"])),
+            ("Issues", _format_number(mix["issues"])),
+            ("Repositories", _format_number(mix["repositories"])),
+            ("Restricted", _format_number(mix["restricted"])),
+        ],
+        start_y=116,
+    )
+    _render_experimental_template(
+        "contribution-mix",
+        "Contribution Mix",
+        f'Current year total: {_format_number(mix["total"])}',
+        stack + "\n" + rows,
+    )
+
+
+def _generate_experimental_impact(metrics: Dict[str, Any]) -> None:
+    impact = metrics["impact"]
+    top_repo = impact["top_public_repo"]
+    rows = [
+        ("Stars", _format_number(impact["stars"])),
+        ("Forks", _format_number(impact["forks"])),
+        ("Views, 14 days", _format_number(impact["views_14_days"])),
+        ("Clones, 14 days", _format_number(impact["clones_14_days"])),
+        ("Top public repo", top_repo["display_name"]),
+        ("Top repo score", _format_number(top_repo["score"])),
+    ]
+    _render_experimental_template(
+        "impact",
+        "Impact",
+        f"Traffic is time-limited; {_limited_suffix(metrics)}",
+        _experimental_rows(rows),
+    )
+
+
+def _generate_experimental_language_momentum(metrics: Dict[str, Any]) -> None:
+    items = [
+        {
+            "language": item["language"],
+            "percent": f'{item["percent"]:0.1f}%',
+            "raw_percent": item["percent"],
+            "display_value": f'{item["percent"]:0.1f}%',
+            "color": item["color"],
+        }
+        for item in metrics["language_momentum"]
+    ]
+    bars = _experimental_horizontal_bars(
+        items,
+        "language",
+        "raw_percent",
+        color_key="color",
+    )
+    _render_experimental_template(
+        "language-momentum",
+        "Language Momentum",
+        "Estimated from recent repo activity",
+        bars,
+    )
+
+
+def _generate_experimental_collaboration(metrics: Dict[str, Any]) -> None:
+    collaboration = metrics["collaboration"]
+    rows = [
+        ("Merged pull requests", _format_number(collaboration["merged_pull_requests"])),
+        ("PR reviews", _format_number(collaboration["pull_request_reviews"])),
+        ("Issues opened", _format_number(collaboration["issues"])),
+        ("Owned repositories", _format_number(collaboration["owned_repositories"])),
+        (
+            "External repositories",
+            _format_number(collaboration["external_repositories"]),
+        ),
+    ]
+    _render_experimental_template(
+        "collaboration",
+        "Collaboration",
+        f"Current-year contribution signals; {_limited_suffix(metrics)}",
+        _experimental_rows(rows),
+    )
+
+
+def _generate_experimental_maintainer_health(metrics: Dict[str, Any]) -> None:
+    health = metrics["maintainer_health"]
+    rows = [
+        ("Open issues", _format_number(health["open_issues"])),
+        ("Open pull requests", _format_number(health["open_pull_requests"])),
+        ("Updated in 90 days", _format_number(health["recently_updated"])),
+        ("Stale over 1 year", _format_number(health["stale_repositories"])),
+        ("Archived", _format_number(health["archived_repositories"])),
+        ("With releases", _format_number(health["release_repositories"])),
+        ("With tags", _format_number(health["tagged_repositories"])),
+    ]
+    _render_experimental_template(
+        "maintainer-health",
+        "Maintainer Health",
+        "Repository maintenance signals",
+        _experimental_rows(rows),
+    )
+
+
+def _generate_experimental_personal_bests(metrics: Dict[str, Any]) -> None:
+    bests = metrics["personal_bests"]
+    rows = [
+        (
+            "Best month",
+            f'{bests["best_month"]} ({_format_number(bests["best_month_count"])})',
+        ),
+        ("Active streak", f'{bests["active_streak_months"]} months'),
+        ("Top public repo", bests["top_public_repo"]),
+        ("Top repo score", _format_number(bests["top_public_repo_score"])),
+        ("Private repos redacted", metrics["privacy"]["private_repositories"]),
+    ]
+    _render_experimental_template(
+        "personal-bests",
+        "Personal Bests",
+        "Highlights from available profile data",
+        _experimental_rows(rows),
+    )
+
+
+def _generate_experimental_trading_card(metrics: Dict[str, Any]) -> None:
+    card = metrics["trading_card"]
+    rows = [
+        ("Primary language", card["primary_language"]),
+        ("Activity score", f'{card["activity_score"]}/100'),
+        ("Impact score", f'{card["impact_score"]}/100'),
+        ("Collaboration score", f'{card["collaboration_score"]}/100'),
+        ("Breadth score", f'{card["breadth_score"]}/100'),
+    ]
+    _render_experimental_template(
+        "trading-card",
+        "GitHub Trading Card",
+        "Transparent experimental scorecard",
+        _experimental_rows(rows),
+    )
+
+
+def _generate_experimental_repo_portfolio(metrics: Dict[str, Any]) -> None:
+    portfolio = metrics["repo_portfolio"]
+    bars = _experimental_horizontal_bars(
+        portfolio["repositories"],
+        "display_name",
+        "score",
+    )
+    _render_experimental_template(
+        "repo-portfolio",
+        "Repo Portfolio",
+        (
+            f'{portfolio["public_repositories"]} public; '
+            f'{portfolio["private_repositories"]} private redacted'
+        ),
+        bars,
+    )
+
+
+async def generate_experimental(s: Stats) -> Dict[str, Any]:
+    metrics = await build_experimental_metrics(s)
+    _generate_experimental_contribution_pulse(metrics)
+    _generate_experimental_contribution_mix(metrics)
+    _generate_experimental_impact(metrics)
+    _generate_experimental_language_momentum(metrics)
+    _generate_experimental_collaboration(metrics)
+    _generate_experimental_maintainer_health(metrics)
+    _generate_experimental_personal_bests(metrics)
+    _generate_experimental_trading_card(metrics)
+    _generate_experimental_repo_portfolio(metrics)
+    return metrics
+
+
 ################################################################################
 # Main Function
 ################################################################################
@@ -537,6 +1211,7 @@ async def main() -> None:
     """
     Generate all badges
     """
+    load_env_file()
     access_token = os.getenv("ACCESS_TOKEN")
     if not access_token:
         # access_token = os.getenv("GITHUB_TOKEN")
@@ -571,8 +1246,10 @@ async def main() -> None:
         await asyncio.gather(
             generate_languages(s),
             generate_overview(s),
-            generate_monthly_commits(s),
         )
+        await generate_monthly_commits(s)
+        if env_truthy("GENERATE_EXPERIMENTAL", default=True):
+            await generate_experimental(s)
         validate_generated_output()
         report = await build_run_report(s)
         write_run_report(report)

@@ -10,6 +10,9 @@ on:
 permissions:
   contents: write
 
+env:
+  GENERATE_EXPERIMENTAL: true
+
 jobs:
   build:
     runs-on: ubuntu-latest

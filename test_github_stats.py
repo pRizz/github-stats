@@ -88,38 +88,6 @@ class _FakeRequestsResponse:
         raise requests.exceptions.JSONDecodeError("Expecting value", "", 0)
 
 
-class _Always202Response:
-    status_code = 202
-    text = ""
-    headers = {}
-
-
-class _ConcurrentContributorQueries:
-    def __init__(self):
-        self.active_requests = 0
-        self.max_active_requests = 0
-
-    async def query_rest_with_outcome(self, path, params=None, max_wait_seconds=None):
-        self.active_requests += 1
-        self.max_active_requests = max(self.max_active_requests, self.active_requests)
-        try:
-            await generate_images.asyncio.sleep(0.01)
-            return github_stats.RestQueryResult(
-                [
-                    {
-                        "author": {"login": "octocat"},
-                        "weeks": [{"a": 10, "d": 4}],
-                    }
-                ],
-                attempts=2,
-                retry_count=1,
-                wait_seconds=0.5,
-                elapsed_seconds=0.6,
-            )
-        finally:
-            self.active_requests -= 1
-
-
 class _PathOutcomeQueries:
     def __init__(self, outcomes):
         self.outcomes = outcomes
@@ -162,9 +130,10 @@ class _SlowMonthlyCommitQueries(_MonthlyCommitQueries):
 class _FakeStats:
     loaded = False
     get_stats_calls = 0
+    init_args = None
 
     def __init__(self, *args, **kwargs):
-        pass
+        type(self).init_args = (args, kwargs)
 
     async def get_stats(self):
         type(self).loaded = True
@@ -255,6 +224,88 @@ class _ReportStats:
     @property
     async def lines_changed(self):
         raise AssertionError("report should not read lines_changed")
+
+
+class _ExperimentalStats:
+    username = "octocat"
+
+    def __init__(self):
+        self.report = github_stats.StatsReport()
+
+    @property
+    async def repo_metrics(self):
+        return {
+            "octocat/public": github_stats.RepoMetric(
+                name_with_owner="octocat/public",
+                display_name="octocat/public",
+                is_private=False,
+                is_fork=False,
+                is_archived=False,
+                stargazers=8,
+                forks=3,
+                updated_at="2026-05-01T00:00:00Z",
+                pushed_at="2026-05-01T00:00:00Z",
+                open_issues=2,
+                open_pull_requests=1,
+                releases=1,
+                tags=2,
+                languages={
+                    "Python": {"size": 100, "color": "#3572A5"},
+                    "Shell": {"size": 20, "color": "#89e051"},
+                },
+            ),
+            "octocat/secret": github_stats.RepoMetric(
+                name_with_owner="octocat/secret",
+                display_name="Private repo #1",
+                is_private=True,
+                is_fork=True,
+                is_archived=False,
+                stargazers=5,
+                forks=1,
+                updated_at="2025-01-01T00:00:00Z",
+                pushed_at="2025-01-01T00:00:00Z",
+                open_issues=4,
+                open_pull_requests=2,
+                releases=0,
+                tags=0,
+                languages={"Rust": {"size": 50, "color": "#dea584"}},
+            ),
+        }
+
+    @property
+    async def stargazers(self):
+        return 13
+
+    @property
+    async def forks(self):
+        return 4
+
+    @property
+    async def merged_pull_requests(self):
+        return 7
+
+    @property
+    async def current_year_contribution_breakdown(self):
+        return github_stats.ContributionBreakdown(
+            commits=11,
+            issues=2,
+            pull_requests=3,
+            pull_request_reviews=4,
+            repositories=1,
+            restricted=1,
+        )
+
+    @property
+    async def lines_changed(self):
+        raise AssertionError("experimental metrics should not read lines_changed")
+
+    @property
+    async def views(self):
+        return 25
+
+    @property
+    async def clones(self):
+        return 6
 
 
 class _MonthlyCacheStats:
@@ -594,7 +645,6 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_rest_query_returns_empty_for_optional_not_found_statuses(self):
         for path, expected in (
-            ("/repos/octocat/hello/stats/contributors", []),
             ("/repos/octocat/hello/traffic/views", {}),
             ("/repos/octocat/hello/commits", []),
         ):
@@ -711,43 +761,6 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(stats.report.rest_requests_total, 1)
         self.assertEqual(stats.report.slowest_requests[0].repo, "octocat/private")
 
-    async def test_lines_changed_records_repo_for_contributor_degradation(self):
-        # Arrange
-        stats = Stats("octocat", "token", _FailingSession())
-        stats._repos = {"octocat/slow"}
-        stats.queries = _PathOutcomeQueries(
-            {
-                "/repos/octocat/slow/stats/contributors": github_stats.RestQueryResult(
-                    [],
-                    degraded=True,
-                    status=202,
-                    category="pending",
-                    message="stats still pending",
-                    attempts=3,
-                    retry_count=2,
-                    wait_seconds=4.3,
-                    elapsed_seconds=4.5,
-                )
-            }
-        )
-
-        # Act
-        result = await stats.lines_changed
-
-        # Assert
-        self.assertEqual(result, (0, 0))
-        self.assertEqual(len(stats.report.contributors_degraded), 1)
-        self.assertEqual(stats.report.contributors_degraded[0].repo, "octocat/slow")
-        self.assertEqual(
-            stats.report.contributors_degraded[0].endpoint,
-            "stats/contributors",
-        )
-        self.assertEqual(stats.report.rest_requests_total, 1)
-        self.assertEqual(stats.report.rest_retries_total, 2)
-        self.assertEqual(stats.report.rest_wait_seconds_total, 4.3)
-        self.assertEqual(stats.report.contributors_wait_seconds_total, 4.3)
-        self.assertEqual(stats.report.contributors_degraded[0].wait_seconds, 4.3)
-
     async def test_rest_query_raises_for_auth_rate_limit_and_unknown_statuses(self):
         for status, headers in (
             (401, {}),
@@ -784,57 +797,6 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
 
         # Assert
         self.assertEqual(result, {})
-
-    async def test_rest_query_can_skip_202_wait_for_contributor_stats(self):
-        # Arrange
-        queries = Queries("octocat", "token", _FailingSession())
-
-        with mock.patch(
-            "github_stats.requests.get", return_value=_Always202Response()
-        ), mock.patch("github_stats.asyncio.sleep", mock.AsyncMock()) as sleep:
-            # Act
-            result = await queries.query_rest(
-                "/repos/octocat/hello/stats/contributors",
-                max_wait_seconds=0.0,
-            )
-
-        # Assert
-        self.assertEqual(result, [])
-        sleep.assert_not_awaited()
-
-    async def test_rest_query_records_wait_stats_for_retryable_202(self):
-        # Arrange
-        queries = Queries("octocat", "token", _FailingSession())
-
-        with mock.patch(
-            "github_stats.requests.get", return_value=_Always202Response()
-        ), mock.patch("github_stats.asyncio.sleep", mock.AsyncMock()) as sleep:
-            # Act
-            result = await queries.query_rest_with_outcome(
-                "/repos/octocat/hello/stats/contributors",
-                max_wait_seconds=1.0,
-            )
-
-        # Assert
-        self.assertTrue(result.degraded)
-        self.assertGreater(result.retry_count, 0)
-        self.assertGreater(result.wait_seconds, 0)
-        self.assertGreaterEqual(result.attempts, 1)
-        sleep.assert_awaited()
-
-    async def test_lines_changed_fetches_contributor_stats_concurrently(self):
-        # Arrange
-        stats = Stats("octocat", "token", _FailingSession())
-        stats._repos = {"octocat/one", "octocat/two", "octocat/three"}
-        queries = _ConcurrentContributorQueries()
-        stats.queries = queries
-
-        # Act
-        result = await stats.lines_changed
-
-        # Assert
-        self.assertEqual(result, (30, 12))
-        self.assertGreater(queries.max_active_requests, 1)
 
     def test_monthly_commit_throttle_env_defaults_and_overrides(self):
         # Act / Assert
@@ -1030,6 +992,7 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         # Arrange
         _FakeStats.loaded = False
         _FakeStats.get_stats_calls = 0
+        _FakeStats.init_args = None
 
         async def assert_loaded_before_render(stats):
             self.assertTrue(type(stats).loaded)
@@ -1045,6 +1008,8 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
             "generate_images.generate_overview", assert_loaded_before_render
         ), mock.patch(
             "generate_images.generate_monthly_commits", assert_loaded_before_render
+        ), mock.patch(
+            "generate_images.generate_experimental", assert_loaded_before_render
         ), mock.patch(
             "generate_images.validate_generated_output"
         ), mock.patch(
@@ -1063,14 +1028,12 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                     },
                     "api": {
                         "total_repos": 0,
-                        "contributors_degraded": [],
                         "traffic_degraded": [],
                         "monthly_commits_degraded": [],
                         "critical_failures": [],
                         "rest_requests_total": 0,
                         "rest_retries_total": 0,
                         "rest_wait_seconds_total": 0.0,
-                        "contributors_wait_seconds_total": 0.0,
                         "traffic_wait_seconds_total": 0.0,
                         "monthly_commits_wait_seconds_total": 0.0,
                         "slowest_requests": [],
@@ -1233,6 +1196,179 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("Apr &#x27;26", output)
         self.assertIn("12", output)
 
+    async def test_experimental_metrics_redact_private_repository_names(self):
+        # Arrange
+        now = dt.datetime(2026, 5, 2, 10, 30, tzinfo=dt.timezone.utc)
+        with TemporaryDirectory() as tmpdir:
+            tmp_path = Path(tmpdir)
+            (tmp_path / "generated").mkdir()
+            (tmp_path / "generated" / "monthly-commits.json").write_text(
+                generate_images.json.dumps(
+                    {
+                        "months": [
+                            {
+                                "key": "2026-04",
+                                "label": "Apr '26",
+                                "count": 5,
+                                "is_current": False,
+                            },
+                            {
+                                "key": "2026-05",
+                                "label": "May '26",
+                                "count": 7,
+                                "is_current": True,
+                            },
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+            previous_cwd = Path.cwd()
+
+            try:
+                os.chdir(tmp_path)
+
+                # Act
+                metrics = await generate_images.build_experimental_metrics(
+                    _ExperimentalStats(),
+                    now=now,
+                )
+
+                # Assert
+                serialized = generate_images.json.dumps(metrics)
+                self.assertIn("Private repo #1", serialized)
+                self.assertNotIn("octocat/secret", serialized)
+                self.assertIn("octocat/public", serialized)
+                self.assertEqual(metrics["privacy"]["private_repositories"], 1)
+                self.assertNotIn("code_footprint", metrics)
+            finally:
+                os.chdir(previous_cwd)
+
+    def test_experimental_card_names_exclude_code_footprint(self):
+        # Assert
+        self.assertNotIn("code-footprint", generate_images.EXPERIMENTAL_CARD_NAMES)
+
+    async def test_generate_experimental_renders_all_cards_without_placeholders(self):
+        # Arrange
+        template = """<svg id="gh-dark-mode-only" width="360" height="210" xmlns="http://www.w3.org/2000/svg">
+<text>{{ title }}</text><text>{{ subtitle }}</text>{{ body }}</svg>"""
+        with TemporaryDirectory() as tmpdir:
+            tmp_path = Path(tmpdir)
+            (tmp_path / "templates").mkdir()
+            (tmp_path / "generated").mkdir()
+            (tmp_path / "generated" / "monthly-commits.json").write_text(
+                generate_images.json.dumps(
+                    {
+                        "months": [
+                            {
+                                "key": "2026-05",
+                                "label": "May '26",
+                                "count": 7,
+                                "is_current": True,
+                            }
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+            for name in generate_images.EXPERIMENTAL_CARD_NAMES:
+                (tmp_path / "templates" / f"experimental-{name}.svg").write_text(
+                    template,
+                    encoding="utf-8",
+                )
+            previous_cwd = Path.cwd()
+
+            try:
+                os.chdir(tmp_path)
+
+                # Act
+                await generate_images.generate_experimental(_ExperimentalStats())
+
+                # Assert
+                for name in generate_images.EXPERIMENTAL_CARD_NAMES:
+                    output = (
+                        tmp_path / "generated" / f"experimental-{name}.svg"
+                    ).read_text(encoding="utf-8")
+                    self.assertNotIn("{{", output)
+                    self.assertNotIn("}}", output)
+                    self.assertIn("<svg", output)
+                    self.assertNotIn("octocat/secret", output)
+                metrics = (
+                    tmp_path / "generated" / "experimental-metrics.json"
+                ).read_text(encoding="utf-8")
+                self.assertNotIn("octocat/secret", metrics)
+                self.assertFalse(
+                    (
+                        tmp_path
+                        / "generated"
+                        / "experimental-code-footprint.svg"
+                    ).exists()
+                )
+            finally:
+                os.chdir(previous_cwd)
+
+    def test_generation_sources_do_not_call_contributor_stats_endpoint(self):
+        # Arrange
+        retired_endpoint = "stats/" + "contributors"
+        source_paths = ("generate_images.py", "github_stats.py")
+
+        # Act
+        source_text = "\n".join(
+            Path(path).read_text(encoding="utf-8") for path in source_paths
+        )
+
+        # Assert
+        self.assertNotIn(retired_endpoint, source_text)
+
+    def test_validate_generated_output_checks_experimental_when_enabled(self):
+        # Arrange
+        with TemporaryDirectory() as tmpdir:
+            generated = Path(tmpdir)
+            (generated / "overview.svg").write_text(
+                "Octocat Stars</td><td>1</td> Forks</td><td>2</td> "
+                "Repositories with contributions</td><td>1</td>",
+                encoding="utf-8",
+            )
+            (generated / "languages.svg").write_text(
+                '<span class="progress-item"></span>',
+                encoding="utf-8",
+            )
+            (generated / "monthly-commits.svg").write_text(
+                'Monthly Commits <rect class="bar" />',
+                encoding="utf-8",
+            )
+            for name in generate_images.EXPERIMENTAL_CARD_NAMES:
+                (generated / f"experimental-{name}.svg").write_text(
+                    "<svg>ok</svg>",
+                    encoding="utf-8",
+                )
+
+            # Act / Assert
+            with mock.patch.dict("os.environ", {"GENERATE_EXPERIMENTAL": "true"}):
+                generate_images.validate_generated_output(str(generated))
+
+    def test_validate_generated_output_skips_experimental_when_disabled(self):
+        # Arrange
+        with TemporaryDirectory() as tmpdir:
+            generated = Path(tmpdir)
+            (generated / "overview.svg").write_text(
+                "Octocat Stars</td><td>1</td> Forks</td><td>2</td> "
+                "Repositories with contributions</td><td>1</td>",
+                encoding="utf-8",
+            )
+            (generated / "languages.svg").write_text(
+                '<span class="progress-item"></span>',
+                encoding="utf-8",
+            )
+            (generated / "monthly-commits.svg").write_text(
+                'Monthly Commits <rect class="bar" />',
+                encoding="utf-8",
+            )
+
+            # Act / Assert
+            with mock.patch.dict("os.environ", {"GENERATE_EXPERIMENTAL": "false"}):
+                generate_images.validate_generated_output(str(generated))
+
     async def test_build_run_report_includes_new_metrics_without_lines_changed(self):
         # Act
         report = await generate_images.build_run_report(_ReportStats())
@@ -1258,19 +1394,6 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
             },
             "api": {
                 "total_repos": 4,
-                "contributors_degraded": [
-                    {
-                        "repo": "octocat/slow",
-                        "endpoint": "stats/contributors",
-                        "status": 202,
-                        "category": "pending",
-                        "message": "stats still pending",
-                        "attempts": 3,
-                        "retry_count": 2,
-                        "wait_seconds": 4.3,
-                        "elapsed_seconds": 4.5,
-                    }
-                ],
                 "traffic_degraded": [
                     {
                         "repo": "octocat/private",
@@ -1278,30 +1401,31 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                         "status": 403,
                         "category": "auth_or_permission_error",
                         "message": "traffic views inaccessible",
-                        "attempts": 1,
-                        "retry_count": 0,
-                        "wait_seconds": 0.0,
-                        "elapsed_seconds": 0.2,
+                        "attempts": 3,
+                        "retry_count": 2,
+                        "wait_seconds": 4.3,
+                        "elapsed_seconds": 4.5,
                     }
                 ],
                 "critical_failures": [],
-                "rest_requests_total": 2,
+                "rest_requests_total": 1,
                 "rest_retries_total": 2,
                 "rest_wait_seconds_total": 4.3,
-                "contributors_wait_seconds_total": 4.3,
-                "traffic_wait_seconds_total": 0.0,
+                "traffic_wait_seconds_total": 4.3,
+                "monthly_commits_degraded": [],
+                "monthly_commits_wait_seconds_total": 0.0,
                 "slowest_requests": [
                     {
-                        "repo": "octocat/slow",
-                        "endpoint": "stats/contributors",
-                        "status": 202,
-                        "category": "pending",
+                        "repo": "octocat/private",
+                        "endpoint": "traffic/views",
+                        "status": 403,
+                        "category": "auth_or_permission_error",
                         "degraded": True,
                         "attempts": 3,
                         "retry_count": 2,
                         "wait_seconds": 4.3,
                         "elapsed_seconds": 4.5,
-                        "message": "stats still pending",
+                        "message": "traffic views inaccessible",
                     }
                 ],
             },
@@ -1312,44 +1436,13 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
 
         # Assert
         self.assertIn("octocat/private", summary)
-        self.assertIn("octocat/slow", summary)
         self.assertIn("Traffic views degraded: 1", summary)
-        self.assertIn("Contributor stats degraded: 1", summary)
         self.assertIn("Current-year contributions", summary)
         self.assertIn("Merged pull requests", summary)
         self.assertIn("API Wait Summary", summary)
         self.assertIn("Slowest API Waits", summary)
         self.assertIn("4.3s", summary)
-
-    def test_run_report_validation_allows_contributor_degradation(self):
-        # Arrange
-        report = {
-            "stats": {
-                "name": "Octocat",
-                "stargazers": 1,
-                "forks": 2,
-                "total_contributions": 3,
-                "current_year_contributions": 4,
-                "merged_pull_requests": 5,
-                "repos": 4,
-                "views": 7,
-            },
-            "api": {
-                "contributors_degraded": [
-                    {
-                        "repo": "octocat/slow",
-                        "endpoint": "stats/contributors",
-                        "status": 202,
-                        "category": "pending",
-                        "message": "stats still pending",
-                    }
-                ],
-                "traffic_degraded": [],
-            },
-        }
-
-        # Act / Assert
-        generate_images.validate_run_report(report)
+        self.assertNotIn("Contributor stats", summary)
 
     def test_run_report_validation_allows_zero_views_with_degraded_traffic_by_default(
         self,
@@ -1367,7 +1460,6 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                 "views": 0,
             },
             "api": {
-                "contributors_degraded": [],
                 "traffic_degraded": [
                     {
                         "repo": "octocat/private",
@@ -1398,7 +1490,6 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                 "views": 0,
             },
             "api": {
-                "contributors_degraded": [],
                 "traffic_degraded": [
                     {
                         "repo": "octocat/private",
@@ -1434,7 +1525,6 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                 "views": 0,
             },
             "api": {
-                "contributors_degraded": [],
                 "traffic_degraded": [],
             },
         }
@@ -1463,6 +1553,172 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                 self.assertFalse(
                     generate_images.env_truthy("STRICT_TRAFFIC_VIEW_VALIDATION")
                 )
+
+    def test_env_file_loader_loads_simple_assignments(self):
+        # Arrange
+        with TemporaryDirectory() as tmpdir:
+            env_path = Path(tmpdir) / ".env"
+            env_path.write_text(
+                "ACCESS_TOKEN=token-from-file\n"
+                "GITHUB_ACTOR=octocat\n"
+                "EXCLUDED=octocat/one,octocat/two\n",
+                encoding="utf-8",
+            )
+
+            # Act
+            with mock.patch.dict("os.environ", {}, clear=True):
+                generate_images.load_env_file(str(env_path))
+
+                # Assert
+                self.assertEqual(os.environ["ACCESS_TOKEN"], "token-from-file")
+                self.assertEqual(os.environ["GITHUB_ACTOR"], "octocat")
+                self.assertEqual(os.environ["EXCLUDED"], "octocat/one,octocat/two")
+
+    def test_env_file_loader_ignores_comments_and_blank_lines(self):
+        # Arrange
+        with TemporaryDirectory() as tmpdir:
+            env_path = Path(tmpdir) / ".env"
+            env_path.write_text(
+                "\n# local secrets\nACCESS_TOKEN=token\n\n",
+                encoding="utf-8",
+            )
+
+            # Act
+            with mock.patch.dict("os.environ", {}, clear=True):
+                generate_images.load_env_file(str(env_path))
+
+                # Assert
+                self.assertEqual(os.environ, {"ACCESS_TOKEN": "token"})
+
+    def test_env_file_loader_preserves_existing_environment_values(self):
+        # Arrange
+        with TemporaryDirectory() as tmpdir:
+            env_path = Path(tmpdir) / ".env"
+            env_path.write_text(
+                "ACCESS_TOKEN=token-from-file\nGITHUB_ACTOR=from-file\n",
+                encoding="utf-8",
+            )
+
+            # Act
+            with mock.patch.dict(
+                "os.environ",
+                {"ACCESS_TOKEN": "token-from-shell"},
+                clear=True,
+            ):
+                generate_images.load_env_file(str(env_path))
+
+                # Assert
+                self.assertEqual(os.environ["ACCESS_TOKEN"], "token-from-shell")
+                self.assertEqual(os.environ["GITHUB_ACTOR"], "from-file")
+
+    def test_env_file_loader_strips_optional_quotes(self):
+        # Arrange
+        with TemporaryDirectory() as tmpdir:
+            env_path = Path(tmpdir) / ".env"
+            env_path.write_text(
+                "ACCESS_TOKEN='single-quoted'\n"
+                'GITHUB_ACTOR="double-quoted"\n',
+                encoding="utf-8",
+            )
+
+            # Act
+            with mock.patch.dict("os.environ", {}, clear=True):
+                generate_images.load_env_file(str(env_path))
+
+                # Assert
+                self.assertEqual(os.environ["ACCESS_TOKEN"], "single-quoted")
+                self.assertEqual(os.environ["GITHUB_ACTOR"], "double-quoted")
+
+    def test_env_file_loader_allows_missing_file(self):
+        # Act / Assert
+        with mock.patch.dict("os.environ", {}, clear=True):
+            generate_images.load_env_file("/tmp/github-stats-missing-env-file")
+            self.assertEqual(os.environ, {})
+
+    async def test_main_loads_access_token_and_actor_from_env_file(self):
+        # Arrange
+        _FakeStats.loaded = False
+        _FakeStats.get_stats_calls = 0
+        _FakeStats.init_args = None
+
+        async def assert_loaded_before_render(stats):
+            self.assertTrue(type(stats).loaded)
+
+        with TemporaryDirectory() as tmpdir:
+            tmp_path = Path(tmpdir)
+            (tmp_path / ".env").write_text(
+                "ACCESS_TOKEN=token-from-env-file\n"
+                "GITHUB_ACTOR=env-file-user\n"
+                "GENERATE_EXPERIMENTAL=false\n",
+                encoding="utf-8",
+            )
+            previous_cwd = Path.cwd()
+
+            try:
+                os.chdir(tmp_path)
+
+                # Act
+                with mock.patch.dict("os.environ", {}, clear=True), mock.patch(
+                    "generate_images.Stats", _FakeStats
+                ), mock.patch(
+                    "generate_images.generate_languages", assert_loaded_before_render
+                ), mock.patch(
+                    "generate_images.generate_overview", assert_loaded_before_render
+                ), mock.patch(
+                    "generate_images.generate_monthly_commits",
+                    assert_loaded_before_render,
+                ), mock.patch(
+                    "generate_images.validate_generated_output"
+                ), mock.patch(
+                    "generate_images.build_run_report",
+                    mock.AsyncMock(
+                        return_value={
+                            "stats": {
+                                "name": "Octocat",
+                                "stargazers": 0,
+                                "forks": 0,
+                                "total_contributions": 0,
+                                "current_year_contributions": 0,
+                                "merged_pull_requests": 0,
+                                "repos": 0,
+                                "views": 0,
+                            },
+                            "api": {
+                                "total_repos": 0,
+                                "traffic_degraded": [],
+                                "monthly_commits_degraded": [],
+                                "critical_failures": [],
+                                "rest_requests_total": 0,
+                                "rest_retries_total": 0,
+                                "rest_wait_seconds_total": 0.0,
+                                "traffic_wait_seconds_total": 0.0,
+                                "monthly_commits_wait_seconds_total": 0.0,
+                                "slowest_requests": [],
+                            },
+                            "monthly_commits": {
+                                "total": 0,
+                                "current_month": {},
+                                "month_count": 0,
+                            },
+                        }
+                    ),
+                ), mock.patch(
+                    "generate_images.write_run_report"
+                ), mock.patch(
+                    "generate_images.write_action_summary"
+                ), mock.patch(
+                    "generate_images.generate_experimental",
+                    mock.AsyncMock(side_effect=AssertionError("disabled")),
+                ):
+                    await generate_images.main()
+
+                # Assert
+                args, _kwargs = _FakeStats.init_args
+                self.assertEqual(args[0], "env-file-user")
+                self.assertEqual(args[1], "token-from-env-file")
+                self.assertEqual(_FakeStats.get_stats_calls, 1)
+            finally:
+                os.chdir(previous_cwd)
 
     def test_action_summary_writer_allows_missing_github_step_summary(self):
         # Act / Assert

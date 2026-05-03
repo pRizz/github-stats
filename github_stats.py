@@ -5,7 +5,7 @@ import datetime as dt
 import os
 import time
 from dataclasses import asdict, dataclass, field
-from typing import Dict, List, Optional, Set, Tuple, Any, cast
+from typing import Dict, List, Optional, Set, Any, cast
 
 import aiohttp
 import requests
@@ -13,9 +13,7 @@ import requests
 
 def _empty_rest_value(normalized_path: str) -> Any:
     """JSON shape GitHub would return for an empty successful response."""
-    if "stats/contributors" in normalized_path or normalized_path.endswith(
-        "/commits"
-    ):
+    if normalized_path.endswith("/commits"):
         return []
     return {}
 
@@ -57,14 +55,12 @@ class ApiWaitStat:
 @dataclass
 class StatsReport:
     total_repos: int = 0
-    contributors_degraded: List[ApiDegradation] = field(default_factory=list)
     traffic_degraded: List[ApiDegradation] = field(default_factory=list)
     monthly_commits_degraded: List[ApiDegradation] = field(default_factory=list)
     critical_failures: List[str] = field(default_factory=list)
     rest_requests_total: int = 0
     rest_retries_total: int = 0
     rest_wait_seconds_total: float = 0.0
-    contributors_wait_seconds_total: float = 0.0
     traffic_wait_seconds_total: float = 0.0
     monthly_commits_wait_seconds_total: float = 0.0
     slowest_requests: List[ApiWaitStat] = field(default_factory=list)
@@ -73,9 +69,7 @@ class StatsReport:
         self.rest_requests_total += 1
         self.rest_retries_total += item.retry_count
         self.rest_wait_seconds_total += item.wait_seconds
-        if item.endpoint == "stats/contributors":
-            self.contributors_wait_seconds_total += item.wait_seconds
-        elif item.endpoint == "traffic/views":
+        if item.endpoint.startswith("traffic/"):
             self.traffic_wait_seconds_total += item.wait_seconds
         elif item.endpoint == "commits":
             self.monthly_commits_wait_seconds_total += item.wait_seconds
@@ -90,9 +84,6 @@ class StatsReport:
     def to_dict(self) -> Dict[str, Any]:
         return {
             "total_repos": self.total_repos,
-            "contributors_degraded": [
-                asdict(item) for item in self.contributors_degraded
-            ],
             "traffic_degraded": [asdict(item) for item in self.traffic_degraded],
             "monthly_commits_degraded": [
                 asdict(item) for item in self.monthly_commits_degraded
@@ -101,7 +92,6 @@ class StatsReport:
             "rest_requests_total": self.rest_requests_total,
             "rest_retries_total": self.rest_retries_total,
             "rest_wait_seconds_total": self.rest_wait_seconds_total,
-            "contributors_wait_seconds_total": self.contributors_wait_seconds_total,
             "traffic_wait_seconds_total": self.traffic_wait_seconds_total,
             "monthly_commits_wait_seconds_total": (
                 self.monthly_commits_wait_seconds_total
@@ -136,6 +126,73 @@ class MonthlyCommitScanResult:
     scanned_months: int
     identity_patterns: List[str]
     degraded_months: Set[str] = field(default_factory=set)
+
+
+@dataclass(frozen=True)
+class RepoMetric:
+    name_with_owner: str
+    display_name: str
+    is_private: bool
+    is_fork: bool
+    is_archived: bool
+    stargazers: int
+    forks: int
+    updated_at: str
+    pushed_at: str
+    open_issues: int
+    open_pull_requests: int
+    releases: int
+    tags: int
+    languages: Dict[str, Dict[str, Any]]
+
+    def to_safe_dict(self) -> Dict[str, Any]:
+        return {
+            "display_name": self.display_name,
+            "is_private": self.is_private,
+            "is_fork": self.is_fork,
+            "is_archived": self.is_archived,
+            "stargazers": self.stargazers,
+            "forks": self.forks,
+            "updated_at": self.updated_at,
+            "pushed_at": self.pushed_at,
+            "open_issues": self.open_issues,
+            "open_pull_requests": self.open_pull_requests,
+            "releases": self.releases,
+            "tags": self.tags,
+            "languages": self.languages,
+        }
+
+
+@dataclass(frozen=True)
+class ContributionBreakdown:
+    commits: int = 0
+    issues: int = 0
+    pull_requests: int = 0
+    pull_request_reviews: int = 0
+    repositories: int = 0
+    restricted: int = 0
+
+    @property
+    def total(self) -> int:
+        return (
+            self.commits
+            + self.issues
+            + self.pull_requests
+            + self.pull_request_reviews
+            + self.repositories
+            + self.restricted
+        )
+
+    def to_dict(self) -> Dict[str, int]:
+        return {
+            "commits": self.commits,
+            "issues": self.issues,
+            "pull_requests": self.pull_requests,
+            "pull_request_reviews": self.pull_request_reviews,
+            "repositories": self.repositories,
+            "restricted": self.restricted,
+            "total": self.total,
+        }
 
 
 @dataclass(frozen=True)
@@ -188,14 +245,6 @@ def _retry_delay(headers: Any, attempt: int, default: float = 2.0) -> float:
         return max(1.0, min(reset_epoch - time.time(), 60.0))
 
     return min(default * (1.15 ** min(attempt - 1, 10)), 20.0)
-
-
-def _delay_for_202(retry_after_header: Optional[str], attempt: int) -> float:
-    """
-    Seconds to wait before retrying a 202. Prefer GitHub's Retry-After header.
-    """
-    return _retry_delay({"Retry-After": retry_after_header}, attempt)
-
 
 def _looks_rate_limited(status: int, headers: Any, body_preview: str) -> bool:
     if status not in {403, 429}:
@@ -291,9 +340,7 @@ def _status_error_message(
 
 
 def _can_degrade_rest_status(normalized_path: str, decision: _StatusDecision) -> bool:
-    if "stats/contributors" in normalized_path:
-        return decision.category in {"pending", "not_found_or_gone"}
-    if "traffic/views" in normalized_path:
+    if "traffic/views" in normalized_path or "traffic/clones" in normalized_path:
         return decision.category in {
             "auth_or_permission_error",
             "not_found_or_gone",
@@ -310,8 +357,8 @@ def _can_degrade_rest_status(normalized_path: str, decision: _StatusDecision) ->
 
 def _can_degrade_rest_body(normalized_path: str) -> bool:
     return (
-        "stats/contributors" in normalized_path
-        or "traffic/views" in normalized_path
+        "traffic/views" in normalized_path
+        or "traffic/clones" in normalized_path
         or normalized_path.endswith("/commits")
     )
 
@@ -719,8 +766,7 @@ class Queries(object):
             params = dict()
         normalized = path[1:] if path.startswith("/") else path
 
-        # GitHub returns 202 while statistics (e.g. contributors) are computed.
-        # Without a wall-clock cap, many repos times repeated sleeps can run for hours in CI.
+        # Without a wall-clock cap, retryable responses can run for hours in CI.
         started_at = time.monotonic()
         deadline = time.monotonic() + max_wait_seconds
         max_iterations = 35
@@ -1045,10 +1091,24 @@ class Queries(object):
       }}
       nodes {{
         nameWithOwner
+        isPrivate
+        isFork
+        isArchived
+        updatedAt
+        pushedAt
         stargazers {{
           totalCount
         }}
         forkCount
+        issues(states: OPEN) {{
+          totalCount
+        }}
+        pullRequests(states: OPEN) {{
+          totalCount
+        }}
+        refs(refPrefix: "refs/tags/", first: 1) {{
+          totalCount
+        }}
         languages(first: 10, orderBy: {{field: SIZE, direction: DESC}}) {{
           edges {{
             size
@@ -1081,10 +1141,144 @@ class Queries(object):
       }}
       nodes {{
         nameWithOwner
+        isPrivate
+        isFork
+        isArchived
+        updatedAt
+        pushedAt
         stargazers {{
           totalCount
         }}
         forkCount
+        issues(states: OPEN) {{
+          totalCount
+        }}
+        pullRequests(states: OPEN) {{
+          totalCount
+        }}
+        refs(refPrefix: "refs/tags/", first: 1) {{
+          totalCount
+        }}
+        languages(first: 10, orderBy: {{field: SIZE, direction: DESC}}) {{
+          edges {{
+            size
+            node {{
+              name
+              color
+            }}
+          }}
+        }}
+      }}
+    }}
+  }}
+}}
+"""
+
+    @staticmethod
+    def owned_repos_overview(owned_cursor: Optional[str] = None) -> str:
+        """
+        :return: GraphQL query with overview of repositories owned by the user
+        """
+        return f"""{{
+  viewer {{
+    login,
+    name,
+    repositories(
+        first: 100,
+        orderBy: {{
+            field: UPDATED_AT,
+            direction: DESC
+        }},
+        isFork: false,
+        after: {"null" if owned_cursor is None else '"'+ owned_cursor +'"'}
+    ) {{
+      pageInfo {{
+        hasNextPage
+        endCursor
+      }}
+      nodes {{
+        nameWithOwner
+        isPrivate
+        isFork
+        isArchived
+        updatedAt
+        pushedAt
+        stargazers {{
+          totalCount
+        }}
+        forkCount
+        issues(states: OPEN) {{
+          totalCount
+        }}
+        pullRequests(states: OPEN) {{
+          totalCount
+        }}
+        refs(refPrefix: "refs/tags/", first: 1) {{
+          totalCount
+        }}
+        languages(first: 10, orderBy: {{field: SIZE, direction: DESC}}) {{
+          edges {{
+            size
+            node {{
+              name
+              color
+            }}
+          }}
+        }}
+      }}
+    }}
+  }}
+}}
+"""
+
+    @staticmethod
+    def contributed_repos_overview(contrib_cursor: Optional[str] = None) -> str:
+        """
+        :return: GraphQL query with overview of repositories the user contributed to
+        """
+        return f"""{{
+  viewer {{
+    login,
+    name,
+    repositoriesContributedTo(
+        first: 100,
+        includeUserRepositories: false,
+        orderBy: {{
+            field: UPDATED_AT,
+            direction: DESC
+        }},
+        contributionTypes: [
+            COMMIT,
+            PULL_REQUEST,
+            REPOSITORY,
+            PULL_REQUEST_REVIEW
+        ]
+        after: {"null" if contrib_cursor is None else '"'+ contrib_cursor +'"'}
+    ) {{
+      pageInfo {{
+        hasNextPage
+        endCursor
+      }}
+      nodes {{
+        nameWithOwner
+        isPrivate
+        isFork
+        isArchived
+        updatedAt
+        pushedAt
+        stargazers {{
+          totalCount
+        }}
+        forkCount
+        issues(states: OPEN) {{
+          totalCount
+        }}
+        pullRequests(states: OPEN) {{
+          totalCount
+        }}
+        refs(refPrefix: "refs/tags/", first: 1) {{
+          totalCount
+        }}
         languages(first: 10, orderBy: {{field: SIZE, direction: DESC}}) {{
           edges {{
             size
@@ -1176,6 +1370,30 @@ query {{
 """
 
     @staticmethod
+    def contribution_breakdown(year: int) -> str:
+        """
+        :param year: year to query for
+        :return: query to retrieve contribution-type totals for a year
+        """
+        return f"""
+query {{
+  viewer {{
+    contributionsCollection(
+        from: "{year}-01-01T00:00:00Z",
+        to: "{year + 1}-01-01T00:00:00Z"
+    ) {{
+      totalCommitContributions
+      totalIssueContributions
+      totalPullRequestContributions
+      totalPullRequestReviewContributions
+      totalRepositoryContributions
+      restrictedContributionsCount
+    }}
+  }}
+}}
+"""
+
+    @staticmethod
     def contribs_by_year(year: str) -> str:
         """
         :param year: year to query for
@@ -1236,8 +1454,12 @@ class Stats(object):
         self._merged_pull_requests: Optional[int] = None
         self._languages: Optional[Dict[str, Any]] = None
         self._repos: Optional[Set[str]] = None
-        self._lines_changed: Optional[Tuple[int, int]] = None
+        self._repo_metrics: Optional[Dict[str, RepoMetric]] = None
         self._views: Optional[int] = None
+        self._clones: Optional[int] = None
+        self._current_year_contribution_breakdown: Optional[
+            ContributionBreakdown
+        ] = None
         self.report = StatsReport()
 
     def _record_degradation(
@@ -1257,9 +1479,7 @@ class Stats(object):
             wait_seconds=result.wait_seconds,
             elapsed_seconds=result.elapsed_seconds,
         )
-        if endpoint == "stats/contributors":
-            self.report.contributors_degraded.append(degradation)
-        elif endpoint == "traffic/views":
+        if endpoint.startswith("traffic/"):
             self.report.traffic_degraded.append(degradation)
         elif endpoint == "commits":
             self.report.monthly_commits_degraded.append(degradation)
@@ -1293,7 +1513,6 @@ class Stats(object):
         formatted_languages = "\n  - ".join(
             [f"{k}: {v:0.4f}%" for k, v in languages.items()]
         )
-        lines_changed = await self.lines_changed
         return f"""Name: {await self.name}
 Stargazers: {await self.stargazers:,}
 Forks: {await self.forks:,}
@@ -1301,9 +1520,6 @@ All-time contributions: {await self.total_contributions:,}
 Current-year contributions: {await self.current_year_contributions:,}
 Merged pull requests: {await self.merged_pull_requests:,}
 Repositories with contributions: {len(await self.repos)}
-Lines of code added: {lines_changed[0]:,}
-Lines of code deleted: {lines_changed[1]:,}
-Lines of code changed: {lines_changed[0] + lines_changed[1]:,}
 Project page views: {await self.views:,}
 Languages:
   - {formatted_languages}"""
@@ -1316,68 +1532,107 @@ Languages:
         forks = 0
         languages: Dict[str, Any] = dict()
         repos_set: Set[str] = set()
+        raw_repo_metrics: Dict[str, Dict[str, Any]] = {}
         maybe_name: Optional[str] = None
 
         exclude_langs_lower = {x.lower() for x in self._exclude_langs}
 
+        def record_repo(repo: Any) -> None:
+            nonlocal stargazers, forks
+            if repo is None:
+                return
+            name = repo.get("nameWithOwner")
+            if not isinstance(name, str):
+                return
+            if name in repos_set or name in self._exclude_repos:
+                return
+            repos_set.add(name)
+            repo_stargazers = repo.get("stargazers", {}).get("totalCount", 0)
+            repo_forks = repo.get("forkCount", 0)
+            stargazers += repo_stargazers
+            forks += repo.get("forkCount", 0)
+            raw_repo_languages: Dict[str, Dict[str, Any]] = {}
+
+            for lang in repo.get("languages", {}).get("edges", []):
+                language_name = lang.get("node", {}).get("name", "Other")
+                if language_name.lower() in exclude_langs_lower:
+                    continue
+                raw_repo_languages[language_name] = {
+                    "size": lang.get("size", 0),
+                    "color": lang.get("node", {}).get("color"),
+                }
+                if language_name in languages:
+                    languages[language_name]["size"] += lang.get("size", 0)
+                    languages[language_name]["occurrences"] += 1
+                else:
+                    languages[language_name] = {
+                        "size": lang.get("size", 0),
+                        "occurrences": 1,
+                        "color": lang.get("node", {}).get("color"),
+                    }
+            raw_repo_metrics[name] = {
+                "is_private": bool(repo.get("isPrivate", False)),
+                "is_fork": bool(repo.get("isFork", False)),
+                "is_archived": bool(repo.get("isArchived", False)),
+                "stargazers": int(repo_stargazers),
+                "forks": int(repo_forks),
+                "updated_at": str(repo.get("updatedAt") or ""),
+                "pushed_at": str(repo.get("pushedAt") or ""),
+                "open_issues": int(repo.get("issues", {}).get("totalCount", 0)),
+                "open_pull_requests": int(
+                    repo.get("pullRequests", {}).get("totalCount", 0)
+                ),
+                "releases": int(repo.get("releases", {}).get("totalCount", 0)),
+                "tags": int(repo.get("refs", {}).get("totalCount", 0)),
+                "languages": raw_repo_languages,
+            }
+
         next_owned = None
-        next_contrib = None
         while True:
             raw_results = await self.queries.query(
-                Queries.repos_overview(
-                    owned_cursor=next_owned, contrib_cursor=next_contrib
-                )
+                Queries.owned_repos_overview(owned_cursor=next_owned)
             )
             viewer = raw_results.get("data", {}).get("viewer")
             if not isinstance(viewer, dict) or "repositories" not in viewer:
                 raise GitHubQueryError(
-                    "GraphQL response missing required viewer repository data"
+                    "GraphQL response missing required owned repository data"
                 )
-
             maybe_name = viewer.get("name") or viewer.get("login") or maybe_name
-            contrib_repos = viewer.get("repositoriesContributedTo", {})
             owned_repos = viewer.get("repositories", {})
-            if not isinstance(owned_repos, dict) or not isinstance(
-                contrib_repos, dict
-            ):
+            if not isinstance(owned_repos, dict):
                 raise GitHubQueryError(
-                    "GraphQL response has malformed repository data"
+                    "GraphQL response has malformed owned repository data"
                 )
+            for repo in owned_repos.get("nodes", []):
+                record_repo(repo)
 
-            repos = owned_repos.get("nodes", [])
-            if not self._ignore_forked_repos:
-                repos += contrib_repos.get("nodes", [])
-
-            for repo in repos:
-                if repo is None:
-                    continue
-                name = repo.get("nameWithOwner")
-                if name in repos_set or name in self._exclude_repos:
-                    continue
-                repos_set.add(name)
-                stargazers += repo.get("stargazers").get("totalCount", 0)
-                forks += repo.get("forkCount", 0)
-
-                for lang in repo.get("languages", {}).get("edges", []):
-                    language_name = lang.get("node", {}).get("name", "Other")
-                    if language_name.lower() in exclude_langs_lower:
-                        continue
-                    if language_name in languages:
-                        languages[language_name]["size"] += lang.get("size", 0)
-                        languages[language_name]["occurrences"] += 1
-                    else:
-                        languages[language_name] = {
-                            "size": lang.get("size", 0),
-                            "occurrences": 1,
-                            "color": lang.get("node", {}).get("color"),
-                        }
-
-            if owned_repos.get("pageInfo", {}).get(
-                "hasNextPage", False
-            ) or contrib_repos.get("pageInfo", {}).get("hasNextPage", False):
+            if owned_repos.get("pageInfo", {}).get("hasNextPage", False):
                 next_owned = owned_repos.get("pageInfo", {}).get(
                     "endCursor", next_owned
                 )
+            else:
+                break
+
+        next_contrib = None
+        while not self._ignore_forked_repos:
+            raw_results = await self.queries.query(
+                Queries.contributed_repos_overview(contrib_cursor=next_contrib)
+            )
+            viewer = raw_results.get("data", {}).get("viewer")
+            if not isinstance(viewer, dict) or "repositoriesContributedTo" not in viewer:
+                raise GitHubQueryError(
+                    "GraphQL response missing required contributed repository data"
+                )
+            maybe_name = viewer.get("name") or viewer.get("login") or maybe_name
+            contrib_repos = viewer.get("repositoriesContributedTo", {})
+            if not isinstance(contrib_repos, dict):
+                raise GitHubQueryError(
+                    "GraphQL response has malformed contributed repository data"
+                )
+            for repo in contrib_repos.get("nodes", []):
+                record_repo(repo)
+
+            if contrib_repos.get("pageInfo", {}).get("hasNextPage", False):
                 next_contrib = contrib_repos.get("pageInfo", {}).get(
                     "endCursor", next_contrib
                 )
@@ -1396,6 +1651,36 @@ Languages:
         self._forks = forks
         self._languages = languages
         self._repos = repos_set
+        private_labels = {
+            name: f"Private repo #{index}"
+            for index, name in enumerate(
+                sorted(
+                    name
+                    for name, data in raw_repo_metrics.items()
+                    if data["is_private"]
+                ),
+                start=1,
+            )
+        }
+        self._repo_metrics = {
+            name: RepoMetric(
+                name_with_owner=name,
+                display_name=private_labels.get(name, name),
+                is_private=data["is_private"],
+                is_fork=data["is_fork"],
+                is_archived=data["is_archived"],
+                stargazers=data["stargazers"],
+                forks=data["forks"],
+                updated_at=data["updated_at"],
+                pushed_at=data["pushed_at"],
+                open_issues=data["open_issues"],
+                open_pull_requests=data["open_pull_requests"],
+                releases=data["releases"],
+                tags=data["tags"],
+                languages=data["languages"],
+            )
+            for name, data in raw_repo_metrics.items()
+        }
         self.report.total_repos = len(repos_set)
 
     @property
@@ -1465,6 +1750,17 @@ Languages:
         return self._repos
 
     @property
+    async def repo_metrics(self) -> Dict[str, RepoMetric]:
+        """
+        :return: repository metadata with private repository display names redacted
+        """
+        if self._repo_metrics is not None:
+            return self._repo_metrics
+        await self.get_stats()
+        assert self._repo_metrics is not None
+        return self._repo_metrics
+
+    @property
     async def total_contributions(self) -> int:
         """
         :return: count of user's total contributions as defined by GitHub
@@ -1513,6 +1809,35 @@ Languages:
         return self._current_year_contributions
 
     @property
+    async def current_year_contribution_breakdown(self) -> ContributionBreakdown:
+        """
+        :return: current-year contribution counts grouped by contribution type
+        """
+        if self._current_year_contribution_breakdown is not None:
+            return self._current_year_contribution_breakdown
+
+        year = _current_utc_year()
+        result = (
+            (await self.queries.query(Queries.contribution_breakdown(year)))
+            .get("data", {})
+            .get("viewer", {})
+            .get("contributionsCollection", {})
+        )
+        if not isinstance(result, dict):
+            result = {}
+        self._current_year_contribution_breakdown = ContributionBreakdown(
+            commits=int(result.get("totalCommitContributions", 0)),
+            issues=int(result.get("totalIssueContributions", 0)),
+            pull_requests=int(result.get("totalPullRequestContributions", 0)),
+            pull_request_reviews=int(
+                result.get("totalPullRequestReviewContributions", 0)
+            ),
+            repositories=int(result.get("totalRepositoryContributions", 0)),
+            restricted=int(result.get("restrictedContributionsCount", 0)),
+        )
+        return self._current_year_contribution_breakdown
+
+    @property
     async def merged_pull_requests(self) -> int:
         """
         :return: count of merged pull requests authored by the user
@@ -1528,50 +1853,6 @@ Languages:
         )
         self._merged_pull_requests = int(result)
         return self._merged_pull_requests
-
-    @property
-    async def lines_changed(self) -> Tuple[int, int]:
-        """
-        :return: count of total lines added, removed, or modified by the user
-        """
-        if self._lines_changed is not None:
-            return self._lines_changed
-        contributor_stats_wait_seconds = _env_float(
-            "CONTRIBUTOR_STATS_WAIT_SECONDS", 8.0
-        )
-        repos = list(await self.repos)
-        repo_stats = await asyncio.gather(
-            *[
-                self.queries.query_rest_with_outcome(
-                    f"/repos/{repo}/stats/contributors",
-                    max_wait_seconds=contributor_stats_wait_seconds,
-                )
-                for repo in repos
-            ]
-        )
-
-        additions = 0
-        deletions = 0
-        for repo, repo_result in zip(repos, repo_stats):
-            self._record_rest_call(repo, "stats/contributors", repo_result)
-            if repo_result.degraded:
-                self._record_degradation(repo, "stats/contributors", repo_result)
-            for author_obj in repo_result.payload:
-                # Handle malformed response from the API by skipping this repo
-                if not isinstance(author_obj, dict) or not isinstance(
-                    author_obj.get("author", {}), dict
-                ):
-                    continue
-                author = author_obj.get("author", {}).get("login", "")
-                if author != self.username:
-                    continue
-
-                for week in author_obj.get("weeks", []):
-                    additions += week.get("a", 0)
-                    deletions += week.get("d", 0)
-
-        self._lines_changed = (additions, deletions)
-        return self._lines_changed
 
     async def scan_monthly_commits(
         self,
@@ -1712,6 +1993,29 @@ Languages:
                 total += view.get("count", 0)
 
         self._views = total
+        return total
+
+    @property
+    async def clones(self) -> int:
+        """
+        Note: only returns clones for the last 14 days (as-per GitHub API)
+        :return: total number of clones for the user's projects
+        """
+        if self._clones is not None:
+            return self._clones
+
+        total = 0
+        for repo in await self.repos:
+            result = await self.queries.query_rest_with_outcome(
+                f"/repos/{repo}/traffic/clones"
+            )
+            self._record_rest_call(repo, "traffic/clones", result)
+            if result.degraded:
+                self._record_degradation(repo, "traffic/clones", result)
+            for clone in result.payload.get("clones", []):
+                total += clone.get("count", 0)
+
+        self._clones = total
         return total
 
 

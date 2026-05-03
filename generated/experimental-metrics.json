@@ -1,0 +1,4585 @@
+{
+  "generated_at": "2026-05-03T02:52:37Z",
+  "limited_data": [
+    "monthly commit scan data degraded"
+  ],
+  "privacy": {
+    "private_repository_names": "redacted",
+    "private_repositories": 73
+  },
+  "contribution_pulse": {
+    "total": 4319,
+    "active_months": 13,
+    "month_count": 13,
+    "average_monthly": 332.2,
+    "best_month": "Jan '26",
+    "best_month_count": 1867,
+    "current_month": "May '26",
+    "current_month_count": 158,
+    "active_streak_months": 13
+  },
+  "contribution_mix": {
+    "commits": 4607,
+    "issues": 23,
+    "pull_requests": 217,
+    "pull_request_reviews": 2,
+    "repositories": 101,
+    "restricted": 0,
+    "total": 4950
+  },
+  "impact": {
+    "stars": 178,
+    "forks": 351,
+    "views_14_days": 195,
+    "clones_14_days": 7373,
+    "top_public_repo": {
+      "display_name": "pRizz/CryptoNoter",
+      "is_private": false,
+      "score": 550,
+      "stars": 4,
+      "forks": 273
+    }
+  },
+  "language_momentum": [
+    {
+      "language": "Rust",
+      "percent": 40.14,
+      "color": "#dea584",
+      "repos": 17
+    },
+    {
+      "language": "TypeScript",
+      "percent": 27.52,
+      "color": "#3178c6",
+      "repos": 64
+    },
+    {
+      "language": "HTML",
+      "percent": 24.14,
+      "color": "#e34c26",
+      "repos": 66
+    },
+    {
+      "language": "JavaScript",
+      "percent": 4.4,
+      "color": "#f1e05a",
+      "repos": 94
+    },
+    {
+      "language": "Shell",
+      "percent": 1.87,
+      "color": "#89e051",
+      "repos": 42
+    },
+    {
+      "language": "Python",
+      "percent": 0.74,
+      "color": "#3572A5",
+      "repos": 7
+    },
+    {
+      "language": "CSS",
+      "percent": 0.59,
+      "color": "#663399",
+      "repos": 69
+    },
+    {
+      "language": "C",
+      "percent": 0.14,
+      "color": "#555555",
+      "repos": 2
+    }
+  ],
+  "collaboration": {
+    "merged_pull_requests": 232,
+    "pull_request_reviews": 2,
+    "issues": 23,
+    "owned_repositories": 175,
+    "external_repositories": 0
+  },
+  "maintainer_health": {
+    "open_issues": 101,
+    "open_pull_requests": 211,
+    "recently_updated": 44,
+    "stale_repositories": 88,
+    "archived_repositories": 0,
+    "release_repositories": 0,
+    "tagged_repositories": 19
+  },
+  "personal_bests": {
+    "best_month": "Jan '26",
+    "best_month_count": 1867,
+    "active_streak_months": 13,
+    "top_public_repo": "pRizz/CryptoNoter",
+    "top_public_repo_score": 550
+  },
+  "trading_card": {
+    "activity_score": 100,
+    "impact_score": 100,
+    "collaboration_score": 48,
+    "breadth_score": 94,
+    "primary_language": "Rust"
+  },
+  "repo_portfolio": {
+    "repositories": [
+      {
+        "display_name": "pRizz/CryptoNoter",
+        "is_private": false,
+        "score": 550,
+        "stars": 4,
+        "forks": 273
+      },
+      {
+        "display_name": "pRizz/Chatangle",
+        "is_private": false,
+        "score": 98,
+        "stars": 14,
+        "forks": 3
+      },
+      {
+        "display_name": "pRizz/iota-transaction-spammer-webapp",
+        "is_private": false,
+        "score": 75,
+        "stars": 38,
+        "forks": 13
+      },
+      {
+        "display_name": "pRizz/nanocurrency-node",
+        "is_private": false,
+        "score": 46,
+        "stars": 12,
+        "forks": 3
+      },
+      {
+        "display_name": "pRizz/SVG-Navigator---Chrome-Extension",
+        "is_private": false,
+        "score": 42,
+        "stars": 18,
+        "forks": 6
+      },
+      {
+        "display_name": "pRizz/iota-buy-strategy",
+        "is_private": false,
+        "score": 37,
+        "stars": 14,
+        "forks": 11
+      }
+    ],
+    "public_repositories": 102,
+    "private_repositories": 73
+  },
+  "repositories": [
+    {
+      "display_name": "pRizz/github-stats",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-05-03T01:12:54Z",
+      "pushed_at": "2026-05-03T01:12:51Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "Python": {
+          "size": 131572,
+          "color": "#3572A5"
+        },
+        "TypeScript": {
+          "size": 9000,
+          "color": "#3178c6"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/pRizz",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-05-02T23:53:39Z",
+      "pushed_at": "2026-05-02T23:53:35Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 6536,
+          "color": "#f1e05a"
+        },
+        "Python": {
+          "size": 1192,
+          "color": "#3572A5"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/av-denoiser",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-05-02T23:49:31Z",
+      "pushed_at": "2026-05-02T23:49:27Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 306439,
+          "color": "#3178c6"
+        },
+        "Shell": {
+          "size": 6888,
+          "color": "#89e051"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #54",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-05-02T12:47:06Z",
+      "pushed_at": "2026-05-02T12:47:02Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 655237,
+          "color": "#f1e05a"
+        },
+        "Shell": {
+          "size": 5155,
+          "color": "#89e051"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/open-links-sites",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-05-02T07:38:55Z",
+      "pushed_at": "2026-05-02T07:38:52Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 510034,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 13546,
+          "color": "#663399"
+        },
+        "Shell": {
+          "size": 12392,
+          "color": "#89e051"
+        },
+        "HTML": {
+          "size": 714,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 83,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/open-links",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 1,
+      "forks": 1,
+      "updated_at": "2026-05-02T07:33:12Z",
+      "pushed_at": "2026-05-02T07:33:08Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 3,
+      "languages": {
+        "TypeScript": {
+          "size": 2790251,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 86276,
+          "color": "#663399"
+        },
+        "Shell": {
+          "size": 47762,
+          "color": "#89e051"
+        },
+        "JavaScript": {
+          "size": 28985,
+          "color": "#f1e05a"
+        },
+        "HTML": {
+          "size": 2536,
+          "color": "#e34c26"
+        },
+        "Dockerfile": {
+          "size": 1948,
+          "color": "#384d54"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/top-revenue-per-employee",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-05-02T03:30:36Z",
+      "pushed_at": "2026-05-02T03:30:32Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "HTML": {
+          "size": 9478757,
+          "color": "#e34c26"
+        },
+        "TypeScript": {
+          "size": 197992,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 957,
+          "color": "#663399"
+        },
+        "JavaScript": {
+          "size": 83,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/simple-market-maker",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-05-02T01:10:34Z",
+      "pushed_at": "2026-05-02T01:10:26Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 358332,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 1115,
+          "color": "#663399"
+        },
+        "Dockerfile": {
+          "size": 855,
+          "color": "#384d54"
+        },
+        "JavaScript": {
+          "size": 462,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/nanocurrency-node",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 12,
+      "forks": 3,
+      "updated_at": "2026-05-01T21:57:59Z",
+      "pushed_at": "2023-01-06T18:00:44Z",
+      "open_issues": 0,
+      "open_pull_requests": 28,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 198855,
+          "color": "#3178c6"
+        },
+        "JavaScript": {
+          "size": 463,
+          "color": "#f1e05a"
+        },
+        "HTML": {
+          "size": 176,
+          "color": "#e34c26"
+        },
+        "CSS": {
+          "size": 111,
+          "color": "#663399"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #37",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-05-01T15:47:16Z",
+      "pushed_at": "2026-05-01T15:47:11Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 76504,
+          "color": "#3178c6"
+        },
+        "PowerShell": {
+          "size": 13827,
+          "color": "#012456"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/free-the-world",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-05-01T07:13:30Z",
+      "pushed_at": "2026-05-01T07:13:27Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 2918929,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 5736,
+          "color": "#663399"
+        },
+        "Shell": {
+          "size": 829,
+          "color": "#89e051"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #55",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-04-28T16:17:08Z",
+      "pushed_at": "2026-04-28T16:17:03Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "Python": {
+          "size": 146408,
+          "color": "#3572A5"
+        },
+        "Shell": {
+          "size": 14860,
+          "color": "#89e051"
+        },
+        "Swift": {
+          "size": 5006,
+          "color": "#F05138"
+        },
+        "PowerShell": {
+          "size": 4947,
+          "color": "#012456"
+        },
+        "JavaScript": {
+          "size": 3463,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/opencode-cloud",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 16,
+      "forks": 1,
+      "updated_at": "2026-04-28T15:05:00Z",
+      "pushed_at": "2026-04-27T09:58:19Z",
+      "open_issues": 7,
+      "open_pull_requests": 3,
+      "releases": 0,
+      "tags": 130,
+      "languages": {
+        "Rust": {
+          "size": 877198,
+          "color": "#dea584"
+        },
+        "Shell": {
+          "size": 154405,
+          "color": "#89e051"
+        },
+        "Dockerfile": {
+          "size": 42093,
+          "color": "#384d54"
+        },
+        "Just": {
+          "size": 18206,
+          "color": "#384d54"
+        },
+        "TypeScript": {
+          "size": 13016,
+          "color": "#3178c6"
+        },
+        "JavaScript": {
+          "size": 12327,
+          "color": "#f1e05a"
+        },
+        "HCL": {
+          "size": 5167,
+          "color": "#844FBA"
+        },
+        "Python": {
+          "size": 757,
+          "color": "#3572A5"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #53",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-04-27T11:17:08Z",
+      "pushed_at": "2026-04-27T11:17:04Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "Shell": {
+          "size": 9466,
+          "color": "#89e051"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #51",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-04-27T10:47:07Z",
+      "pushed_at": "2026-04-27T10:47:03Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 655240,
+          "color": "#f1e05a"
+        },
+        "Shell": {
+          "size": 5158,
+          "color": "#89e051"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/zeckendorf",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 2,
+      "forks": 0,
+      "updated_at": "2026-04-26T14:14:29Z",
+      "pushed_at": "2026-04-26T14:14:25Z",
+      "open_issues": 0,
+      "open_pull_requests": 1,
+      "releases": 0,
+      "tags": 14,
+      "languages": {
+        "Rust": {
+          "size": 139078,
+          "color": "#dea584"
+        },
+        "Shell": {
+          "size": 13418,
+          "color": "#89e051"
+        },
+        "TypeScript": {
+          "size": 10307,
+          "color": "#3178c6"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/CryptoNoter",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 4,
+      "forks": 273,
+      "updated_at": "2026-04-24T08:34:25Z",
+      "pushed_at": "2017-12-14T22:08:12Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 213875,
+          "color": "#f1e05a"
+        },
+        "Shell": {
+          "size": 2749,
+          "color": "#89e051"
+        },
+        "HTML": {
+          "size": 2366,
+          "color": "#e34c26"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #2",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-04-14T23:24:36Z",
+      "pushed_at": "2026-04-14T23:24:32Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "pRizz/broadcast",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-04-12T19:15:58Z",
+      "pushed_at": "2026-04-12T19:15:55Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 93815,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 10122,
+          "color": "#663399"
+        },
+        "Shell": {
+          "size": 6888,
+          "color": "#89e051"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/bitcoin-bond-proposal",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-04-12T13:38:30Z",
+      "pushed_at": "2026-04-12T13:38:24Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 3,
+      "languages": {
+        "TypeScript": {
+          "size": 146625,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 7134,
+          "color": "#663399"
+        },
+        "Shell": {
+          "size": 6945,
+          "color": "#89e051"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/yolo-port",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-04-12T13:37:35Z",
+      "pushed_at": "2026-04-12T13:37:27Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 281389,
+          "color": "#3178c6"
+        },
+        "Shell": {
+          "size": 38694,
+          "color": "#89e051"
+        },
+        "JavaScript": {
+          "size": 7019,
+          "color": "#f1e05a"
+        },
+        "Go Template": {
+          "size": 1588,
+          "color": "#00ADD8"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #49",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-04-11T20:51:24Z",
+      "pushed_at": "2026-04-11T20:51:21Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "Shell": {
+          "size": 39527,
+          "color": "#89e051"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/open-bitcoin-web-miner",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-04-11T20:34:00Z",
+      "pushed_at": "2026-04-11T20:33:15Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 6,
+      "languages": {
+        "TypeScript": {
+          "size": 811182,
+          "color": "#3178c6"
+        },
+        "Shell": {
+          "size": 49934,
+          "color": "#89e051"
+        },
+        "JavaScript": {
+          "size": 5586,
+          "color": "#f1e05a"
+        },
+        "CSS": {
+          "size": 3630,
+          "color": "#663399"
+        },
+        "HTML": {
+          "size": 1618,
+          "color": "#e34c26"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/animated-svg-playground",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-04-06T20:56:17Z",
+      "pushed_at": "2026-04-06T20:56:08Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 55591,
+          "color": "#3178c6"
+        },
+        "HTML": {
+          "size": 21501,
+          "color": "#e34c26"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #34",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-03-28T14:39:34Z",
+      "pushed_at": "2026-03-28T14:39:30Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 1,
+      "languages": {
+        "Rust": {
+          "size": 520026,
+          "color": "#dea584"
+        },
+        "Shell": {
+          "size": 140136,
+          "color": "#89e051"
+        },
+        "HCL": {
+          "size": 6990,
+          "color": "#844FBA"
+        },
+        "PLpgSQL": {
+          "size": 4040,
+          "color": "#336790"
+        },
+        "Dockerfile": {
+          "size": 2143,
+          "color": "#384d54"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #27",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-03-28T14:35:28Z",
+      "pushed_at": "2026-03-28T14:35:25Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 1,
+      "languages": {
+        "Rust": {
+          "size": 198875,
+          "color": "#dea584"
+        },
+        "Shell": {
+          "size": 177714,
+          "color": "#89e051"
+        },
+        "HCL": {
+          "size": 6857,
+          "color": "#844FBA"
+        },
+        "Dockerfile": {
+          "size": 2918,
+          "color": "#384d54"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/my-tooling-opinions",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-03-26T10:34:54Z",
+      "pushed_at": "2026-03-26T10:34:51Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 47410,
+          "color": "#3178c6"
+        },
+        "HTML": {
+          "size": 18185,
+          "color": "#e34c26"
+        },
+        "CSS": {
+          "size": 11586,
+          "color": "#663399"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/SVG-Navigator---Chrome-Extension",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 18,
+      "forks": 6,
+      "updated_at": "2026-03-22T08:28:27Z",
+      "pushed_at": "2025-02-25T23:26:39Z",
+      "open_issues": 12,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 31,
+      "languages": {
+        "JavaScript": {
+          "size": 219933,
+          "color": "#f1e05a"
+        },
+        "CSS": {
+          "size": 11331,
+          "color": "#663399"
+        },
+        "HTML": {
+          "size": 1921,
+          "color": "#e34c26"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/free-open-distilled-models",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-03-21T12:00:38Z",
+      "pushed_at": "2026-03-21T12:00:33Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 100479,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 14972,
+          "color": "#663399"
+        },
+        "HTML": {
+          "size": 1983,
+          "color": "#e34c26"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/ceos-are-overpaid",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-03-21T02:06:39Z",
+      "pushed_at": "2026-03-21T02:06:36Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "pRizz/demail",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-03-17T08:16:49Z",
+      "pushed_at": "2026-03-17T08:16:45Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "pRizz/free-slack-poll",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-03-16T00:51:00Z",
+      "pushed_at": "2026-03-16T00:50:57Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 168607,
+          "color": "#3178c6"
+        },
+        "Shell": {
+          "size": 21501,
+          "color": "#89e051"
+        },
+        "Dockerfile": {
+          "size": 917,
+          "color": "#384d54"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/solid-start-alpha-kobalte-hydration-repro",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-03-15T23:13:45Z",
+      "pushed_at": "2026-03-15T23:13:42Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 5864,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 2644,
+          "color": "#663399"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/solid-start-dev-overlay-sourcemap-repro",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-03-15T23:13:45Z",
+      "pushed_at": "2026-03-15T23:13:41Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 2942,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 942,
+          "color": "#663399"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/open-emoji-picker",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-03-14T18:44:17Z",
+      "pushed_at": "2026-03-14T18:44:14Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 70243,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 2075,
+          "color": "#663399"
+        },
+        "HTML": {
+          "size": 558,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 91,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/wiki-clone",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-03-06T01:01:23Z",
+      "pushed_at": "2026-03-06T01:01:18Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 128892,
+          "color": "#3178c6"
+        },
+        "Python": {
+          "size": 12598,
+          "color": "#3572A5"
+        },
+        "CSS": {
+          "size": 1417,
+          "color": "#663399"
+        },
+        "Shell": {
+          "size": 840,
+          "color": "#89e051"
+        },
+        "HTML": {
+          "size": 353,
+          "color": "#e34c26"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/kalshi-quant-dashboard",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-03-01T17:26:37Z",
+      "pushed_at": "2026-03-01T17:26:41Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 209371,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 291,
+          "color": "#663399"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/quartz-ts",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-02-23T01:21:27Z",
+      "pushed_at": "2026-02-23T01:21:21Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 64743,
+          "color": "#3178c6"
+        },
+        "C": {
+          "size": 12842,
+          "color": "#555555"
+        },
+        "Objective-C": {
+          "size": 5311,
+          "color": "#438eff"
+        },
+        "Just": {
+          "size": 2608,
+          "color": "#384d54"
+        },
+        "JavaScript": {
+          "size": 2043,
+          "color": "#f1e05a"
+        },
+        "Makefile": {
+          "size": 1255,
+          "color": "#427819"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #61",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-02-21T03:27:16Z",
+      "pushed_at": "2026-02-21T03:27:12Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "pRizz/proof-of-censorship",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-02-17T02:19:11Z",
+      "pushed_at": "2026-02-17T02:19:07Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 157716,
+          "color": "#3178c6"
+        },
+        "Shell": {
+          "size": 34685,
+          "color": "#89e051"
+        },
+        "Just": {
+          "size": 2366,
+          "color": "#384d54"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/local-docker-cache",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-02-16T19:06:36Z",
+      "pushed_at": "2026-02-16T19:06:32Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "Shell": {
+          "size": 44534,
+          "color": "#89e051"
+        },
+        "Just": {
+          "size": 728,
+          "color": "#384d54"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #47",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-02-14T17:11:39Z",
+      "pushed_at": "2026-04-27T15:37:45Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "Nix": {
+          "size": 3002,
+          "color": "#7e7eff"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/mac-nix-bootstrapper",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-02-14T17:08:55Z",
+      "pushed_at": "2026-02-14T17:08:42Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "Shell": {
+          "size": 23130,
+          "color": "#89e051"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/a-new-america-article",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-02-14T15:34:31Z",
+      "pushed_at": "2026-02-14T15:34:27Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "pRizz/a-new-america",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-02-14T10:14:39Z",
+      "pushed_at": "2026-02-14T10:14:35Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 322235,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 10543,
+          "color": "#663399"
+        },
+        "HTML": {
+          "size": 2154,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 80,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/nix-macos-wizard",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-02-13T11:14:42Z",
+      "pushed_at": "2026-02-13T11:14:39Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "pRizz/add-stars-badges",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-02-11T00:52:41Z",
+      "pushed_at": "2026-02-11T00:52:38Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "Shell": {
+          "size": 18547,
+          "color": "#89e051"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/sus-repo-finder",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-02-01T02:23:49Z",
+      "pushed_at": "2026-02-01T02:23:29Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "Rust": {
+          "size": 45493566,
+          "color": "#dea584"
+        },
+        "JavaScript": {
+          "size": 104986,
+          "color": "#f1e05a"
+        },
+        "HTML": {
+          "size": 93895,
+          "color": "#e34c26"
+        },
+        "CSS": {
+          "size": 23132,
+          "color": "#663399"
+        },
+        "Shell": {
+          "size": 22639,
+          "color": "#89e051"
+        },
+        "Python": {
+          "size": 18177,
+          "color": "#3572A5"
+        },
+        "PLpgSQL": {
+          "size": 2081,
+          "color": "#336790"
+        },
+        "Dockerfile": {
+          "size": 2043,
+          "color": "#384d54"
+        },
+        "TSQL": {
+          "size": 383,
+          "color": "#e38c00"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #52",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-02-01T02:20:33Z",
+      "pushed_at": "2026-02-01T02:20:30Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "Shell": {
+          "size": 26016,
+          "color": "#89e051"
+        },
+        "Dockerfile": {
+          "size": 6056,
+          "color": "#384d54"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/webgpu-canvas-studio",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-29T17:11:50Z",
+      "pushed_at": "2026-01-29T17:11:46Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 236681,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 4755,
+          "color": "#663399"
+        },
+        "HTML": {
+          "size": 2152,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 846,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #63",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-26T05:31:27Z",
+      "pushed_at": "2026-01-26T05:31:22Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 181078,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 3571,
+          "color": "#663399"
+        },
+        "HTML": {
+          "size": 1030,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 846,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #48",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-22T07:21:55Z",
+      "pushed_at": "2026-01-22T07:21:51Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "Nix": {
+          "size": 1308,
+          "color": "#7e7eff"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/twitter-feels",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-21T23:28:48Z",
+      "pushed_at": "2026-01-21T23:28:45Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 444196,
+          "color": "#3178c6"
+        },
+        "Rust": {
+          "size": 42679,
+          "color": "#dea584"
+        },
+        "JavaScript": {
+          "size": 22754,
+          "color": "#f1e05a"
+        },
+        "Shell": {
+          "size": 16641,
+          "color": "#89e051"
+        },
+        "CSS": {
+          "size": 4629,
+          "color": "#663399"
+        },
+        "Just": {
+          "size": 1265,
+          "color": "#384d54"
+        },
+        "HTML": {
+          "size": 493,
+          "color": "#e34c26"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #19",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-21T17:01:02Z",
+      "pushed_at": "2026-01-21T16:46:58Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 251265,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 3461,
+          "color": "#663399"
+        },
+        "HTML": {
+          "size": 1030,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 846,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/virtual-mac",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-21T12:54:27Z",
+      "pushed_at": "2026-01-22T11:03:01Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 3,
+      "languages": {
+        "Rust": {
+          "size": 358483,
+          "color": "#dea584"
+        },
+        "CSS": {
+          "size": 105899,
+          "color": "#663399"
+        },
+        "TypeScript": {
+          "size": 30570,
+          "color": "#3178c6"
+        },
+        "HTML": {
+          "size": 363,
+          "color": "#e34c26"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/text-2-audiobook",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-21T00:30:10Z",
+      "pushed_at": "2026-01-21T00:30:06Z",
+      "open_issues": 0,
+      "open_pull_requests": 1,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 161718,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 3005,
+          "color": "#663399"
+        },
+        "JavaScript": {
+          "size": 814,
+          "color": "#f1e05a"
+        },
+        "HTML": {
+          "size": 379,
+          "color": "#e34c26"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/ralphcity-ui",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-18T00:43:31Z",
+      "pushed_at": "2026-01-18T00:43:19Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 1,
+      "languages": {
+        "TypeScript": {
+          "size": 261286,
+          "color": "#3178c6"
+        },
+        "Rust": {
+          "size": 219392,
+          "color": "#dea584"
+        },
+        "CSS": {
+          "size": 1968,
+          "color": "#663399"
+        },
+        "HTML": {
+          "size": 1003,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 846,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #46",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-17T12:31:52Z",
+      "pushed_at": "2026-01-17T12:31:49Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "Rust": {
+          "size": 122165,
+          "color": "#dea584"
+        },
+        "CSS": {
+          "size": 16291,
+          "color": "#663399"
+        },
+        "Swift": {
+          "size": 15178,
+          "color": "#F05138"
+        },
+        "HTML": {
+          "size": 291,
+          "color": "#e34c26"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/word-weave",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-16T22:15:46Z",
+      "pushed_at": "2026-01-16T22:15:51Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 274858,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 4716,
+          "color": "#663399"
+        },
+        "JavaScript": {
+          "size": 2448,
+          "color": "#f1e05a"
+        },
+        "HTML": {
+          "size": 2402,
+          "color": "#e34c26"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/bitchat-web",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-16T03:19:31Z",
+      "pushed_at": "2026-01-16T03:31:07Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 181157,
+          "color": "#3178c6"
+        },
+        "Rust": {
+          "size": 855,
+          "color": "#dea584"
+        },
+        "CSS": {
+          "size": 460,
+          "color": "#663399"
+        },
+        "HTML": {
+          "size": 440,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 262,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/coinflow-exercise",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-15T16:30:36Z",
+      "pushed_at": "2026-01-15T16:30:31Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 68606,
+          "color": "#3178c6"
+        },
+        "HTML": {
+          "size": 1709,
+          "color": "#e34c26"
+        },
+        "CSS": {
+          "size": 1308,
+          "color": "#663399"
+        },
+        "JavaScript": {
+          "size": 685,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #36",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-15T05:44:58Z",
+      "pushed_at": "2026-01-15T05:44:55Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "Private repo #38",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-14T15:10:38Z",
+      "pushed_at": "2026-01-14T15:10:34Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "Rust": {
+          "size": 40018,
+          "color": "#dea584"
+        },
+        "HTML": {
+          "size": 38162,
+          "color": "#e34c26"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #20",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-13T20:49:16Z",
+      "pushed_at": "2026-01-13T20:49:11Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 172563,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 3611,
+          "color": "#663399"
+        },
+        "HTML": {
+          "size": 1030,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 846,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/apple-notes-exporter-rs",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-13T15:47:50Z",
+      "pushed_at": "2026-01-13T15:47:30Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 7,
+      "languages": {
+        "Rust": {
+          "size": 25024,
+          "color": "#dea584"
+        },
+        "Shell": {
+          "size": 1009,
+          "color": "#89e051"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/git-hook-installer",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-13T15:16:39Z",
+      "pushed_at": "2026-01-13T15:16:20Z",
+      "open_issues": 0,
+      "open_pull_requests": 1,
+      "releases": 0,
+      "tags": 6,
+      "languages": {
+        "Rust": {
+          "size": 94789,
+          "color": "#dea584"
+        },
+        "Shell": {
+          "size": 1095,
+          "color": "#89e051"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/apple-notes-exporter-ts",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-13T15:09:15Z",
+      "pushed_at": "2026-01-13T15:09:39Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 3,
+      "languages": {
+        "TypeScript": {
+          "size": 16593,
+          "color": "#3178c6"
+        },
+        "JavaScript": {
+          "size": 5284,
+          "color": "#f1e05a"
+        },
+        "Shell": {
+          "size": 845,
+          "color": "#89e051"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/apple-notes-exporter",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-13T14:40:02Z",
+      "pushed_at": "2026-01-13T14:39:43Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "AppleScript": {
+          "size": 19422,
+          "color": "#101F1F"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/squash-only",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-12T17:05:33Z",
+      "pushed_at": "2026-01-12T17:05:39Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 14,
+      "languages": {
+        "Shell": {
+          "size": 15062,
+          "color": "#89e051"
+        },
+        "JavaScript": {
+          "size": 1394,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #3",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-12T16:55:27Z",
+      "pushed_at": "2026-01-12T16:55:26Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 197553,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 3637,
+          "color": "#663399"
+        },
+        "HTML": {
+          "size": 1102,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 846,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #32",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-10T20:02:02Z",
+      "pushed_at": "2026-01-10T20:01:59Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 228218,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 5703,
+          "color": "#663399"
+        },
+        "HTML": {
+          "size": 1057,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 846,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #31",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-10T03:09:13Z",
+      "pushed_at": "2026-01-10T03:22:35Z",
+      "open_issues": 0,
+      "open_pull_requests": 1,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "pRizz/zeckendorf-spiral",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-09T15:22:46Z",
+      "pushed_at": "2026-01-09T15:22:42Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 232290,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 3579,
+          "color": "#663399"
+        },
+        "HTML": {
+          "size": 1518,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 846,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #70",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-08T16:57:36Z",
+      "pushed_at": "2026-01-08T16:57:26Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 184366,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 3637,
+          "color": "#663399"
+        },
+        "HTML": {
+          "size": 1030,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 846,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #64",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-08T16:42:00Z",
+      "pushed_at": "2026-01-08T16:41:57Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TeX": {
+          "size": 7177,
+          "color": "#3D6117"
+        },
+        "Shell": {
+          "size": 449,
+          "color": "#89e051"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/zeckendorf-webapp",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-06T03:30:54Z",
+      "pushed_at": "2026-01-06T03:30:50Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 262920,
+          "color": "#3178c6"
+        },
+        "HTML": {
+          "size": 4566,
+          "color": "#e34c26"
+        },
+        "CSS": {
+          "size": 4344,
+          "color": "#663399"
+        },
+        "JavaScript": {
+          "size": 2072,
+          "color": "#f1e05a"
+        },
+        "Shell": {
+          "size": 610,
+          "color": "#89e051"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/zeckendorf-article",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-06T03:26:06Z",
+      "pushed_at": "2026-01-06T03:26:03Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 8488,
+          "color": "#3178c6"
+        },
+        "TeX": {
+          "size": 960,
+          "color": "#3D6117"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/cargo-lens-rust",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-01-02T03:00:52Z",
+      "pushed_at": "2026-01-02T03:00:49Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 7219,
+          "color": "#3178c6"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/blue-noise-canvas",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2025-12-27T05:43:13Z",
+      "pushed_at": "2025-12-27T05:43:09Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 190261,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 2576,
+          "color": "#663399"
+        },
+        "HTML": {
+          "size": 1030,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 846,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #72",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2025-12-10T00:43:01Z",
+      "pushed_at": "2025-12-10T00:42:58Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 54143,
+          "color": "#3178c6"
+        },
+        "JavaScript": {
+          "size": 670,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/iota-buy-strategy",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 14,
+      "forks": 11,
+      "updated_at": "2025-12-09T13:21:39Z",
+      "pushed_at": "2017-09-15T04:52:18Z",
+      "open_issues": 1,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "HTML": {
+          "size": 9463,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 7062,
+          "color": "#f1e05a"
+        },
+        "CSS": {
+          "size": 1411,
+          "color": "#663399"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #41",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2025-12-09T04:17:49Z",
+      "pushed_at": "2025-12-09T04:17:45Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 178378,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 3394,
+          "color": "#663399"
+        },
+        "HTML": {
+          "size": 1263,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 846,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/Monero-Donator",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 8,
+      "forks": 4,
+      "updated_at": "2025-11-25T00:05:06Z",
+      "pushed_at": "2017-09-29T14:14:57Z",
+      "open_issues": 2,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "HTML": {
+          "size": 10888,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 6421,
+          "color": "#f1e05a"
+        },
+        "CSS": {
+          "size": 2110,
+          "color": "#663399"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #69",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2025-10-14T02:33:48Z",
+      "pushed_at": "2025-10-14T02:33:44Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "C": {
+          "size": 158669,
+          "color": "#555555"
+        },
+        "TypeScript": {
+          "size": 45413,
+          "color": "#3178c6"
+        },
+        "Rust": {
+          "size": 39309,
+          "color": "#dea584"
+        },
+        "Shell": {
+          "size": 36352,
+          "color": "#89e051"
+        },
+        "Swift": {
+          "size": 28941,
+          "color": "#F05138"
+        },
+        "Kotlin": {
+          "size": 7682,
+          "color": "#A97BFF"
+        },
+        "JavaScript": {
+          "size": 3847,
+          "color": "#f1e05a"
+        },
+        "Ruby": {
+          "size": 3052,
+          "color": "#701516"
+        },
+        "CMake": {
+          "size": 1616,
+          "color": "#DA3434"
+        },
+        "Python": {
+          "size": 686,
+          "color": "#3572A5"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/Easy-File-Encryptor-Decryptor",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 2,
+      "forks": 1,
+      "updated_at": "2025-10-06T15:28:00Z",
+      "pushed_at": "2025-06-19T02:54:46Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "HTML": {
+          "size": 14633,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 8215,
+          "color": "#f1e05a"
+        },
+        "CSS": {
+          "size": 4229,
+          "color": "#663399"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #65",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2025-10-02T18:39:39Z",
+      "pushed_at": "2025-10-02T18:39:35Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 32533,
+          "color": "#3178c6"
+        },
+        "Rust": {
+          "size": 7931,
+          "color": "#dea584"
+        },
+        "Shell": {
+          "size": 3146,
+          "color": "#89e051"
+        },
+        "JavaScript": {
+          "size": 237,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/tune-time-vibe-check",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2025-07-10T01:10:52Z",
+      "pushed_at": "2025-07-10T01:10:48Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 178346,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 2963,
+          "color": "#663399"
+        },
+        "HTML": {
+          "size": 912,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 869,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/sound-shape-shifter-studio",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2025-07-09T22:00:52Z",
+      "pushed_at": "2025-07-09T22:00:50Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 184829,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 3859,
+          "color": "#663399"
+        },
+        "HTML": {
+          "size": 924,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 869,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/binary-difficulty-visualizer",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2025-07-09T19:43:03Z",
+      "pushed_at": "2025-07-09T19:42:59Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 181238,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 3585,
+          "color": "#663399"
+        },
+        "HTML": {
+          "size": 928,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 869,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #22",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2025-06-27T21:14:01Z",
+      "pushed_at": "2025-06-27T21:13:58Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 276834,
+          "color": "#3178c6"
+        },
+        "JavaScript": {
+          "size": 2897,
+          "color": "#f1e05a"
+        },
+        "CSS": {
+          "size": 1664,
+          "color": "#663399"
+        },
+        "HTML": {
+          "size": 637,
+          "color": "#e34c26"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #26",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2025-06-23T20:06:58Z",
+      "pushed_at": "2025-06-23T20:06:55Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "Shell": {
+          "size": 12192,
+          "color": "#89e051"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #28",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2025-06-18T21:29:19Z",
+      "pushed_at": "2025-06-18T21:29:16Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "Rust": {
+          "size": 10047,
+          "color": "#dea584"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #24",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2025-03-16T22:55:26Z",
+      "pushed_at": "2025-03-16T22:55:23Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "Shell": {
+          "size": 6755,
+          "color": "#89e051"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #67",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2025-02-16T02:11:42Z",
+      "pushed_at": "2025-02-16T02:11:39Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "Rust": {
+          "size": 9964,
+          "color": "#dea584"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #45",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2025-02-16T02:10:14Z",
+      "pushed_at": "2025-02-16T02:10:11Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 192667,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 3060,
+          "color": "#663399"
+        },
+        "JavaScript": {
+          "size": 871,
+          "color": "#f1e05a"
+        },
+        "HTML": {
+          "size": 571,
+          "color": "#e34c26"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/SecureSeedCommands",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 5,
+      "forks": 4,
+      "updated_at": "2025-01-24T03:51:44Z",
+      "pushed_at": "2025-01-24T03:51:40Z",
+      "open_issues": 1,
+      "open_pull_requests": 19,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 30871,
+          "color": "#f1e05a"
+        },
+        "Vue": {
+          "size": 12272,
+          "color": "#41b883"
+        },
+        "HTML": {
+          "size": 736,
+          "color": "#e34c26"
+        },
+        "CSS": {
+          "size": 245,
+          "color": "#663399"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #25",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2025-01-19T21:09:44Z",
+      "pushed_at": "2025-01-19T21:09:42Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 170682,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 1473,
+          "color": "#663399"
+        },
+        "JavaScript": {
+          "size": 869,
+          "color": "#f1e05a"
+        },
+        "HTML": {
+          "size": 563,
+          "color": "#e34c26"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #23",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2024-11-08T20:05:15Z",
+      "pushed_at": "2024-11-08T20:05:11Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 12269,
+          "color": "#3178c6"
+        },
+        "JavaScript": {
+          "size": 990,
+          "color": "#f1e05a"
+        },
+        "HTML": {
+          "size": 491,
+          "color": "#e34c26"
+        },
+        "CSS": {
+          "size": 59,
+          "color": "#663399"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #58",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2024-11-08T19:00:32Z",
+      "pushed_at": "2024-11-08T19:00:21Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 40699,
+          "color": "#f1e05a"
+        },
+        "CSS": {
+          "size": 576,
+          "color": "#663399"
+        },
+        "HTML": {
+          "size": 341,
+          "color": "#e34c26"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #16",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2024-10-01T02:47:42Z",
+      "pushed_at": "2024-10-01T02:47:39Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 26923,
+          "color": "#3178c6"
+        },
+        "JavaScript": {
+          "size": 2888,
+          "color": "#f1e05a"
+        },
+        "CSS": {
+          "size": 1836,
+          "color": "#663399"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #17",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2024-07-27T18:40:32Z",
+      "pushed_at": "2024-07-27T18:40:29Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "Private repo #39",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2024-07-05T18:47:26Z",
+      "pushed_at": "2024-07-05T18:46:38Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 163234,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 9641,
+          "color": "#663399"
+        },
+        "JavaScript": {
+          "size": 1825,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #33",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2024-07-04T17:26:59Z",
+      "pushed_at": "2024-07-04T17:26:56Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 4867,
+          "color": "#3178c6"
+        },
+        "JavaScript": {
+          "size": 1968,
+          "color": "#f1e05a"
+        },
+        "CSS": {
+          "size": 59,
+          "color": "#663399"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #73",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2024-07-02T16:10:36Z",
+      "pushed_at": "2024-07-02T16:10:33Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "Private repo #59",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2024-06-20T22:15:44Z",
+      "pushed_at": "2024-06-20T22:13:12Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 59271,
+          "color": "#3178c6"
+        },
+        "JavaScript": {
+          "size": 9028,
+          "color": "#f1e05a"
+        },
+        "CSS": {
+          "size": 328,
+          "color": "#663399"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #60",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2024-06-20T17:51:49Z",
+      "pushed_at": "2024-06-20T17:50:55Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 6787,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 606,
+          "color": "#663399"
+        },
+        "JavaScript": {
+          "size": 227,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #44",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2024-03-23T15:51:07Z",
+      "pushed_at": "2024-03-23T15:51:04Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 810,
+          "color": "#3178c6"
+        },
+        "JavaScript": {
+          "size": 29,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #10",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2024-03-12T00:59:29Z",
+      "pushed_at": "2024-03-12T00:59:29Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "pRizz/apple-update-screensaver",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 5,
+      "forks": 1,
+      "updated_at": "2024-01-12T22:40:21Z",
+      "pushed_at": "2019-10-19T18:31:59Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "Clojure": {
+          "size": 5920,
+          "color": "#db5855"
+        },
+        "HTML": {
+          "size": 488,
+          "color": "#e34c26"
+        },
+        "CSS": {
+          "size": 427,
+          "color": "#663399"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #71",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2023-12-24T14:25:27Z",
+      "pushed_at": "2023-12-24T14:28:31Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "Private repo #68",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2023-12-16T04:42:37Z",
+      "pushed_at": "2023-12-16T05:14:06Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "pRizz/Simple-Hash-Generator",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 3,
+      "forks": 3,
+      "updated_at": "2023-11-13T12:54:54Z",
+      "pushed_at": "2017-10-15T19:19:25Z",
+      "open_issues": 4,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 1,
+      "languages": {
+        "HTML": {
+          "size": 10164,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 5899,
+          "color": "#f1e05a"
+        },
+        "CSS": {
+          "size": 4304,
+          "color": "#663399"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/Chatangle",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 14,
+      "forks": 3,
+      "updated_at": "2023-03-15T13:21:12Z",
+      "pushed_at": "2022-12-09T04:58:17Z",
+      "open_issues": 35,
+      "open_pull_requests": 43,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "Vue": {
+          "size": 44867,
+          "color": "#41b883"
+        },
+        "JavaScript": {
+          "size": 28441,
+          "color": "#f1e05a"
+        },
+        "HTML": {
+          "size": 15055,
+          "color": "#e34c26"
+        },
+        "CSS": {
+          "size": 12327,
+          "color": "#663399"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/iota-transaction-spammer-webapp",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 38,
+      "forks": 13,
+      "updated_at": "2023-02-20T18:29:53Z",
+      "pushed_at": "2018-06-11T13:32:34Z",
+      "open_issues": 11,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 5,
+      "languages": {
+        "HTML": {
+          "size": 12879,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 5747,
+          "color": "#f1e05a"
+        },
+        "CSS": {
+          "size": 1862,
+          "color": "#663399"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/iota-fountain",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 3,
+      "forks": 2,
+      "updated_at": "2022-12-31T07:03:39Z",
+      "pushed_at": "2023-01-07T02:03:56Z",
+      "open_issues": 1,
+      "open_pull_requests": 7,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 56762,
+          "color": "#f1e05a"
+        },
+        "Vue": {
+          "size": 22529,
+          "color": "#41b883"
+        },
+        "HTML": {
+          "size": 3213,
+          "color": "#e34c26"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/multi-hash",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 1,
+      "forks": 2,
+      "updated_at": "2022-11-24T19:13:35Z",
+      "pushed_at": "2023-01-05T06:15:12Z",
+      "open_issues": 0,
+      "open_pull_requests": 4,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 97587,
+          "color": "#f1e05a"
+        },
+        "HTML": {
+          "size": 2936,
+          "color": "#e34c26"
+        },
+        "CSS": {
+          "size": 930,
+          "color": "#663399"
+        },
+        "Shell": {
+          "size": 363,
+          "color": "#89e051"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #9",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2022-11-24T19:06:07Z",
+      "pushed_at": "2022-11-24T19:06:02Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 1,
+      "languages": {
+        "Vue": {
+          "size": 44188,
+          "color": "#41b883"
+        },
+        "HTML": {
+          "size": 3542,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 1144,
+          "color": "#f1e05a"
+        },
+        "CSS": {
+          "size": 245,
+          "color": "#663399"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/Euler-Identity-with-Tau-LaTeX",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 1,
+      "forks": 0,
+      "updated_at": "2022-03-13T14:28:05Z",
+      "pushed_at": "2017-11-16T03:00:20Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TeX": {
+          "size": 392,
+          "color": "#3D6117"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #1",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 1,
+      "forks": 1,
+      "updated_at": "2020-10-11T22:33:48Z",
+      "pushed_at": "2020-10-12T15:20:44Z",
+      "open_issues": 2,
+      "open_pull_requests": 1,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "HTML": {
+          "size": 116790,
+          "color": "#e34c26"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #21",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2020-09-08T03:05:35Z",
+      "pushed_at": "2020-09-08T03:05:33Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "Private repo #56",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2020-08-29T03:57:28Z",
+      "pushed_at": "2020-08-29T03:57:25Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "pRizz/bolero-chatangle.lib",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2020-07-30T12:53:43Z",
+      "pushed_at": "2021-01-05T02:41:15Z",
+      "open_issues": 0,
+      "open_pull_requests": 3,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 45156,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/memory-game",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2020-06-08T11:34:31Z",
+      "pushed_at": "2023-01-04T07:50:24Z",
+      "open_issues": 0,
+      "open_pull_requests": 20,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 11202,
+          "color": "#f1e05a"
+        },
+        "HTML": {
+          "size": 1751,
+          "color": "#e34c26"
+        },
+        "CSS": {
+          "size": 858,
+          "color": "#663399"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/vue-sensor-api-demo",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 1,
+      "updated_at": "2020-06-08T11:34:14Z",
+      "pushed_at": "2023-01-05T03:27:29Z",
+      "open_issues": 0,
+      "open_pull_requests": 27,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "Vue": {
+          "size": 7086,
+          "color": "#41b883"
+        },
+        "HTML": {
+          "size": 575,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 274,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #18",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2020-05-20T04:31:43Z",
+      "pushed_at": "2022-02-27T03:36:53Z",
+      "open_issues": 0,
+      "open_pull_requests": 12,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 99949,
+          "color": "#f1e05a"
+        },
+        "Java": {
+          "size": 5359,
+          "color": "#b07219"
+        },
+        "Objective-C": {
+          "size": 3532,
+          "color": "#438eff"
+        },
+        "Ruby": {
+          "size": 3080,
+          "color": "#701516"
+        },
+        "Starlark": {
+          "size": 1946,
+          "color": "#76d275"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/tanukidex-support",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2020-05-20T03:01:25Z",
+      "pushed_at": "2020-05-20T03:01:23Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "pRizz/My-IOTA-Balance",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 1,
+      "forks": 4,
+      "updated_at": "2020-05-11T20:56:59Z",
+      "pushed_at": "2018-02-20T16:05:40Z",
+      "open_issues": 2,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "HTML": {
+          "size": 10268,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 5107,
+          "color": "#f1e05a"
+        },
+        "CSS": {
+          "size": 1359,
+          "color": "#663399"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/Chatangle-Backend",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 8,
+      "forks": 1,
+      "updated_at": "2020-04-11T19:49:47Z",
+      "pushed_at": "2022-04-28T17:14:09Z",
+      "open_issues": 0,
+      "open_pull_requests": 5,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 13309,
+          "color": "#f1e05a"
+        },
+        "Shell": {
+          "size": 59,
+          "color": "#89e051"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/prizz-tip-addresses",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2019-12-15T06:40:56Z",
+      "pushed_at": "2019-12-15T06:40:54Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 383,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/json-edn-converter",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2019-10-20T17:27:43Z",
+      "pushed_at": "2019-10-20T17:27:42Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "Clojure": {
+          "size": 3043,
+          "color": "#db5855"
+        },
+        "HTML": {
+          "size": 460,
+          "color": "#e34c26"
+        },
+        "CSS": {
+          "size": 437,
+          "color": "#663399"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/Grade-Grid-Support",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2019-08-23T18:03:38Z",
+      "pushed_at": "2019-08-23T18:03:36Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "Private repo #35",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2019-08-19T18:37:59Z",
+      "pushed_at": "2023-01-04T07:37:30Z",
+      "open_issues": 0,
+      "open_pull_requests": 22,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "Private repo #40",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2019-07-17T15:46:48Z",
+      "pushed_at": "2019-07-29T01:41:51Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "pRizz/curl-transaction-core",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 1,
+      "forks": 1,
+      "updated_at": "2019-05-27T17:09:44Z",
+      "pushed_at": "2022-04-28T13:54:53Z",
+      "open_issues": 1,
+      "open_pull_requests": 2,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 3497,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/curl-transaction-webgl2-impl",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 1,
+      "forks": 0,
+      "updated_at": "2019-05-23T10:43:07Z",
+      "pushed_at": "2018-08-19T20:24:45Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 494,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #15",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2019-05-02T03:18:31Z",
+      "pushed_at": "2019-07-23T04:50:11Z",
+      "open_issues": 1,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "Private repo #14",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2019-02-09T16:49:23Z",
+      "pushed_at": "2019-02-09T16:49:22Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "Private repo #66",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2018-12-26T17:45:16Z",
+      "pushed_at": "2019-02-23T05:40:54Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "pRizz/iota-transaction-stream-front-end",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 1,
+      "forks": 1,
+      "updated_at": "2018-11-21T02:34:57Z",
+      "pushed_at": "2018-11-21T02:34:55Z",
+      "open_issues": 2,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 24805,
+          "color": "#f1e05a"
+        },
+        "Vue": {
+          "size": 13045,
+          "color": "#41b883"
+        },
+        "HTML": {
+          "size": 568,
+          "color": "#e34c26"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/liquidfun-prizz",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 1,
+      "forks": 0,
+      "updated_at": "2018-10-30T18:40:12Z",
+      "pushed_at": "2018-10-26T01:17:28Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 39,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/curl-transaction-webgl-impl",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2018-10-29T19:28:42Z",
+      "pushed_at": "2018-10-29T19:31:17Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "pRizz/chatangle-full-stack",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 2,
+      "forks": 0,
+      "updated_at": "2018-10-01T12:38:09Z",
+      "pushed_at": "2018-10-01T12:38:07Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 1882,
+          "color": "#f1e05a"
+        },
+        "Dockerfile": {
+          "size": 1116,
+          "color": "#384d54"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/iota-transaction-stream",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 7,
+      "forks": 1,
+      "updated_at": "2018-09-20T21:11:57Z",
+      "pushed_at": "2022-04-28T13:56:50Z",
+      "open_issues": 1,
+      "open_pull_requests": 8,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 7724,
+          "color": "#f1e05a"
+        },
+        "Shell": {
+          "size": 158,
+          "color": "#89e051"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #13",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2018-09-04T02:14:07Z",
+      "pushed_at": "2020-03-08T20:56:53Z",
+      "open_issues": 1,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "pRizz/bolero.headless",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2018-08-30T16:30:53Z",
+      "pushed_at": "2018-08-30T16:30:55Z",
+      "open_issues": 2,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 1872,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/iota-transaction-spammer-core",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2018-08-30T16:21:06Z",
+      "pushed_at": "2019-05-22T21:35:27Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 12263,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/chatangle-codec",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2018-08-30T16:20:32Z",
+      "pushed_at": "2022-01-22T02:51:46Z",
+      "open_issues": 0,
+      "open_pull_requests": 2,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 1200,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/iota-transaction-spammer-cli",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2018-08-30T15:57:48Z",
+      "pushed_at": "2018-08-30T15:57:47Z",
+      "open_issues": 2,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 660,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #12",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2018-08-30T15:44:10Z",
+      "pushed_at": "2018-03-25T22:31:21Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "Private repo #11",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2018-08-30T15:43:57Z",
+      "pushed_at": "2018-03-25T22:15:22Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "pRizz/Tryte-UTF8-JSON-Codec",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 2,
+      "forks": 1,
+      "updated_at": "2018-08-30T15:42:46Z",
+      "pushed_at": "2018-08-30T15:46:17Z",
+      "open_issues": 1,
+      "open_pull_requests": 1,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 2657,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #50",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2018-08-28T15:40:30Z",
+      "pushed_at": "2018-08-28T15:40:28Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "Private repo #57",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2018-08-28T14:46:22Z",
+      "pushed_at": "2018-08-28T14:46:20Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "Private repo #30",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2018-08-20T21:43:21Z",
+      "pushed_at": "2018-08-20T21:43:19Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "Private repo #29",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2018-08-19T05:13:41Z",
+      "pushed_at": "2018-09-26T12:19:48Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "pRizz/seed-cx-order-book-assignment",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2018-08-16T00:07:16Z",
+      "pushed_at": "2018-08-19T17:20:15Z",
+      "open_issues": 1,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 13460,
+          "color": "#f1e05a"
+        },
+        "HTML": {
+          "size": 1590,
+          "color": "#e34c26"
+        },
+        "CSS": {
+          "size": 440,
+          "color": "#663399"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #43",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2018-07-17T17:25:52Z",
+      "pushed_at": "2018-07-17T17:25:51Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "pRizz/iota-vanity-address-finder",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2018-07-10T22:50:41Z",
+      "pushed_at": "2018-08-19T17:19:05Z",
+      "open_issues": 1,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 10419,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/nano-vanity-address-finder",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2018-07-10T22:49:39Z",
+      "pushed_at": "2018-08-19T17:19:17Z",
+      "open_issues": 1,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 10611,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/secure-iota-seed-generator",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2018-07-03T19:33:29Z",
+      "pushed_at": "2018-08-19T17:19:55Z",
+      "open_issues": 1,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 410,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/curl-transaction-ccurl-impl",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2018-06-30T04:55:28Z",
+      "pushed_at": "2018-08-19T18:03:39Z",
+      "open_issues": 1,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 437,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/iota.transactionSpammer.js",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 5,
+      "forks": 4,
+      "updated_at": "2018-06-19T04:13:22Z",
+      "pushed_at": "2018-06-30T05:22:33Z",
+      "open_issues": 1,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 669491,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #7",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2018-05-04T00:17:33Z",
+      "pushed_at": "2018-05-04T00:17:32Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "Shell": {
+          "size": 852,
+          "color": "#89e051"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #8",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2017-12-10T06:29:14Z",
+      "pushed_at": "2017-07-18T23:32:07Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "Private repo #5",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2017-11-11T20:27:42Z",
+      "pushed_at": "2017-11-11T21:12:33Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "Private repo #6",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2017-11-11T17:29:25Z",
+      "pushed_at": "2017-11-11T17:29:26Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "Private repo #4",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2017-11-11T16:04:14Z",
+      "pushed_at": "2017-11-11T17:15:19Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "pRizz/IOTA-Address-Utilities",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 1,
+      "updated_at": "2017-09-29T02:05:53Z",
+      "pushed_at": "2017-09-29T13:01:53Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 1,
+      "languages": {
+        "HTML": {
+          "size": 8311,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 2097,
+          "color": "#f1e05a"
+        },
+        "CSS": {
+          "size": 1801,
+          "color": "#663399"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/iota-seed-encryptor-decryptor",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 1,
+      "forks": 2,
+      "updated_at": "2017-09-21T12:44:34Z",
+      "pushed_at": "2017-09-03T21:30:36Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "HTML": {
+          "size": 14736,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 7721,
+          "color": "#f1e05a"
+        },
+        "CSS": {
+          "size": 4229,
+          "color": "#663399"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #62",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2017-09-16T02:58:56Z",
+      "pushed_at": "2018-02-21T15:12:12Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "HTML": {
+          "size": 14397,
+          "color": "#e34c26"
+        },
+        "CSS": {
+          "size": 1389,
+          "color": "#663399"
+        },
+        "Shell": {
+          "size": 185,
+          "color": "#89e051"
+        }
+      }
+    },
+    {
+      "display_name": "Private repo #42",
+      "is_private": true,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2017-09-13T02:50:11Z",
+      "pushed_at": "2017-09-13T02:50:12Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {}
+    },
+    {
+      "display_name": "pRizz/iota-web-wallet",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 3,
+      "updated_at": "2017-07-22T14:43:19Z",
+      "pushed_at": "2017-07-22T10:31:46Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 79911,
+          "color": "#f1e05a"
+        },
+        "HTML": {
+          "size": 49791,
+          "color": "#e34c26"
+        },
+        "Ruby": {
+          "size": 39194,
+          "color": "#701516"
+        },
+        "CSS": {
+          "size": 4806,
+          "color": "#663399"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/GitHubOneClickComment",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2017-06-21T00:44:39Z",
+      "pushed_at": "2017-12-29T23:36:15Z",
+      "open_issues": 1,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 2361,
+          "color": "#f1e05a"
+        },
+        "HTML": {
+          "size": 1198,
+          "color": "#e34c26"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/Creature-Running-Evolution-With-MVC",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 1,
+      "updated_at": "2016-10-01T23:06:11Z",
+      "pushed_at": "2016-10-07T21:34:32Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 805228,
+          "color": "#f1e05a"
+        },
+        "Processing": {
+          "size": 76000,
+          "color": "#0096D8"
+        },
+        "HTML": {
+          "size": 3016,
+          "color": "#e34c26"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/Quiet-Password",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 1,
+      "updated_at": "2014-01-26T20:02:00Z",
+      "pushed_at": "2014-01-26T20:02:00Z",
+      "open_issues": 5,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 3,
+      "languages": {
+        "JavaScript": {
+          "size": 7421,
+          "color": "#f1e05a"
+        }
+      }
+    }
+  ]
+}
