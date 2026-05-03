@@ -17,7 +17,7 @@ svg { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial
 </style>
 <rect x="5" y="5" id="background" />
 <text class="title" x="21" y="36">Repo Portfolio</text>
-<text class="subtitle" x="21" y="55">102 public; 73 private redacted</text>
+<text class="subtitle" x="21" y="55">102 public; 0 private redacted</text>
 <g class="row" style="animation-delay: 0ms"><text class="label" x="21" y="74">pRizz/CryptoNoter</text><rect class="metric-bar" x="182" y="64" width="130" height="10" rx="2" style="fill:#2da44e" /><text class="value" x="330" y="74" text-anchor="end">550</text></g>
 <g class="row" style="animation-delay: 80ms"><text class="label" x="21" y="94">pRizz/Chatangle</text><rect class="metric-bar" x="182" y="84" width="23" height="10" rx="2" style="fill:#2da44e" /><text class="value" x="330" y="94" text-anchor="end">98</text></g>
 <g class="row" style="animation-delay: 160ms"><text class="label" x="21" y="114">pRizz/iota-transaction-spammer-webapp</text><rect class="metric-bar" x="182" y="104" width="18" height="10" rx="2" style="fill:#2da44e" /><text class="value" x="330" y="114" text-anchor="end">75</text></g>
