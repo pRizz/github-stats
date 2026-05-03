@@ -6,6 +6,7 @@ import unittest
 import os
 import re
 import typing
+from xml.etree import ElementTree as ET
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import mock
@@ -14,6 +15,7 @@ import requests
 
 import github_stats
 import generate_images
+import language_icons
 from github_stats import Queries, Stats
 
 
@@ -1270,6 +1272,131 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         typing.get_type_hints(generate_images._experimental_horizontal_bars)
         typing.get_type_hints(generate_images._experimental_stack_bar)
 
+    def test_language_icon_normalization_maps_clear_github_languages(self):
+        # Act / Assert
+        self.assertEqual(language_icons.normalize_language_icon_slug("Shell"), "bash")
+        self.assertEqual(language_icons.normalize_language_icon_slug("CSS"), "css3")
+        self.assertEqual(language_icons.normalize_language_icon_slug("C++"), "cplusplus")
+        self.assertEqual(language_icons.normalize_language_icon_slug("C#"), "csharp")
+        self.assertEqual(
+            language_icons.normalize_language_icon_slug("Dockerfile"),
+            "docker",
+        )
+        self.assertEqual(language_icons.normalize_language_icon_slug("Go"), "go")
+        self.assertEqual(language_icons.normalize_language_icon_slug("SCSS"), "sass")
+        self.assertEqual(language_icons.normalize_language_icon_slug("Swift"), "swift")
+        self.assertEqual(language_icons.normalize_language_icon_slug("Kotlin"), "kotlin")
+        self.assertEqual(language_icons.normalize_language_icon_slug("PHP"), "php")
+        self.assertEqual(
+            language_icons.normalize_language_icon_slug("Jupyter Notebook"),
+            "jupyter",
+        )
+        self.assertEqual(language_icons.normalize_language_icon_slug("YAML"), "yaml")
+        self.assertEqual(language_icons.normalize_language_icon_slug("Svelte"), "svelte")
+        self.assertEqual(
+            language_icons.normalize_language_icon_slug("WebAssembly"),
+            "wasm",
+        )
+        self.assertEqual(
+            language_icons.normalize_language_icon_slug("Objective-C"),
+            "objectivec",
+        )
+        self.assertEqual(
+            language_icons.normalize_language_icon_slug("PLpgSQL"),
+            "postgresql",
+        )
+        self.assertEqual(
+            language_icons.normalize_language_icon_slug("TSQL"),
+            "microsoftsqlserver",
+        )
+        self.assertIsNone(language_icons.normalize_language_icon_slug("HCL"))
+        self.assertIsNone(language_icons.normalize_language_icon_slug("Go Template"))
+
+    def test_language_icon_renderer_uses_vendored_svg_for_mapped_languages(self):
+        # Act
+        icon = language_icons.render_language_icon("Rust", "#dea584")
+
+        # Assert
+        self.assertIn("<svg", icon)
+        self.assertIn('class="language-icon"', icon)
+        self.assertNotIn("language-icon-fallback", icon)
+        self.assertNotIn("href=", icon)
+        self.assertNotIn("cdn.", icon)
+
+    def test_all_vendored_language_icons_pass_sanitization(self):
+        # Arrange
+        language_icons._load_sanitized_icon.cache_clear()
+
+        # Act / Assert
+        for slug in language_icons.LANGUAGE_ICON_FILES:
+            with self.subTest(slug=slug):
+                icon = language_icons._load_sanitized_icon(slug)
+                self.assertIsNotNone(icon)
+                self.assertNotRegex(icon, r'href="https?:')
+                self.assertNotRegex(icon, r"href='https?:")
+                self.assertNotIn("cdn.", icon)
+                self.assertNotIn("javascript:", icon)
+
+    def test_language_icon_renderer_falls_back_to_colored_dot(self):
+        # Act
+        icon = language_icons.render_language_icon("Just", "#384d54")
+
+        # Assert
+        self.assertIn("language-icon-fallback", icon)
+        self.assertIn("fill:#384d54", icon)
+        self.assertIn("M8 4a4 4", icon)
+
+    def test_language_icon_sanitizer_rejects_unsafe_svg(self):
+        # Arrange
+        root = ET.fromstring(
+            '<svg xmlns="http://www.w3.org/2000/svg">'
+            '<script>alert(1)</script>'
+            "</svg>"
+        )
+
+        # Act / Assert
+        with self.assertRaises(ValueError):
+            language_icons._sanitize_svg_tree(root, "unsafe")
+
+    async def test_generate_languages_renders_icons_without_external_refs(self):
+        # Arrange
+        class LanguageStats:
+            @property
+            async def languages(self):
+                return {
+                    "Rust": {"size": 10, "prop": 90, "color": "#dea584"},
+                    "Just": {"size": 1, "prop": 10, "color": "#384d54"},
+                }
+
+        with TemporaryDirectory() as tmpdir:
+            tmp_path = Path(tmpdir)
+            (tmp_path / "templates").mkdir()
+            (tmp_path / "generated").mkdir()
+            (tmp_path / "templates" / "languages.svg").write_text(
+                '<svg xmlns="http://www.w3.org/2000/svg">'
+                "{{ progress }}{{ lang_list }}</svg>",
+                encoding="utf-8",
+            )
+            previous_cwd = Path.cwd()
+
+            try:
+                os.chdir(tmp_path)
+
+                # Act
+                await generate_images.generate_languages(LanguageStats())
+
+                # Assert
+                output = (tmp_path / "generated" / "languages.svg").read_text(
+                    encoding="utf-8"
+                )
+                self.assertIn('class="language-icon"', output)
+                self.assertIn("language-icon-fallback", output)
+                self.assertIn("<span class=\"lang\">Rust</span>", output)
+                self.assertNotIn("href=", output)
+                self.assertNotIn("cdn.", output)
+            finally:
+                os.chdir(previous_cwd)
+
     def test_repo_portfolio_truncates_long_visible_labels(self):
         # Arrange
         long_repo = "pRizz/iota-transaction-spammer-webapp"
@@ -1338,6 +1465,73 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertIsNotNone(rect_match)
         self.assertLess(int(value_match.group(1)), int(rect_match.group(1)))
         self.assertLess(value_index, rect_index)
+
+    def test_horizontal_bar_language_icons_shift_labels_without_overlap(self):
+        # Arrange
+        bars = generate_images._experimental_horizontal_bars(
+            [
+                {
+                    "language": "Rust",
+                    "raw_percent": 100,
+                    "display_value": "100.0%",
+                    "color": "#dea584",
+                }
+            ],
+            "language",
+            "raw_percent",
+            bar_x=182,
+            bar_max_width=96,
+            value_x=170,
+            value_position="before_bar",
+            label_icon_key="language",
+            label_icon_color_key="color",
+        )
+
+        # Act
+        icon_tag = re.search(r'<svg[^>]*experimental-language-icon[^>]*>', bars)
+        label_match = re.search(r'<text class="label" x="(\d+)"', bars)
+        value_match = re.search(r'<text class="value" x="(\d+)"', bars)
+        rect_match = re.search(r'<rect class="metric-bar" x="(\d+)"', bars)
+
+        # Assert
+        self.assertIsNotNone(icon_tag)
+        self.assertIsNotNone(label_match)
+        self.assertIsNotNone(value_match)
+        self.assertIsNotNone(rect_match)
+        icon_x = int(re.search(r' x="(\d+)"', icon_tag.group(0)).group(1))
+        icon_y = int(re.search(r' y="(\d+)"', icon_tag.group(0)).group(1))
+        icon_width = int(re.search(r' width="(\d+)"', icon_tag.group(0)).group(1))
+        icon_end = icon_x + icon_width
+        label_x = int(label_match.group(1))
+        value_x = int(value_match.group(1))
+        rect_x = int(rect_match.group(1))
+        self.assertEqual(63, icon_y)
+        self.assertLess(icon_end, label_x)
+        self.assertLess(label_x, value_x)
+        self.assertLess(value_x, rect_x)
+
+    def test_primary_language_row_renders_icon_next_to_value(self):
+        # Arrange
+        rows = generate_images._experimental_rows(
+            [("Primary language", "Rust")],
+            value_icon_labels={"Primary language"},
+        )
+
+        # Act
+        icon_tag = re.search(r'<svg[^>]*experimental-language-icon[^>]*>', rows)
+        value_match = re.search(r'<text class="value" x="(\d+)"', rows)
+
+        # Assert
+        self.assertIsNotNone(icon_tag)
+        self.assertIsNotNone(value_match)
+        icon_x = int(re.search(r' x="(\d+)"', icon_tag.group(0)).group(1))
+        icon_y = int(re.search(r' y="(\d+)"', icon_tag.group(0)).group(1))
+        icon_width = int(re.search(r' width="(\d+)"', icon_tag.group(0)).group(1))
+        self.assertEqual(65, icon_y)
+        self.assertLess(
+            icon_x + icon_width,
+            int(value_match.group(1)),
+        )
 
     def test_repo_portfolio_shortens_large_values_with_title(self):
         # Arrange
@@ -1534,6 +1728,16 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                     self.assertNotIn("}}", output)
                     self.assertIn("<svg", output)
                     self.assertNotIn("octocat/secret", output)
+                language_momentum = (
+                    tmp_path / "generated" / "experimental-language-momentum.svg"
+                ).read_text(encoding="utf-8")
+                trading_card = (
+                    tmp_path / "generated" / "experimental-trading-card.svg"
+                ).read_text(encoding="utf-8")
+                self.assertIn("experimental-language-icon", language_momentum)
+                self.assertIn("experimental-language-icon", trading_card)
+                self.assertNotIn("href=", language_momentum)
+                self.assertNotIn("href=", trading_card)
                 metrics = (
                     tmp_path / "generated" / "experimental-metrics.json"
                 ).read_text(encoding="utf-8")

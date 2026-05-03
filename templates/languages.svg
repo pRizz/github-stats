@@ -76,6 +76,14 @@ div.ellipsis {
   vertical-align: top;
 }
 
+.language-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 0.5ch;
+  flex: 0 0 16px;
+  vertical-align: top;
+}
+
 #gh-dark-mode-only:target .octicon {
   color: #8b949e;
   fill: #8b949e;

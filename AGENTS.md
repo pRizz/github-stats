@@ -15,14 +15,19 @@ omitted data.
 Use commit-count scans, GraphQL `ContributionsCollection` totals, repository
 metadata, traffic data, or other bounded APIs for future generated metrics.
 
-## Generated SVG Rebase Conflicts
+## Generated Artifact Rebase Conflicts
 
-When rebasing, if every conflicted file is a regenerated SVG under `generated/`,
-resolve those SVG conflicts by keeping the local commit's regenerated output.
-In Git rebase conflict terminology this may be `--theirs`, not `--ours`, because
-the commit being replayed is the local change. Re-run the relevant generation or
-validation command afterward when practical.
+When rebasing, if every conflicted file is a regenerated artifact under
+`generated/`, resolve those conflicts by keeping the local commit's regenerated
+output. This applies to generated SVG and JSON artifacts. In Git rebase conflict
+terminology this may be `--theirs`, not `--ours`, because the commit being
+replayed is the local change.
 
-Do not use this shortcut when conflicts include source code, JSON cache/report
-files, templates, documentation, or any non-SVG artifact. Resolve those conflicts
-intentionally or report the blocker.
+Use this shortcut only when the files that produce the generated output are not
+also conflicted. Do not use it if conflicts include source code, templates,
+vendored assets, documentation, repo guidance, or any other generator input.
+
+After resolving generated artifacts mechanically, re-run the relevant generation
+command when practical, then run validation before continuing. If regeneration
+requires unavailable credentials or network access, run the strongest available
+validation and report the limitation.

@@ -19,6 +19,7 @@ from github_stats import (
     monthly_commit_identity_patterns,
     rolling_month_windows,
 )
+from language_icons import render_language_icon
 
 
 MONTHLY_COMMITS_CACHE = os.path.join("generated", "monthly-commits.json")
@@ -34,6 +35,7 @@ EXPERIMENTAL_CARD_NAMES = [
     "trading-card",
     "repo-portfolio",
 ]
+EXPERIMENTAL_LANGUAGE_ICON_BASELINE_OFFSET = 3
 
 
 ################################################################################
@@ -821,10 +823,8 @@ async def generate_languages(s: Stats) -> None:
         )
         lang_list += f"""
 <li style="animation-delay: {i * delay_between}ms;">
-<svg xmlns="http://www.w3.org/2000/svg" class="octicon" style="fill:{color};"
-viewBox="0 0 16 16" version="1.1" width="16" height="16"><path
-fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8z"></path></svg>
-<span class="lang">{lang}</span>
+{render_language_icon(lang, color)}
+<span class="lang">{_svg_text(lang)}</span>
 <span class="percent">{data.get("prop", 0):0.2f}%</span>
 </li>
 
@@ -930,11 +930,18 @@ def _shorten_text(value: Any, max_chars: Optional[int]) -> Tuple[str, bool]:
     return f"{text[:max_chars - 3]}...", True
 
 
+def _experimental_icon_y_for_text_baseline(text_y: int, icon_size: int) -> int:
+    return text_y - icon_size + EXPERIMENTAL_LANGUAGE_ICON_BASELINE_OFFSET
+
+
 def _experimental_rows(
     rows: List[Tuple[str, Any]],
     start_y: int = 76,
     row_gap: int = 18,
     value_max_chars: Optional[int] = None,
+    value_icon_labels: Optional[Set[str]] = None,
+    value_icon_x: int = 248,
+    value_icon_size: int = 14,
 ) -> str:
     output = []
     for index, (label, value) in enumerate(rows[:7]):
@@ -945,10 +952,21 @@ def _experimental_rows(
             if value_shortened
             else ""
         )
+        value_icon = ""
+        if value_icon_labels is not None and label in value_icon_labels:
+            value_icon = render_language_icon(
+                str(value),
+                "#8b949e",
+                class_name="language-icon experimental-language-icon",
+                size=value_icon_size,
+                x=value_icon_x,
+                y=_experimental_icon_y_for_text_baseline(y, value_icon_size),
+            )
         output.append(
             f'<g class="row" style="animation-delay: {index * 80}ms">'
             f"{title}"
             f'<text class="label" x="21" y="{y}">{_svg_text(label)}</text>'
+            f"{value_icon}"
             f'<text class="value" x="330" y="{y}" text-anchor="end">'
             f"{_svg_text(display_value)}</text></g>"
         )
@@ -967,6 +985,9 @@ def _experimental_horizontal_bars(
     bar_max_width: int = 130,
     value_x: int = 330,
     value_position: str = "after_bar",
+    label_icon_key: Optional[str] = None,
+    label_icon_color_key: Optional[str] = None,
+    label_icon_size: int = 14,
 ) -> str:
     max_value = max([float(item.get(value_key, 0)) for item in items] + [1.0])
     output = []
@@ -984,6 +1005,18 @@ def _experimental_horizontal_bars(
             if label_shortened or value_shortened
             else ""
         )
+        label_icon = ""
+        label_x = 21
+        if label_icon_key is not None:
+            label_icon = render_language_icon(
+                str(item.get(label_icon_key, label)),
+                str(item.get(label_icon_color_key or color_key or "color", color)),
+                class_name="language-icon experimental-language-icon",
+                size=label_icon_size,
+                x=21,
+                y=_experimental_icon_y_for_text_baseline(y, label_icon_size),
+            )
+            label_x = 41
         value_text = (
             f'<text class="value" x="{value_x}" y="{y}" text-anchor="end">'
             f"{_svg_text(display_value)}</text>"
@@ -998,7 +1031,8 @@ def _experimental_horizontal_bars(
         output.append(
             f'<g class="row" style="animation-delay: {index * 80}ms">'
             f"{title}"
-            f'<text class="label" x="21" y="{y}">'
+            f"{label_icon}"
+            f'<text class="label" x="{label_x}" y="{y}">'
             f'{_svg_text(display_label)}</text>'
             f"{value_and_bar}</g>"
         )
@@ -1164,6 +1198,8 @@ def _generate_experimental_language_momentum(metrics: Dict[str, Any]) -> None:
         bar_max_width=96,
         value_x=170,
         value_position="before_bar",
+        label_icon_key="language",
+        label_icon_color_key="color",
     )
     _render_experimental_template(
         "language-momentum",
@@ -1245,7 +1281,7 @@ def _generate_experimental_trading_card(metrics: Dict[str, Any]) -> None:
         "trading-card",
         "GitHub Trading Card",
         "Transparent experimental scorecard",
-        _experimental_rows(rows),
+        _experimental_rows(rows, value_icon_labels={"Primary language"}),
     )
 
 
