@@ -6,7 +6,7 @@ import html
 import json
 import os
 import re
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 import aiohttp
 

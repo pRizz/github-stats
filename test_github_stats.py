@@ -4,6 +4,7 @@ import asyncio
 import datetime as dt
 import unittest
 import os
+import typing
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import mock
@@ -1247,6 +1248,11 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
     def test_experimental_card_names_exclude_code_footprint(self):
         # Assert
         self.assertNotIn("code-footprint", generate_images.EXPERIMENTAL_CARD_NAMES)
+
+    def test_experimental_renderer_type_hints_resolve(self):
+        # Act / Assert
+        typing.get_type_hints(generate_images._experimental_rows)
+        typing.get_type_hints(generate_images._experimental_stack_bar)
 
     async def test_generate_experimental_renders_all_cards_without_placeholders(self):
         # Arrange
