@@ -3,21 +3,21 @@
     "name": "Peter Ryszkiewicz",
     "stargazers": 178,
     "forks": 351,
-    "total_contributions": 8564,
-    "current_year_contributions": 4951,
+    "total_contributions": 8567,
+    "current_year_contributions": 4954,
     "merged_pull_requests": 232,
     "repos": 175,
     "views": 195
   },
   "monthly_commits": {
-    "total": 4319,
+    "total": 4322,
     "current_month": {
       "key": "2026-05",
       "label": "May '26",
-      "count": 158,
+      "count": 161,
       "is_current": true,
       "scan_degraded": false,
-      "github_attributed_count": 173
+      "github_attributed_count": 176
     },
     "month_count": 13
   },
@@ -52,7 +52,7 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.14732416700280737
+        "elapsed_seconds": 0.1257792909964337
       }
     ],
     "critical_failures": [],
@@ -63,7 +63,7 @@
     "monthly_commits_wait_seconds_total": 0.0,
     "slowest_requests": [
       {
-        "repo": "pRizz/word-weave",
+        "repo": "pRizz/av-denoiser",
         "endpoint": "commits",
         "status": 200,
         "category": "success_with_json",
@@ -71,7 +71,19 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.39482795799995074,
+        "elapsed_seconds": 0.4207824580007582,
+        "message": "response contains JSON"
+      },
+      {
+        "repo": "pRizz/nix-macos-wizard",
+        "endpoint": "commits",
+        "status": 200,
+        "category": "success_with_json",
+        "degraded": false,
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.36888216600345913,
         "message": "response contains JSON"
       },
       {
@@ -83,55 +95,7 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.3651619170050253,
-        "message": "response contains JSON"
-      },
-      {
-        "repo": "pRizz/text-2-audiobook",
-        "endpoint": "commits",
-        "status": 200,
-        "category": "success_with_json",
-        "degraded": false,
-        "attempts": 1,
-        "retry_count": 0,
-        "wait_seconds": 0.0,
-        "elapsed_seconds": 0.33504687499953434,
-        "message": "response contains JSON"
-      },
-      {
-        "repo": "pRizz/iota-web-wallet",
-        "endpoint": "commits",
-        "status": 200,
-        "category": "success_with_json",
-        "degraded": false,
-        "attempts": 1,
-        "retry_count": 0,
-        "wait_seconds": 0.0,
-        "elapsed_seconds": 0.3334090419957647,
-        "message": "response contains JSON"
-      },
-      {
-        "repo": "pRizz/P-Rizz-Ventures-LLC-Website",
-        "endpoint": "commits",
-        "status": 200,
-        "category": "success_with_json",
-        "degraded": false,
-        "attempts": 1,
-        "retry_count": 0,
-        "wait_seconds": 0.0,
-        "elapsed_seconds": 0.33106620900070993,
-        "message": "response contains JSON"
-      },
-      {
-        "repo": "pRizz/av-denoiser",
-        "endpoint": "commits",
-        "status": 200,
-        "category": "success_with_json",
-        "degraded": false,
-        "attempts": 1,
-        "retry_count": 0,
-        "wait_seconds": 0.0,
-        "elapsed_seconds": 0.33044241700554267,
+        "elapsed_seconds": 0.2974495829985244,
         "message": "response contains JSON"
       },
       {
@@ -143,11 +107,23 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.32358445799764013,
+        "elapsed_seconds": 0.27199600000312785,
         "message": "response contains JSON"
       },
       {
-        "repo": "pRizz/Easy-File-Encryptor-Decryptor",
+        "repo": "pRizz/macbook-pro-2026-nix-configs",
+        "endpoint": "traffic/clones",
+        "status": 200,
+        "category": "success_with_json",
+        "degraded": false,
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.25462612500268733,
+        "message": "response contains JSON"
+      },
+      {
+        "repo": "pRizz/virtual-mac",
         "endpoint": "commits",
         "status": 200,
         "category": "success_with_json",
@@ -155,11 +131,23 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.32323570900189225,
+        "elapsed_seconds": 0.2335900420002872,
         "message": "response contains JSON"
       },
       {
-        "repo": "pRizz/apple-notes-exporter-ts",
+        "repo": "pRizz/bolero.headless",
+        "endpoint": "traffic/views",
+        "status": 200,
+        "category": "success_with_json",
+        "degraded": false,
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.21829645799880382,
+        "message": "response contains JSON"
+      },
+      {
+        "repo": "pRizz/gdrive-ralph-v2",
         "endpoint": "commits",
         "status": 200,
         "category": "success_with_json",
@@ -167,11 +155,11 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.30773437499738066,
+        "elapsed_seconds": 0.21618125000532018,
         "message": "response contains JSON"
       },
       {
-        "repo": "pRizz/twitter-feels",
+        "repo": "pRizz/SVG-Navigator---Chrome-Extension",
         "endpoint": "commits",
         "status": 200,
         "category": "success_with_json",
@@ -179,7 +167,19 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.3043896660019527,
+        "elapsed_seconds": 0.2129186669990304,
+        "message": "response contains JSON"
+      },
+      {
+        "repo": "pRizz/meta-repo",
+        "endpoint": "commits",
+        "status": 200,
+        "category": "success_with_json",
+        "degraded": false,
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.19845316700229887,
         "message": "response contains JSON"
       }
     ]

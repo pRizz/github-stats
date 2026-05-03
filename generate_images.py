@@ -921,15 +921,36 @@ def _format_number(value: Any) -> str:
         return str(value)
 
 
-def _experimental_rows(rows: List[Tuple[str, Any]], start_y: int = 76) -> str:
+def _shorten_text(value: Any, max_chars: Optional[int]) -> Tuple[str, bool]:
+    text = str(value)
+    if max_chars is None or max_chars <= 0 or len(text) <= max_chars:
+        return text, False
+    if max_chars <= 3:
+        return text[:max_chars], True
+    return f"{text[:max_chars - 3]}...", True
+
+
+def _experimental_rows(
+    rows: List[Tuple[str, Any]],
+    start_y: int = 76,
+    row_gap: int = 18,
+    value_max_chars: Optional[int] = None,
+) -> str:
     output = []
     for index, (label, value) in enumerate(rows[:7]):
-        y = start_y + (index * 18)
+        y = start_y + (index * row_gap)
+        display_value, value_shortened = _shorten_text(value, value_max_chars)
+        title = (
+            f"<title>{_svg_text(label)}: {_svg_text(value)}</title>"
+            if value_shortened
+            else ""
+        )
         output.append(
             f'<g class="row" style="animation-delay: {index * 80}ms">'
+            f"{title}"
             f'<text class="label" x="21" y="{y}">{_svg_text(label)}</text>'
             f'<text class="value" x="330" y="{y}" text-anchor="end">'
-            f"{_svg_text(value)}</text></g>"
+            f"{_svg_text(display_value)}</text></g>"
         )
     return "\n".join(output)
 
@@ -940,6 +961,8 @@ def _experimental_horizontal_bars(
     value_key: str,
     start_y: int = 74,
     color_key: Optional[str] = None,
+    label_max_chars: Optional[int] = None,
+    value_max_chars: Optional[int] = None,
 ) -> str:
     max_value = max([float(item.get(value_key, 0)) for item in items] + [1.0])
     output = []
@@ -948,14 +971,24 @@ def _experimental_horizontal_bars(
         value = float(item.get(value_key, 0))
         width = max(2, round((value / max_value) * 130))
         color = item.get(color_key or "color", "#2da44e")
+        label = item.get(label_key, "Unknown")
+        display_label, label_shortened = _shorten_text(label, label_max_chars)
+        raw_value = item.get("display_value", item.get(value_key, 0))
+        display_value, value_shortened = _shorten_text(raw_value, value_max_chars)
+        title = (
+            f"<title>{_svg_text(label)}: {_svg_text(raw_value)}</title>"
+            if label_shortened or value_shortened
+            else ""
+        )
         output.append(
             f'<g class="row" style="animation-delay: {index * 80}ms">'
+            f"{title}"
             f'<text class="label" x="21" y="{y}">'
-            f'{_svg_text(item.get(label_key, "Unknown"))}</text>'
+            f'{_svg_text(display_label)}</text>'
             f'<rect class="metric-bar" x="182" y="{y - 10}" width="{width}" '
             f'height="10" rx="2" style="fill:{_svg_text(color)}" />'
             f'<text class="value" x="330" y="{y}" text-anchor="end">'
-            f'{_svg_text(item.get("display_value", item.get(value_key, 0)))}</text></g>'
+            f"{_svg_text(display_value)}</text></g>"
         )
     return "\n".join(output)
 
@@ -1040,7 +1073,8 @@ def _generate_experimental_contribution_mix(metrics: Dict[str, Any]) -> None:
             ("Repositories", _format_number(mix["repositories"])),
             ("Restricted", _format_number(mix["restricted"])),
         ],
-        start_y=116,
+        start_y=108,
+        row_gap=16,
     )
     _render_experimental_template(
         "contribution-mix",
@@ -1176,6 +1210,7 @@ def _generate_experimental_repo_portfolio(metrics: Dict[str, Any]) -> None:
         portfolio["repositories"],
         "display_name",
         "score",
+        label_max_chars=23,
     )
     _render_experimental_template(
         "repo-portfolio",

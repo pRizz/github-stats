@@ -4,6 +4,7 @@ import asyncio
 import datetime as dt
 import unittest
 import os
+import re
 import typing
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -1267,6 +1268,69 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         # Act / Assert
         typing.get_type_hints(generate_images._experimental_rows)
         typing.get_type_hints(generate_images._experimental_stack_bar)
+
+    def test_repo_portfolio_truncates_long_visible_labels(self):
+        # Arrange
+        long_repo = "pRizz/iota-transaction-spammer-webapp"
+        bars = generate_images._experimental_horizontal_bars(
+            [{"display_name": long_repo, "score": 75}],
+            "display_name",
+            "score",
+            label_max_chars=23,
+        )
+
+        # Act
+        visible_text = re.findall(r"<text[^>]*>(.*?)</text>", bars)
+
+        # Assert
+        self.assertNotIn(long_repo, visible_text)
+        self.assertIn("pRizz/iota-transacti...", visible_text)
+        self.assertIn(f"<title>{long_repo}: 75</title>", bars)
+
+    def test_contribution_mix_rows_stay_inside_card(self):
+        # Arrange
+        template = """<svg id="gh-dark-mode-only" width="360" height="210" xmlns="http://www.w3.org/2000/svg">
+<text>{{ title }}</text><text>{{ subtitle }}</text>{{ body }}</svg>"""
+        metrics = {
+            "contribution_mix": {
+                "commits": 4284,
+                "pull_requests": 215,
+                "pull_request_reviews": 2,
+                "issues": 23,
+                "repositories": 84,
+                "restricted": 346,
+                "total": 4954,
+            }
+        }
+        with TemporaryDirectory() as tmpdir:
+            tmp_path = Path(tmpdir)
+            (tmp_path / "templates").mkdir()
+            (tmp_path / "templates" / "experimental-contribution-mix.svg").write_text(
+                template,
+                encoding="utf-8",
+            )
+            previous_cwd = Path.cwd()
+
+            try:
+                os.chdir(tmp_path)
+
+                # Act
+                generate_images._generate_experimental_contribution_mix(metrics)
+                output = (
+                    tmp_path / "generated" / "experimental-contribution-mix.svg"
+                ).read_text(encoding="utf-8")
+            finally:
+                os.chdir(previous_cwd)
+
+        # Assert
+        row_y_values = [
+            int(value)
+            for value in re.findall(
+                r'<text class="label" x="21" y="(\d+)">', output
+            )
+        ]
+        self.assertEqual(max(row_y_values), 188)
+        self.assertIn(">Restricted</text>", output)
 
     async def test_generate_experimental_renders_all_cards_without_placeholders(self):
         # Arrange
