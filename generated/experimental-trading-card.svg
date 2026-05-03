@@ -20,7 +20,7 @@ svg { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial
 <text class="subtitle" x="21" y="55">Transparent experimental scorecard</text>
 <g class="row" style="animation-delay: 0ms"><text class="label" x="21" y="76">Primary language</text><text class="value" x="330" y="76" text-anchor="end">Rust</text></g>
 <g class="row" style="animation-delay: 80ms"><text class="label" x="21" y="94">Activity score</text><text class="value" x="330" y="94" text-anchor="end">100/100</text></g>
-<g class="row" style="animation-delay: 160ms"><text class="label" x="21" y="112">Impact score</text><text class="value" x="330" y="112" text-anchor="end">100/100</text></g>
+<g class="row" style="animation-delay: 160ms"><text class="label" x="21" y="112">Impact score</text><text class="value" x="330" y="112" text-anchor="end">44/100</text></g>
 <g class="row" style="animation-delay: 240ms"><text class="label" x="21" y="130">Collaboration score</text><text class="value" x="330" y="130" text-anchor="end">48/100</text></g>
-<g class="row" style="animation-delay: 320ms"><text class="label" x="21" y="148">Breadth score</text><text class="value" x="330" y="148" text-anchor="end">94/100</text></g>
+<g class="row" style="animation-delay: 320ms"><text class="label" x="21" y="148">Breadth score</text><text class="value" x="330" y="148" text-anchor="end">57/100</text></g>
 </svg>
