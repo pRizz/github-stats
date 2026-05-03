@@ -963,13 +963,17 @@ def _experimental_horizontal_bars(
     color_key: Optional[str] = None,
     label_max_chars: Optional[int] = None,
     value_max_chars: Optional[int] = None,
+    bar_x: int = 182,
+    bar_max_width: int = 130,
+    value_x: int = 330,
+    value_position: str = "after_bar",
 ) -> str:
     max_value = max([float(item.get(value_key, 0)) for item in items] + [1.0])
     output = []
     for index, item in enumerate(items[:6]):
         y = start_y + (index * 20)
         value = float(item.get(value_key, 0))
-        width = max(2, round((value / max_value) * 130))
+        width = max(2, round((value / max_value) * bar_max_width))
         color = item.get(color_key or "color", "#2da44e")
         label = item.get(label_key, "Unknown")
         display_label, label_shortened = _shorten_text(label, label_max_chars)
@@ -980,35 +984,72 @@ def _experimental_horizontal_bars(
             if label_shortened or value_shortened
             else ""
         )
+        value_text = (
+            f'<text class="value" x="{value_x}" y="{y}" text-anchor="end">'
+            f"{_svg_text(display_value)}</text>"
+        )
+        bar = (
+            f'<rect class="metric-bar" x="{bar_x}" y="{y - 10}" width="{width}" '
+            f'height="10" rx="2" style="fill:{_svg_text(color)}" />'
+        )
+        value_and_bar = (
+            value_text + bar if value_position == "before_bar" else bar + value_text
+        )
         output.append(
             f'<g class="row" style="animation-delay: {index * 80}ms">'
             f"{title}"
             f'<text class="label" x="21" y="{y}">'
             f'{_svg_text(display_label)}</text>'
-            f'<rect class="metric-bar" x="182" y="{y - 10}" width="{width}" '
-            f'height="10" rx="2" style="fill:{_svg_text(color)}" />'
-            f'<text class="value" x="330" y="{y}" text-anchor="end">'
-            f"{_svg_text(display_value)}</text></g>"
+            f"{value_and_bar}</g>"
         )
     return "\n".join(output)
 
 
-def _experimental_stack_bar(values: List[Tuple[str, int, str]]) -> str:
-    total = sum(value for _, value, _ in values)
+def _experimental_stack_bar(
+    values: List[Tuple[str, int, str]],
+    x: int = 21,
+    y: int = 78,
+    width: int = 318,
+    height: int = 14,
+) -> str:
+    total = sum(value for _, value, _ in values if value > 0)
     if total <= 0:
-        return '<rect class="empty-bar" x="21" y="78" width="318" height="14" rx="3" />'
-    x = 21
+        return (
+            f'<rect class="empty-bar" x="{x}" y="{y}" '
+            f'width="{width}" height="{height}" rx="3" />'
+        )
+
+    current_x = x
     output = []
-    for label, value, color in values:
-        width = round((value / total) * 318)
-        if width <= 0:
+    positive_values = [
+        (label, value, color) for label, value, color in values if value > 0
+    ]
+    segment_widths = [
+        max(1, int((value / total) * width))
+        for _, value, _ in positive_values
+    ]
+    remaining_width = width - sum(segment_widths)
+    remainders = sorted(
+        enumerate(
+            ((value / total) * width) - int((value / total) * width)
+            for _, value, _ in positive_values
+        ),
+        key=lambda item: item[1],
+        reverse=True,
+    )
+    for index, _ in remainders[:remaining_width]:
+        segment_widths[index] += 1
+
+    for (label, value, color), segment_width in zip(positive_values, segment_widths):
+        if segment_width <= 0:
             continue
         output.append(
             f"<title>{_svg_text(label)}: {_format_number(value)}</title>"
-            f'<rect x="{x}" y="78" width="{width}" height="14" rx="3" '
+            f'<rect class="metric-bar" x="{current_x}" y="{y}" '
+            f'width="{segment_width}" height="{height}" rx="3" '
             f'style="fill:{_svg_text(color)}" />'
         )
-        x += width
+        current_x += segment_width
     return "\n".join(output)
 
 
@@ -1055,24 +1096,24 @@ def _generate_experimental_contribution_pulse(metrics: Dict[str, Any]) -> None:
 
 def _generate_experimental_contribution_mix(metrics: Dict[str, Any]) -> None:
     mix = metrics["contribution_mix"]
-    stack = _experimental_stack_bar(
-        [
-            ("Commits", int(mix["commits"]), "#2da44e"),
-            ("PRs", int(mix["pull_requests"]), "#0969da"),
-            ("Reviews", int(mix["pull_request_reviews"]), "#8250df"),
-            ("Issues", int(mix["issues"]), "#bf8700"),
-            ("Restricted", int(mix["restricted"]), "#8b949e"),
-        ]
-    )
+    contribution_items = [
+        ("Commits", int(mix["commits"]), "#2da44e"),
+        ("Pull requests", int(mix["pull_requests"]), "#0969da"),
+        ("Reviews", int(mix["pull_request_reviews"]), "#8250df"),
+        ("Issues", int(mix["issues"]), "#bf8700"),
+        ("Repositories", int(mix["repositories"]), "#1f6feb"),
+        ("Restricted", int(mix["restricted"]), "#8b949e"),
+    ]
+    sorted_items = [
+        item
+        for _, item in sorted(
+            enumerate(contribution_items),
+            key=lambda indexed_item: (-indexed_item[1][1], indexed_item[0]),
+        )
+    ]
+    stack = _experimental_stack_bar(sorted_items)
     rows = _experimental_rows(
-        [
-            ("Commits", _format_number(mix["commits"])),
-            ("Pull requests", _format_number(mix["pull_requests"])),
-            ("Reviews", _format_number(mix["pull_request_reviews"])),
-            ("Issues", _format_number(mix["issues"])),
-            ("Repositories", _format_number(mix["repositories"])),
-            ("Restricted", _format_number(mix["restricted"])),
-        ],
+        [(label, _format_number(value)) for label, value, _ in sorted_items],
         start_y=108,
         row_gap=16,
     )
@@ -1119,6 +1160,10 @@ def _generate_experimental_language_momentum(metrics: Dict[str, Any]) -> None:
         "language",
         "raw_percent",
         color_key="color",
+        bar_x=182,
+        bar_max_width=96,
+        value_x=170,
+        value_position="before_bar",
     )
     _render_experimental_template(
         "language-momentum",
@@ -1211,6 +1256,10 @@ def _generate_experimental_repo_portfolio(metrics: Dict[str, Any]) -> None:
         "display_name",
         "score",
         label_max_chars=23,
+        value_max_chars=8,
+        bar_x=182,
+        bar_max_width=96,
+        value_x=330,
     )
     _render_experimental_template(
         "repo-portfolio",

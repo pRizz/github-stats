@@ -1267,6 +1267,7 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
     def test_experimental_renderer_type_hints_resolve(self):
         # Act / Assert
         typing.get_type_hints(generate_images._experimental_rows)
+        typing.get_type_hints(generate_images._experimental_horizontal_bars)
         typing.get_type_hints(generate_images._experimental_stack_bar)
 
     def test_repo_portfolio_truncates_long_visible_labels(self):
@@ -1277,6 +1278,7 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
             "display_name",
             "score",
             label_max_chars=23,
+            bar_max_width=96,
         )
 
         # Act
@@ -1286,6 +1288,83 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn(long_repo, visible_text)
         self.assertIn("pRizz/iota-transacti...", visible_text)
         self.assertIn(f"<title>{long_repo}: 75</title>", bars)
+
+    def test_horizontal_bar_columns_keep_bars_before_values(self):
+        # Arrange
+        bars = generate_images._experimental_horizontal_bars(
+            [{"language": "Rust", "raw_percent": 100, "display_value": "100.0%"}],
+            "language",
+            "raw_percent",
+            bar_x=182,
+            bar_max_width=96,
+            value_x=330,
+        )
+
+        # Act
+        rect_match = re.search(
+            r'<rect class="metric-bar" x="(\d+)" y="\d+" width="(\d+)"',
+            bars,
+        )
+        value_match = re.search(r'<text class="value" x="(\d+)"', bars)
+
+        # Assert
+        self.assertIsNotNone(rect_match)
+        self.assertIsNotNone(value_match)
+        bar_end = int(rect_match.group(1)) + int(rect_match.group(2))
+        value_x = int(value_match.group(1))
+        self.assertLessEqual(bar_end, 278)
+        self.assertLess(bar_end, value_x)
+
+    def test_horizontal_bar_can_place_values_before_bars(self):
+        # Arrange
+        bars = generate_images._experimental_horizontal_bars(
+            [{"language": "Rust", "raw_percent": 100, "display_value": "100.0%"}],
+            "language",
+            "raw_percent",
+            bar_x=182,
+            bar_max_width=96,
+            value_x=170,
+            value_position="before_bar",
+        )
+
+        # Act
+        value_match = re.search(r'<text class="value" x="(\d+)"', bars)
+        rect_match = re.search(r'<rect class="metric-bar" x="(\d+)"', bars)
+        value_index = bars.index('<text class="value"')
+        rect_index = bars.index('<rect class="metric-bar"')
+
+        # Assert
+        self.assertIsNotNone(value_match)
+        self.assertIsNotNone(rect_match)
+        self.assertLess(int(value_match.group(1)), int(rect_match.group(1)))
+        self.assertLess(value_index, rect_index)
+
+    def test_repo_portfolio_shortens_large_values_with_title(self):
+        # Arrange
+        long_repo = "pRizz/SVG-Navigator---Chrome-Extension"
+        bars = generate_images._experimental_horizontal_bars(
+            [
+                {
+                    "display_name": long_repo,
+                    "score": 123456789,
+                    "display_value": "123,456,789",
+                }
+            ],
+            "display_name",
+            "score",
+            label_max_chars=23,
+            value_max_chars=8,
+            bar_max_width=96,
+        )
+
+        # Act
+        visible_text = re.findall(r"<text[^>]*>(.*?)</text>", bars)
+
+        # Assert
+        self.assertNotIn(long_repo, visible_text)
+        self.assertIn("pRizz/SVG-Navigator-...", visible_text)
+        self.assertIn("123,4...", visible_text)
+        self.assertIn(f"<title>{long_repo}: 123,456,789</title>", bars)
 
     def test_contribution_mix_rows_stay_inside_card(self):
         # Arrange
@@ -1298,8 +1377,8 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                 "pull_request_reviews": 2,
                 "issues": 23,
                 "repositories": 84,
-                "restricted": 346,
-                "total": 4954,
+                "restricted": 0,
+                "total": 4608,
             }
         }
         with TemporaryDirectory() as tmpdir:
@@ -1329,8 +1408,30 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                 r'<text class="label" x="21" y="(\d+)">', output
             )
         ]
+        row_labels = re.findall(
+            r'<text class="label" x="21" y="\d+">(.*?)</text>',
+            output,
+        )
+        stack_titles = re.findall(r"<title>(.*?):", output)
         self.assertEqual(max(row_y_values), 188)
+        self.assertEqual(
+            row_labels,
+            [
+                "Commits",
+                "Pull requests",
+                "Repositories",
+                "Issues",
+                "Reviews",
+                "Restricted",
+            ],
+        )
+        self.assertEqual(
+            stack_titles,
+            ["Commits", "Pull requests", "Repositories", "Issues", "Reviews"],
+        )
         self.assertIn(">Restricted</text>", output)
+        self.assertIn("<rect", output)
+        self.assertNotIn("<title>Restricted:", output)
 
     async def test_generate_experimental_renders_all_cards_without_placeholders(self):
         # Arrange
