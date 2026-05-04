@@ -1042,19 +1042,27 @@ def _experimental_horizontal_bars(
 def _experimental_stack_bar(
     values: List[Tuple[str, int, str]],
     x: int = 21,
-    y: int = 78,
+    y: int = 70,
     width: int = 318,
-    height: int = 14,
+    height: int = 8,
 ) -> str:
     total = sum(value for _, value, _ in values if value > 0)
+    clip_id = "contribution-mix-stack-clip"
     if total <= 0:
         return (
-            f'<rect class="empty-bar" x="{x}" y="{y}" '
-            f'width="{width}" height="{height}" rx="3" />'
+            f'<rect class="stack-track" x="{x}" y="{y}" '
+            f'width="{width}" height="{height}" rx="6" />'
         )
 
     current_x = x
-    output = []
+    output = [
+        f"<defs><clipPath id=\"{clip_id}\">"
+        f'<rect x="{x}" y="{y}" width="{width}" height="{height}" rx="6" />'
+        f"</clipPath></defs>",
+        f'<rect class="stack-track" x="{x}" y="{y}" '
+        f'width="{width}" height="{height}" rx="6" />',
+        f'<g clip-path="url(#{clip_id})">',
+    ]
     positive_values = [
         (label, value, color) for label, value, color in values if value > 0
     ]
@@ -1079,11 +1087,12 @@ def _experimental_stack_bar(
             continue
         output.append(
             f"<title>{_svg_text(label)}: {_format_number(value)}</title>"
-            f'<rect class="metric-bar" x="{current_x}" y="{y}" '
-            f'width="{segment_width}" height="{height}" rx="3" '
+            f'<rect class="metric-bar stack-segment" x="{current_x}" y="{y}" '
+            f'width="{segment_width}" height="{height}" '
             f'style="fill:{_svg_text(color)}" />'
         )
         current_x += segment_width
+    output.append("</g>")
     return "\n".join(output)
 
 

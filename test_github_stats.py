@@ -1272,6 +1272,49 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         typing.get_type_hints(generate_images._experimental_horizontal_bars)
         typing.get_type_hints(generate_images._experimental_stack_bar)
 
+    def test_experimental_stack_bar_matches_language_progress_style(self):
+        # Arrange
+        values = [
+            ("Commits", 3, "#2da44e"),
+            ("Pull requests", 1, "#0969da"),
+            ("Issues", 2, "#bf8700"),
+        ]
+
+        # Act
+        stack = generate_images._experimental_stack_bar(values)
+        template = Path("templates/experimental-contribution-mix.svg").read_text(
+            encoding="utf-8"
+        )
+
+        # Assert
+        self.assertIn('class="stack-track"', stack)
+        self.assertIn('class="metric-bar stack-segment"', stack)
+        self.assertIn('y="70"', stack)
+        self.assertIn('height="8"', stack)
+        self.assertIn('rx="6"', stack)
+        self.assertIn(".stack-track { fill: rgb(225, 228, 232); }", template)
+        self.assertIn(
+            "#gh-dark-mode-only:target .stack-track "
+            "{ fill: rgba(110, 118, 129, 0.4); }",
+            template,
+        )
+        self.assertIn(
+            ".stack-segment { stroke: rgb(225, 228, 232); stroke-width: 2; }",
+            template,
+        )
+        self.assertIn(
+            "#gh-dark-mode-only:target .stack-segment { stroke: #393f47; }",
+            template,
+        )
+        segment_widths = [
+            int(width)
+            for width in re.findall(
+                r'<rect class="metric-bar stack-segment"[^>]* width="(\d+)"',
+                stack,
+            )
+        ]
+        self.assertEqual(sum(segment_widths), 318)
+
     def test_language_icon_normalization_maps_clear_github_languages(self):
         # Act / Assert
         self.assertEqual(language_icons.normalize_language_icon_slug("Shell"), "bash")
