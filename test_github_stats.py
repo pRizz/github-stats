@@ -2,6 +2,7 @@
 
 import asyncio
 import datetime as dt
+import shutil
 import unittest
 import os
 import re
@@ -1315,6 +1316,45 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         ]
         self.assertEqual(sum(segment_widths), 318)
 
+    def test_contribution_mix_places_rows_close_to_stack_bar(self):
+        # Arrange
+        metrics = {
+            "contribution_mix": {
+                "commits": 3,
+                "pull_requests": 1,
+                "pull_request_reviews": 0,
+                "issues": 2,
+                "repositories": 1,
+                "restricted": 0,
+                "total": 7,
+            }
+        }
+
+        with TemporaryDirectory() as tmpdir:
+            previous_cwd = Path.cwd()
+            tmp_path = Path(tmpdir)
+            (tmp_path / "templates").mkdir()
+            (tmp_path / "generated").mkdir()
+            shutil.copy(
+                previous_cwd / "templates" / "experimental-contribution-mix.svg",
+                tmp_path / "templates" / "experimental-contribution-mix.svg",
+            )
+
+            try:
+                os.chdir(tmp_path)
+
+                # Act
+                generate_images._generate_experimental_contribution_mix(metrics)
+
+                # Assert
+                output = (
+                    tmp_path / "generated" / "experimental-contribution-mix.svg"
+                ).read_text(encoding="utf-8")
+                self.assertIn('y="70" width="318" height="8"', output)
+                self.assertIn('<text class="label" x="21" y="98">Commits</text>', output)
+            finally:
+                os.chdir(previous_cwd)
+
     def test_language_icon_normalization_maps_clear_github_languages(self):
         # Act / Assert
         self.assertEqual(language_icons.normalize_language_icon_slug("Shell"), "bash")
@@ -1670,7 +1710,7 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
             output,
         )
         stack_titles = re.findall(r"<title>(.*?):", output)
-        self.assertEqual(max(row_y_values), 188)
+        self.assertEqual(max(row_y_values), 178)
         self.assertEqual(
             row_labels,
             [

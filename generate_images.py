@@ -1157,7 +1157,7 @@ def _generate_experimental_contribution_mix(metrics: Dict[str, Any]) -> None:
     stack = _experimental_stack_bar(sorted_items)
     rows = _experimental_rows(
         [(label, _format_number(value)) for label, value, _ in sorted_items],
-        start_y=108,
+        start_y=98,
         row_gap=16,
     )
     _render_experimental_template(
