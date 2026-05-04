@@ -10,7 +10,7 @@ svg { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial
 .value { fill: rgb(36, 41, 46); font-weight: 600; }
 #gh-dark-mode-only:target .value { fill: #c9d1d9; }
 .metric-bar { fill: #2da44e; }
-#gh-dark-mode-only:target .language-icon-dark-outline path, #gh-dark-mode-only:target .language-icon-dark-outline circle, #gh-dark-mode-only:target .language-icon-dark-outline ellipse, #gh-dark-mode-only:target .language-icon-dark-outline rect, #gh-dark-mode-only:target .language-icon-dark-outline polygon, #gh-dark-mode-only:target .language-icon-dark-outline polyline, #gh-dark-mode-only:target .language-icon-dark-outline line { stroke: rgba(240, 246, 252, 0.82); stroke-width: 8; stroke-linejoin: round; paint-order: stroke fill markers; }
+#gh-dark-mode-only:target .language-icon-dark-outline path, #gh-dark-mode-only:target .language-icon-dark-outline circle, #gh-dark-mode-only:target .language-icon-dark-outline ellipse, #gh-dark-mode-only:target .language-icon-dark-outline rect, #gh-dark-mode-only:target .language-icon-dark-outline polygon, #gh-dark-mode-only:target .language-icon-dark-outline polyline, #gh-dark-mode-only:target .language-icon-dark-outline line { stroke: rgba(240, 246, 252, 0.82); stroke-width: 16; stroke-linejoin: round; paint-order: stroke fill markers; }
 .empty-bar { fill: rgb(225, 228, 232); }
 #gh-dark-mode-only:target .empty-bar { fill: #30363d; }
 .row { opacity: 0; transform: translateY(10px); animation: riseIn 600ms ease-out forwards; }
