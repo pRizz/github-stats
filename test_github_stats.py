@@ -1314,14 +1314,28 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
 
     def test_language_icon_renderer_uses_vendored_svg_for_mapped_languages(self):
         # Act
-        icon = language_icons.render_language_icon("Rust", "#dea584")
+        icon = language_icons.render_language_icon("TypeScript", "#3178c6")
 
         # Assert
         self.assertIn("<svg", icon)
         self.assertIn('class="language-icon"', icon)
         self.assertNotIn("language-icon-fallback", icon)
+        self.assertNotIn("language-icon-dark-outline", icon)
         self.assertNotIn("href=", icon)
         self.assertNotIn("cdn.", icon)
+
+    def test_language_icon_renderer_outlines_dark_icons_by_slug(self):
+        # Act
+        rust_icon = language_icons.render_language_icon("Rust", "#dea584")
+        shell_icon = language_icons.render_language_icon("Shell", "#89e051")
+        bash_icon = language_icons.render_language_icon("Bash", "#89e051")
+        typescript_icon = language_icons.render_language_icon("TypeScript", "#3178c6")
+
+        # Assert
+        self.assertIn("language-icon-dark-outline", rust_icon)
+        self.assertIn("language-icon-dark-outline", shell_icon)
+        self.assertIn("language-icon-dark-outline", bash_icon)
+        self.assertNotIn("language-icon-dark-outline", typescript_icon)
 
     def test_all_vendored_language_icons_pass_sanitization(self):
         # Arrange
@@ -1389,8 +1403,12 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                 output = (tmp_path / "generated" / "languages.svg").read_text(
                     encoding="utf-8"
                 )
-                self.assertIn('class="language-icon"', output)
+                self.assertIn("language-icon language-icon-dark-outline", output)
                 self.assertIn("language-icon-fallback", output)
+                self.assertNotIn(
+                    "language-icon-fallback language-icon-dark-outline",
+                    output,
+                )
                 self.assertIn("<span class=\"lang\">Rust</span>", output)
                 self.assertNotIn("href=", output)
                 self.assertNotIn("cdn.", output)
@@ -1495,6 +1513,7 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
 
         # Assert
         self.assertIsNotNone(icon_tag)
+        self.assertIn("language-icon-dark-outline", icon_tag.group(0))
         self.assertIsNotNone(label_match)
         self.assertIsNotNone(value_match)
         self.assertIsNotNone(rect_match)
@@ -1523,6 +1542,7 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
 
         # Assert
         self.assertIsNotNone(icon_tag)
+        self.assertIn("language-icon-dark-outline", icon_tag.group(0))
         self.assertIsNotNone(value_match)
         icon_x = int(re.search(r' x="(\d+)"', icon_tag.group(0)).group(1))
         icon_y = int(re.search(r' y="(\d+)"', icon_tag.group(0)).group(1))
@@ -1736,6 +1756,7 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                 ).read_text(encoding="utf-8")
                 self.assertIn("experimental-language-icon", language_momentum)
                 self.assertIn("experimental-language-icon", trading_card)
+                self.assertIn("language-icon-dark-outline", language_momentum)
                 self.assertNotIn("href=", language_momentum)
                 self.assertNotIn("href=", trading_card)
                 metrics = (

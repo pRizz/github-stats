@@ -200,6 +200,8 @@ LANGUAGE_ICON_SLUGS: Dict[str, str] = {
     "zig": "zig",
 }
 
+DARK_MODE_OUTLINE_ICON_SLUGS = {"bash", "rust"}
+
 ALLOWED_TAGS = {
     "svg",
     "g",
@@ -289,9 +291,10 @@ def render_language_icon(
     if maybe_icon is None:
         return _fallback_icon(color, class_name=class_name, size=size, x=x, y=y)
 
+    rendered_class_name = _with_dark_outline_class(class_name, slug)
     return _with_render_attributes(
         maybe_icon,
-        class_name=class_name,
+        class_name=rendered_class_name,
         size=size,
         x=x,
         y=y,
@@ -382,6 +385,15 @@ def _with_render_attributes(
         root.set("y", str(y))
     ET.register_namespace("", SVG_NS)
     return ET.tostring(root, encoding="unicode", short_empty_elements=True)
+
+
+def _with_dark_outline_class(class_name: str, slug: str) -> str:
+    if slug not in DARK_MODE_OUTLINE_ICON_SLUGS:
+        return class_name
+    classes = class_name.split()
+    if "language-icon-dark-outline" not in classes:
+        classes.append("language-icon-dark-outline")
+    return " ".join(classes)
 
 
 def _fallback_icon(

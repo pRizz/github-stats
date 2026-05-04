@@ -84,6 +84,19 @@ div.ellipsis {
   vertical-align: top;
 }
 
+#gh-dark-mode-only:target .language-icon-dark-outline path,
+#gh-dark-mode-only:target .language-icon-dark-outline circle,
+#gh-dark-mode-only:target .language-icon-dark-outline ellipse,
+#gh-dark-mode-only:target .language-icon-dark-outline rect,
+#gh-dark-mode-only:target .language-icon-dark-outline polygon,
+#gh-dark-mode-only:target .language-icon-dark-outline polyline,
+#gh-dark-mode-only:target .language-icon-dark-outline line {
+  stroke: rgba(240, 246, 252, 0.82);
+  stroke-width: 4;
+  stroke-linejoin: round;
+  paint-order: stroke fill markers;
+}
+
 #gh-dark-mode-only:target .octicon {
   color: #8b949e;
   fill: #8b949e;
