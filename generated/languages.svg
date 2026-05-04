@@ -92,7 +92,7 @@ div.ellipsis {
 #gh-dark-mode-only:target .language-icon-dark-outline polyline,
 #gh-dark-mode-only:target .language-icon-dark-outline line {
   stroke: rgba(240, 246, 252, 0.82);
-  stroke-width: 4;
+  stroke-width: 8;
   stroke-linejoin: round;
   paint-order: stroke fill markers;
 }
