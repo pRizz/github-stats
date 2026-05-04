@@ -280,29 +280,14 @@ def render_language_icon(
     size: int = 16,
     x: Optional[int] = None,
     y: Optional[int] = None,
-    contrast_halo: bool = False,
 ) -> str:
     slug = normalize_language_icon_slug(language)
     if slug is None:
-        return _fallback_icon(
-            color,
-            class_name=class_name,
-            size=size,
-            x=x,
-            y=y,
-            contrast_halo=contrast_halo,
-        )
+        return _fallback_icon(color, class_name=class_name, size=size, x=x, y=y)
 
     maybe_icon = _load_sanitized_icon(slug)
     if maybe_icon is None:
-        return _fallback_icon(
-            color,
-            class_name=class_name,
-            size=size,
-            x=x,
-            y=y,
-            contrast_halo=contrast_halo,
-        )
+        return _fallback_icon(color, class_name=class_name, size=size, x=x, y=y)
 
     return _with_render_attributes(
         maybe_icon,
@@ -310,7 +295,6 @@ def render_language_icon(
         size=size,
         x=x,
         y=y,
-        contrast_halo=contrast_halo,
     )
 
 
@@ -386,11 +370,8 @@ def _with_render_attributes(
     size: int,
     x: Optional[int],
     y: Optional[int],
-    contrast_halo: bool,
 ) -> str:
     root = ET.fromstring(svg)
-    if contrast_halo:
-        _prepend_contrast_halo(root)
     root.set("class", class_name)
     root.set("width", str(size))
     root.set("height", str(size))
@@ -403,46 +384,6 @@ def _with_render_attributes(
     return ET.tostring(root, encoding="unicode", short_empty_elements=True)
 
 
-def _prepend_contrast_halo(root: ET.Element) -> None:
-    maybe_view_box = root.attrib.get("viewBox")
-    if maybe_view_box is None:
-        x = y = 0.0
-        width = height = 128.0
-    else:
-        try:
-            x, y, width, height = [
-                float(part) for part in maybe_view_box.replace(",", " ").split()
-            ]
-        except ValueError:
-            x = y = 0.0
-            width = height = 128.0
-
-    radius = min(width, height) * 0.18
-    stroke_width = min(width, height) * 0.045
-    halo = ET.Element(
-        f"{{{SVG_NS}}}rect",
-        {
-            "class": "language-icon-contrast-halo",
-            "x": _format_svg_number(x),
-            "y": _format_svg_number(y),
-            "width": _format_svg_number(width),
-            "height": _format_svg_number(height),
-            "rx": _format_svg_number(radius),
-            "ry": _format_svg_number(radius),
-            "fill": "transparent",
-            "stroke": "transparent",
-            "stroke-width": _format_svg_number(stroke_width),
-        },
-    )
-    root.insert(0, halo)
-
-
-def _format_svg_number(value: float) -> str:
-    if value.is_integer():
-        return str(int(value))
-    return f"{value:.4f}".rstrip("0").rstrip(".")
-
-
 def _fallback_icon(
     color: str,
     *,
@@ -450,7 +391,6 @@ def _fallback_icon(
     size: int,
     x: Optional[int],
     y: Optional[int],
-    contrast_halo: bool,
 ) -> str:
     location = ""
     if x is not None:
@@ -459,18 +399,10 @@ def _fallback_icon(
         location += f' y="{y}"'
     safe_color = html.escape(str(color), quote=True)
     safe_class = html.escape(f"{class_name} language-icon-fallback", quote=True)
-    halo = (
-        '<rect class="language-icon-contrast-halo" x="0" y="0" width="16" '
-        'height="16" rx="3" ry="3" fill="transparent" stroke="transparent" '
-        'stroke-width="0.75" />'
-        if contrast_halo
-        else ""
-    )
     return (
         f'<svg xmlns="{SVG_NS}" class="{safe_class}"{location} '
         f'viewBox="0 0 16 16" width="{size}" height="{size}" '
         f'aria-hidden="true" style="fill:{safe_color};">'
-        f"{halo}"
         '<path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8z" />'
         "</svg>"
     )
