@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-07T01:08:53Z",
+  "generated_at": "2026-05-08T01:09:02Z",
   "limited_data": [
     "repository traffic data degraded"
   ],
@@ -28,7 +28,7 @@
     "total": 5089
   },
   "impact": {
-    "stars": 177,
+    "stars": 178,
     "forks": 350,
     "views_14_days": 0,
     "clones_14_days": 0,
@@ -43,31 +43,31 @@
   "language_momentum": [
     {
       "language": "Rust",
-      "percent": 41.45,
+      "percent": 41.3,
       "color": "#dea584",
       "repos": 9
     },
     {
       "language": "TypeScript",
-      "percent": 27.72,
+      "percent": 27.56,
       "color": "#3178c6",
       "repos": 42
     },
     {
       "language": "HTML",
-      "percent": 27.01,
+      "percent": 27.34,
       "color": "#e34c26",
       "repos": 49
     },
     {
       "language": "Shell",
-      "percent": 1.2,
+      "percent": 1.19,
       "color": "#89e051",
       "repos": 27
     },
     {
       "language": "JavaScript",
-      "percent": 1.11,
+      "percent": 1.1,
       "color": "#f1e05a",
       "repos": 68
     },
@@ -176,8 +176,8 @@
       "is_archived": false,
       "stargazers": 0,
       "forks": 0,
-      "updated_at": "2026-05-06T08:58:22Z",
-      "pushed_at": "2026-05-06T08:58:18Z",
+      "updated_at": "2026-05-07T09:02:32Z",
+      "pushed_at": "2026-05-07T09:02:28Z",
       "open_issues": 0,
       "open_pull_requests": 0,
       "releases": 0,
@@ -212,8 +212,8 @@
       "is_archived": false,
       "stargazers": 1,
       "forks": 1,
-      "updated_at": "2026-05-06T07:48:58Z",
-      "pushed_at": "2026-05-06T07:48:54Z",
+      "updated_at": "2026-05-07T07:56:11Z",
+      "pushed_at": "2026-05-07T07:56:07Z",
       "open_issues": 0,
       "open_pull_requests": 0,
       "releases": 0,
@@ -252,8 +252,8 @@
       "is_archived": false,
       "stargazers": 0,
       "forks": 0,
-      "updated_at": "2026-05-06T07:14:53Z",
-      "pushed_at": "2026-05-06T07:14:49Z",
+      "updated_at": "2026-05-07T07:20:15Z",
+      "pushed_at": "2026-05-07T07:20:11Z",
       "open_issues": 0,
       "open_pull_requests": 0,
       "releases": 0,
@@ -280,15 +280,15 @@
       "is_archived": false,
       "stargazers": 0,
       "forks": 0,
-      "updated_at": "2026-05-06T03:30:38Z",
-      "pushed_at": "2026-05-06T03:30:35Z",
+      "updated_at": "2026-05-07T03:31:15Z",
+      "pushed_at": "2026-05-07T03:31:11Z",
       "open_issues": 0,
       "open_pull_requests": 0,
       "releases": 0,
       "tags": 0,
       "languages": {
         "HTML": {
-          "size": 9977102,
+          "size": 10143734,
           "color": "#e34c26"
         },
         "TypeScript": {
@@ -306,14 +306,62 @@
       }
     },
     {
+      "display_name": "pRizz/opencode-cloud",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 17,
+      "forks": 1,
+      "updated_at": "2026-05-07T03:29:10Z",
+      "pushed_at": "2026-05-04T09:59:53Z",
+      "open_issues": 8,
+      "open_pull_requests": 3,
+      "releases": 0,
+      "tags": 130,
+      "languages": {
+        "Rust": {
+          "size": 877198,
+          "color": "#dea584"
+        },
+        "Shell": {
+          "size": 154405,
+          "color": "#89e051"
+        },
+        "Dockerfile": {
+          "size": 42093,
+          "color": "#384d54"
+        },
+        "Just": {
+          "size": 18206,
+          "color": "#384d54"
+        },
+        "TypeScript": {
+          "size": 13016,
+          "color": "#3178c6"
+        },
+        "JavaScript": {
+          "size": 12327,
+          "color": "#f1e05a"
+        },
+        "HCL": {
+          "size": 5167,
+          "color": "#844FBA"
+        },
+        "Python": {
+          "size": 757,
+          "color": "#3572A5"
+        }
+      }
+    },
+    {
       "display_name": "pRizz/github-stats",
       "is_private": false,
       "is_fork": false,
       "is_archived": false,
       "stargazers": 0,
       "forks": 0,
-      "updated_at": "2026-05-06T01:05:00Z",
-      "pushed_at": "2026-05-06T01:04:57Z",
+      "updated_at": "2026-05-07T01:09:12Z",
+      "pushed_at": "2026-05-07T01:09:08Z",
       "open_issues": 0,
       "open_pull_requests": 0,
       "releases": 0,
@@ -434,54 +482,6 @@
         "CSS": {
           "size": 111,
           "color": "#663399"
-        }
-      }
-    },
-    {
-      "display_name": "pRizz/opencode-cloud",
-      "is_private": false,
-      "is_fork": false,
-      "is_archived": false,
-      "stargazers": 16,
-      "forks": 1,
-      "updated_at": "2026-04-28T15:05:00Z",
-      "pushed_at": "2026-05-04T09:59:53Z",
-      "open_issues": 8,
-      "open_pull_requests": 3,
-      "releases": 0,
-      "tags": 130,
-      "languages": {
-        "Rust": {
-          "size": 877198,
-          "color": "#dea584"
-        },
-        "Shell": {
-          "size": 154405,
-          "color": "#89e051"
-        },
-        "Dockerfile": {
-          "size": 42093,
-          "color": "#384d54"
-        },
-        "Just": {
-          "size": 18206,
-          "color": "#384d54"
-        },
-        "TypeScript": {
-          "size": 13016,
-          "color": "#3178c6"
-        },
-        "JavaScript": {
-          "size": 12327,
-          "color": "#f1e05a"
-        },
-        "HCL": {
-          "size": 5167,
-          "color": "#844FBA"
-        },
-        "Python": {
-          "size": 757,
-          "color": "#3572A5"
         }
       }
     },
