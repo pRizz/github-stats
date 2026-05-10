@@ -19,7 +19,7 @@ svg { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial
 <rect x="5" y="5" id="background" />
 <text class="title" x="21" y="36">Collaboration</text>
 <text class="subtitle" x="21" y="55">Current-year contribution signals</text>
-<g class="row" style="animation-delay: 0ms"><text class="label" x="21" y="76">Merged pull requests</text><text class="value" x="330" y="76" text-anchor="end">234</text></g>
+<g class="row" style="animation-delay: 0ms"><text class="label" x="21" y="76">Merged pull requests</text><text class="value" x="330" y="76" text-anchor="end">235</text></g>
 <g class="row" style="animation-delay: 80ms"><text class="label" x="21" y="94">PR reviews</text><text class="value" x="330" y="94" text-anchor="end">2</text></g>
 <g class="row" style="animation-delay: 160ms"><text class="label" x="21" y="112">Issues opened</text><text class="value" x="330" y="112" text-anchor="end">23</text></g>
 <g class="row" style="animation-delay: 240ms"><text class="label" x="21" y="130">Owned repositories</text><text class="value" x="330" y="130" text-anchor="end">103</text></g>
