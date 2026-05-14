@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-13T01:12:59Z",
+  "generated_at": "2026-05-14T01:14:12Z",
   "limited_data": [
     "repository traffic data degraded"
   ],
@@ -43,27 +43,21 @@
   "language_momentum": [
     {
       "language": "Rust",
-      "percent": 41.05,
+      "percent": 41.3,
       "color": "#dea584",
       "repos": 9
     },
     {
       "language": "HTML",
-      "percent": 28.49,
+      "percent": 28.67,
       "color": "#e34c26",
       "repos": 49
     },
     {
       "language": "TypeScript",
-      "percent": 26.72,
+      "percent": 26.36,
       "color": "#3178c6",
       "repos": 42
-    },
-    {
-      "language": "Shell",
-      "percent": 1.13,
-      "color": "#89e051",
-      "repos": 28
     },
     {
       "language": "JavaScript",
@@ -72,14 +66,20 @@
       "repos": 68
     },
     {
+      "language": "Shell",
+      "percent": 1.08,
+      "color": "#89e051",
+      "repos": 28
+    },
+    {
       "language": "Python",
-      "percent": 0.6,
+      "percent": 0.61,
       "color": "#3572A5",
       "repos": 5
     },
     {
       "language": "CSS",
-      "percent": 0.57,
+      "percent": 0.56,
       "color": "#663399",
       "repos": 49
     },
@@ -176,8 +176,8 @@
       "is_archived": false,
       "stargazers": 0,
       "forks": 0,
-      "updated_at": "2026-05-13T00:58:06Z",
-      "pushed_at": "2026-05-13T00:58:02Z",
+      "updated_at": "2026-05-13T09:11:25Z",
+      "pushed_at": "2026-05-13T09:11:17Z",
       "open_issues": 0,
       "open_pull_requests": 0,
       "releases": 0,
@@ -212,8 +212,8 @@
       "is_archived": false,
       "stargazers": 1,
       "forks": 1,
-      "updated_at": "2026-05-13T00:15:41Z",
-      "pushed_at": "2026-05-13T00:15:37Z",
+      "updated_at": "2026-05-13T08:01:55Z",
+      "pushed_at": "2026-05-13T08:01:51Z",
       "open_issues": 0,
       "open_pull_requests": 0,
       "releases": 0,
@@ -252,8 +252,8 @@
       "is_archived": false,
       "stargazers": 0,
       "forks": 0,
-      "updated_at": "2026-05-12T07:18:50Z",
-      "pushed_at": "2026-05-12T07:18:45Z",
+      "updated_at": "2026-05-13T07:23:43Z",
+      "pushed_at": "2026-05-13T07:23:39Z",
       "open_issues": 0,
       "open_pull_requests": 0,
       "releases": 0,
@@ -280,8 +280,8 @@
       "is_archived": false,
       "stargazers": 0,
       "forks": 0,
-      "updated_at": "2026-05-12T01:08:19Z",
-      "pushed_at": "2026-05-12T01:08:15Z",
+      "updated_at": "2026-05-13T01:13:25Z",
+      "pushed_at": "2026-05-13T01:13:21Z",
       "open_issues": 0,
       "open_pull_requests": 0,
       "releases": 0,
