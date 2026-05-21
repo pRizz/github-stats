@@ -19,11 +19,11 @@ svg { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial
 <rect x="5" y="5" id="background" />
 <text class="title" x="21" y="36">Maintainer Health</text>
 <text class="subtitle" x="21" y="55">Repository maintenance signals</text>
-<g class="row" style="animation-delay: 0ms"><text class="label" x="21" y="76">Open issues</text><text class="value" x="330" y="76" text-anchor="end">103</text></g>
-<g class="row" style="animation-delay: 80ms"><text class="label" x="21" y="94">Open pull requests</text><text class="value" x="330" y="94" text-anchor="end">211</text></g>
-<g class="row" style="animation-delay: 160ms"><text class="label" x="21" y="112">Updated in 90 days</text><text class="value" x="330" y="112" text-anchor="end">39</text></g>
-<g class="row" style="animation-delay: 240ms"><text class="label" x="21" y="130">Stale over 1 year</text><text class="value" x="330" y="130" text-anchor="end">88</text></g>
+<g class="row" style="animation-delay: 0ms"><text class="label" x="21" y="76">Open issues</text><text class="value" x="330" y="76" text-anchor="end">99</text></g>
+<g class="row" style="animation-delay: 80ms"><text class="label" x="21" y="94">Open pull requests</text><text class="value" x="330" y="94" text-anchor="end">175</text></g>
+<g class="row" style="animation-delay: 160ms"><text class="label" x="21" y="112">Updated in 90 days</text><text class="value" x="330" y="112" text-anchor="end">27</text></g>
+<g class="row" style="animation-delay: 240ms"><text class="label" x="21" y="130">Stale over 1 year</text><text class="value" x="330" y="130" text-anchor="end">46</text></g>
 <g class="row" style="animation-delay: 320ms"><text class="label" x="21" y="148">Archived</text><text class="value" x="330" y="148" text-anchor="end">0</text></g>
 <g class="row" style="animation-delay: 400ms"><text class="label" x="21" y="166">With releases</text><text class="value" x="330" y="166" text-anchor="end">0</text></g>
-<g class="row" style="animation-delay: 480ms"><text class="label" x="21" y="184">With tags</text><text class="value" x="330" y="184" text-anchor="end">20</text></g>
+<g class="row" style="animation-delay: 480ms"><text class="label" x="21" y="184">With tags</text><text class="value" x="330" y="184" text-anchor="end">17</text></g>
 </svg>
