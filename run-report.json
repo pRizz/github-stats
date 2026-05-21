@@ -3,21 +3,21 @@
     "name": "Peter Ryszkiewicz",
     "stargazers": 181,
     "forks": 352,
-    "total_contributions": 8746,
-    "current_year_contributions": 5133,
+    "total_contributions": 8747,
+    "current_year_contributions": 5134,
     "merged_pull_requests": 237,
     "repos": 177,
     "views": 280
   },
   "monthly_commits": {
-    "total": 4462,
+    "total": 4463,
     "current_month": {
       "key": "2026-05",
       "label": "May '26",
-      "count": 301,
+      "count": 302,
       "is_current": true,
       "scan_degraded": false,
-      "github_attributed_count": 350
+      "github_attributed_count": 351
     },
     "month_count": 13
   },
@@ -53,7 +53,7 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.1402934580000874
+        "elapsed_seconds": 0.15959220800141338
       },
       {
         "repo": "pRizz/IotaSeedGeneratoriOS",
@@ -64,7 +64,7 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.17352516599930823
+        "elapsed_seconds": 0.14252591600234155
       }
     ],
     "critical_failures": [],
@@ -75,7 +75,7 @@
     "monthly_commits_wait_seconds_total": 0.0,
     "slowest_requests": [
       {
-        "repo": "pRizz/wiki-clone",
+        "repo": "pRizz/curl-transaction-ccurl-impl",
         "endpoint": "commits",
         "status": 200,
         "category": "success_with_json",
@@ -83,7 +83,7 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 1.2106827499992505,
+        "elapsed_seconds": 1.3614115419986774,
         "message": "response contains JSON"
       },
       {
@@ -95,43 +95,7 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 1.0368500000004133,
-        "message": "response contains JSON"
-      },
-      {
-        "repo": "pRizz/github-stats",
-        "endpoint": "commits",
-        "status": 200,
-        "category": "success_with_json",
-        "degraded": false,
-        "attempts": 1,
-        "retry_count": 0,
-        "wait_seconds": 0.0,
-        "elapsed_seconds": 0.9254146669991314,
-        "message": "response contains JSON"
-      },
-      {
-        "repo": "pRizz/open-links",
-        "endpoint": "commits",
-        "status": 200,
-        "category": "success_with_json",
-        "degraded": false,
-        "attempts": 1,
-        "retry_count": 0,
-        "wait_seconds": 0.0,
-        "elapsed_seconds": 0.8730450000002747,
-        "message": "response contains JSON"
-      },
-      {
-        "repo": "pRizz/yolo-port",
-        "endpoint": "commits",
-        "status": 200,
-        "category": "success_with_json",
-        "degraded": false,
-        "attempts": 1,
-        "retry_count": 0,
-        "wait_seconds": 0.0,
-        "elapsed_seconds": 0.7662449160015967,
+        "elapsed_seconds": 1.324286833005317,
         "message": "response contains JSON"
       },
       {
@@ -143,11 +107,11 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.6435914159992535,
+        "elapsed_seconds": 0.9922000840015244,
         "message": "response contains JSON"
       },
       {
-        "repo": "pRizz/open-links",
+        "repo": "pRizz/local-docker-cache",
         "endpoint": "commits",
         "status": 200,
         "category": "success_with_json",
@@ -155,7 +119,19 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.6028045419989212,
+        "elapsed_seconds": 0.7536965410035918,
+        "message": "response contains JSON"
+      },
+      {
+        "repo": "pRizz/open-bitcoin-web-miner",
+        "endpoint": "commits",
+        "status": 200,
+        "category": "success_with_json",
+        "degraded": false,
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.6993849159989622,
         "message": "response contains JSON"
       },
       {
@@ -167,19 +143,7 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.5782495830026164,
-        "message": "response contains JSON"
-      },
-      {
-        "repo": "pRizz/zeckendorf",
-        "endpoint": "commits",
-        "status": 200,
-        "category": "success_with_json",
-        "degraded": false,
-        "attempts": 1,
-        "retry_count": 0,
-        "wait_seconds": 0.0,
-        "elapsed_seconds": 0.5350763749993348,
+        "elapsed_seconds": 0.635275915999955,
         "message": "response contains JSON"
       },
       {
@@ -191,7 +155,43 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.528224958001374,
+        "elapsed_seconds": 0.5110692500020377,
+        "message": "response contains JSON"
+      },
+      {
+        "repo": "pRizz/twitter-feels",
+        "endpoint": "commits",
+        "status": 200,
+        "category": "success_with_json",
+        "degraded": false,
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.4914592920031282,
+        "message": "response contains JSON"
+      },
+      {
+        "repo": "pRizz/twitter-feels",
+        "endpoint": "commits",
+        "status": 200,
+        "category": "success_with_json",
+        "degraded": false,
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.4808882080033072,
+        "message": "response contains JSON"
+      },
+      {
+        "repo": "pRizz/av-denoiser",
+        "endpoint": "commits",
+        "status": 200,
+        "category": "success_with_json",
+        "degraded": false,
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.4489799170041806,
         "message": "response contains JSON"
       }
     ]

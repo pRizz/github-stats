@@ -320,7 +320,11 @@ class _ExperimentalStats:
     ):
         return github_stats.CommitWindowScanResult(
             counts={
-                window.key: 72 if window.key == "trailing_30_days" else 365
+                window.key: {
+                    "trailing_30_days": 72,
+                    "trailing_180_days": 360,
+                    "trailing_365_days": 365,
+                }.get(window.key, 0)
                 for window in windows
             },
             repo_count=2,
@@ -1327,14 +1331,29 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(metrics["source"]["counting"], "rest_commits_identity_scan")
         self.assertEqual(metrics["source"]["timezone"], "UTC")
         self.assertEqual(metrics["source"]["repo_count"], 2)
+        self.assertEqual(
+            [item["key"] for item in metrics["windows"]],
+            [
+                "trailing_30_days",
+                "trailing_180_days",
+                "trailing_365_days",
+            ],
+        )
         self.assertEqual(metrics["windows"][0]["key"], "trailing_30_days")
         self.assertEqual(metrics["windows"][0]["commits"], 72)
         self.assertEqual(metrics["windows"][0]["per_hour"], 0.1)
         self.assertEqual(metrics["windows"][0]["per_day"], 2.4)
         self.assertEqual(metrics["windows"][0]["per_week"], 16.8)
-        self.assertEqual(metrics["windows"][1]["key"], "trailing_365_days")
-        self.assertEqual(metrics["windows"][1]["commits"], 365)
-        self.assertEqual(metrics["windows"][1]["per_day"], 1.0)
+        self.assertEqual(metrics["windows"][0]["per_month"], 72.0)
+        self.assertEqual(metrics["windows"][1]["key"], "trailing_180_days")
+        self.assertEqual(metrics["windows"][1]["label"], "6 months")
+        self.assertEqual(metrics["windows"][1]["days"], 180)
+        self.assertEqual(metrics["windows"][1]["commits"], 360)
+        self.assertEqual(metrics["windows"][1]["per_month"], 60.0)
+        self.assertEqual(metrics["windows"][2]["key"], "trailing_365_days")
+        self.assertEqual(metrics["windows"][2]["commits"], 365)
+        self.assertEqual(metrics["windows"][2]["per_day"], 1.0)
+        self.assertEqual(metrics["windows"][2]["per_month"], 30.0)
 
     async def test_experimental_metrics_redact_private_repository_names(self):
         # Arrange
@@ -1979,7 +1998,8 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                 self.assertIn("experimental-language-icon", trading_card)
                 self.assertIn("language-icon-dark-outline", language_momentum)
                 self.assertIn("Commit Velocity", commit_velocity)
-                self.assertIn("/ hour", commit_velocity)
+                self.assertIn("/ mo", commit_velocity)
+                self.assertIn("6 months", commit_velocity)
                 self.assertNotIn("href=", language_momentum)
                 self.assertNotIn("href=", trading_card)
                 metrics = (

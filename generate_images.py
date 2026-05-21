@@ -38,7 +38,11 @@ EXPERIMENTAL_CARD_NAMES = [
     "commit-velocity",
 ]
 EXPERIMENTAL_LANGUAGE_ICON_BASELINE_OFFSET = 3
-COMMIT_VELOCITY_WINDOW_DAYS = (30, 365)
+COMMIT_VELOCITY_WINDOW_SPECS = (
+    ("trailing_30_days", "30 days", 30),
+    ("trailing_180_days", "6 months", 180),
+    ("trailing_365_days", "365 days", 365),
+)
 
 
 ################################################################################
@@ -535,12 +539,12 @@ def commit_velocity_windows(now: Optional[dt.datetime] = None) -> List[CommitWin
     current_time = _as_utc(now or dt.datetime.now(dt.timezone.utc))
     return [
         CommitWindow(
-            key=f"trailing_{days}_days",
-            label=f"{days} days",
+            key=key,
+            label=label,
             since=_format_utc_datetime(current_time - dt.timedelta(days=days)),
             until=_format_utc_datetime(current_time),
         )
-        for days in COMMIT_VELOCITY_WINDOW_DAYS
+        for key, label, days in COMMIT_VELOCITY_WINDOW_SPECS
     ]
 
 
@@ -555,15 +559,14 @@ async def build_commit_velocity_metrics(
         extra_repos=parse_repo_list(os.getenv("MONTHLY_COMMITS_EXTRA_REPOS")),
     )
 
-    window_days = dict(
-        zip((window.key for window in windows), COMMIT_VELOCITY_WINDOW_DAYS)
-    )
+    window_days = {key: days for key, _, days in COMMIT_VELOCITY_WINDOW_SPECS}
     velocity_windows = []
     for window in windows:
         days = window_days[window.key]
         commits = int(scan_result.counts.get(window.key, 0))
         hours = days * 24
         weeks = days / 7
+        months = days / 30
         velocity_windows.append(
             {
                 "key": window.key,
@@ -573,6 +576,7 @@ async def build_commit_velocity_metrics(
                 "per_hour": round(commits / hours, 4),
                 "per_day": round(commits / days, 2),
                 "per_week": round(commits / weeks, 2),
+                "per_month": round(commits / months, 2),
                 "scan_degraded": window.key in scan_result.degraded_windows,
             }
         )
@@ -1185,9 +1189,10 @@ def _format_velocity_rate(value: Any, precision: int) -> str:
 def _commit_velocity_table(windows: List[Dict[str, Any]]) -> str:
     headers = [
         ("Window", 21, "start"),
-        ("/ hour", 136, "end"),
-        ("/ day", 234, "end"),
-        ("/ week", 330, "end"),
+        ("/ hr", 106, "end"),
+        ("/ day", 176, "end"),
+        ("/ wk", 252, "end"),
+        ("/ mo", 330, "end"),
     ]
     output = [
         '<g class="row" style="animation-delay: 0ms">'
@@ -1199,24 +1204,28 @@ def _commit_velocity_table(windows: List[Dict[str, Any]]) -> str:
         + "</g>"
     ]
 
-    for index, item in enumerate(windows[:2]):
-        y = 106 + (index * 34)
+    for index, item in enumerate(windows[:3]):
+        y = 100 + (index * 30)
         label = item.get("label", "Unknown")
         commits = _format_number(item.get("commits", 0))
         per_hour = _format_velocity_rate(item.get("per_hour", 0), 2)
         per_day = _format_velocity_rate(item.get("per_day", 0), 1)
         per_week = _format_velocity_rate(item.get("per_week", 0), 1)
+        per_month = _format_velocity_rate(item.get("per_month", 0), 1)
         output.append(
             f'<g class="row" style="animation-delay: {(index + 1) * 80}ms">'
             f"<title>{_svg_text(label)}: {commits} commits; "
-            f"{per_hour}/hour; {per_day}/day; {per_week}/week</title>"
+            f"{per_hour}/hr; {per_day}/day; {per_week}/wk; "
+            f"{per_month}/mo</title>"
             f'<text class="label" x="21" y="{y}">{_svg_text(label)}</text>'
-            f'<text class="value" x="136" y="{y}" text-anchor="end">'
+            f'<text class="value" x="106" y="{y}" text-anchor="end">'
             f"{_svg_text(per_hour)}</text>"
-            f'<text class="value" x="234" y="{y}" text-anchor="end">'
+            f'<text class="value" x="176" y="{y}" text-anchor="end">'
             f"{_svg_text(per_day)}</text>"
-            f'<text class="value" x="330" y="{y}" text-anchor="end">'
+            f'<text class="value" x="252" y="{y}" text-anchor="end">'
             f"{_svg_text(per_week)}</text>"
+            f'<text class="value" x="330" y="{y}" text-anchor="end">'
+            f"{_svg_text(per_month)}</text>"
             "</g>"
         )
     return "\n".join(output)
