@@ -13,6 +13,7 @@ import aiohttp
 from github_stats import (
     ApiDegradation,
     ApiWaitStat,
+    CommitWindow,
     MonthWindow,
     MonthlyCommitRecord,
     Stats,
@@ -34,8 +35,10 @@ EXPERIMENTAL_CARD_NAMES = [
     "personal-bests",
     "trading-card",
     "repo-portfolio",
+    "commit-velocity",
 ]
 EXPERIMENTAL_LANGUAGE_ICON_BASELINE_OFFSET = 3
+COMMIT_VELOCITY_WINDOW_DAYS = (30, 365)
 
 
 ################################################################################
@@ -513,6 +516,78 @@ def _active_month_streak(months: List[Dict[str, Any]]) -> int:
     return streak
 
 
+def _as_utc(value: dt.datetime) -> dt.datetime:
+    if value.tzinfo is None:
+        return value.replace(tzinfo=dt.timezone.utc)
+    return value.astimezone(dt.timezone.utc)
+
+
+def _format_utc_datetime(value: dt.datetime) -> str:
+    return (
+        _as_utc(value)
+        .replace(microsecond=0)
+        .isoformat()
+        .replace("+00:00", "Z")
+    )
+
+
+def commit_velocity_windows(now: Optional[dt.datetime] = None) -> List[CommitWindow]:
+    current_time = _as_utc(now or dt.datetime.now(dt.timezone.utc))
+    return [
+        CommitWindow(
+            key=f"trailing_{days}_days",
+            label=f"{days} days",
+            since=_format_utc_datetime(current_time - dt.timedelta(days=days)),
+            until=_format_utc_datetime(current_time),
+        )
+        for days in COMMIT_VELOCITY_WINDOW_DAYS
+    ]
+
+
+async def build_commit_velocity_metrics(
+    s: Stats,
+    now: Optional[dt.datetime] = None,
+) -> Dict[str, Any]:
+    windows = commit_velocity_windows(now)
+    scan_result = await s.scan_commit_windows(
+        windows,
+        identity_patterns=monthly_commit_identity_patterns(s.username),
+        extra_repos=parse_repo_list(os.getenv("MONTHLY_COMMITS_EXTRA_REPOS")),
+    )
+
+    window_days = dict(
+        zip((window.key for window in windows), COMMIT_VELOCITY_WINDOW_DAYS)
+    )
+    velocity_windows = []
+    for window in windows:
+        days = window_days[window.key]
+        commits = int(scan_result.counts.get(window.key, 0))
+        hours = days * 24
+        weeks = days / 7
+        velocity_windows.append(
+            {
+                "key": window.key,
+                "label": window.label,
+                "days": days,
+                "commits": commits,
+                "per_hour": round(commits / hours, 4),
+                "per_day": round(commits / days, 2),
+                "per_week": round(commits / weeks, 2),
+                "scan_degraded": window.key in scan_result.degraded_windows,
+            }
+        )
+
+    return {
+        "windows": velocity_windows,
+        "source": {
+            "counting": "rest_commits_identity_scan",
+            "timezone": "UTC",
+            "repo_count": scan_result.repo_count,
+            "degraded_windows": len(scan_result.degraded_windows),
+        },
+    }
+
+
 def _bounded_score(value: float, maximum: float) -> int:
     if maximum <= 0:
         return 0
@@ -633,6 +708,9 @@ async def build_experimental_metrics(
         limited_data.append("repository traffic data degraded")
     if s.report.monthly_commits_degraded:
         limited_data.append("monthly commit scan data degraded")
+    commit_velocity = await build_commit_velocity_metrics(s, now=current_time)
+    if int(commit_velocity["source"].get("degraded_windows", 0)) > 0:
+        limited_data.append("commit velocity scan data degraded")
 
     languages: Dict[str, Dict[str, Any]] = {}
     for repo in repo_values:
@@ -765,6 +843,7 @@ async def build_experimental_metrics(
             "public_repositories": public_repo_count,
             "private_repositories": private_repo_count,
         },
+        "commit_velocity": commit_velocity,
         "repositories": repo_values,
     }
     write_experimental_metrics_cache(metrics)
@@ -1096,6 +1175,53 @@ def _experimental_stack_bar(
     return "\n".join(output)
 
 
+def _format_velocity_rate(value: Any, precision: int) -> str:
+    try:
+        return f"{float(value):.{precision}f}"
+    except (TypeError, ValueError):
+        return str(value)
+
+
+def _commit_velocity_table(windows: List[Dict[str, Any]]) -> str:
+    headers = [
+        ("Window", 21, "start"),
+        ("/ hour", 136, "end"),
+        ("/ day", 234, "end"),
+        ("/ week", 330, "end"),
+    ]
+    output = [
+        '<g class="row" style="animation-delay: 0ms">'
+        + "".join(
+            f'<text class="label" x="{x}" y="76" text-anchor="{anchor}">'
+            f"{_svg_text(label)}</text>"
+            for label, x, anchor in headers
+        )
+        + "</g>"
+    ]
+
+    for index, item in enumerate(windows[:2]):
+        y = 106 + (index * 34)
+        label = item.get("label", "Unknown")
+        commits = _format_number(item.get("commits", 0))
+        per_hour = _format_velocity_rate(item.get("per_hour", 0), 2)
+        per_day = _format_velocity_rate(item.get("per_day", 0), 1)
+        per_week = _format_velocity_rate(item.get("per_week", 0), 1)
+        output.append(
+            f'<g class="row" style="animation-delay: {(index + 1) * 80}ms">'
+            f"<title>{_svg_text(label)}: {commits} commits; "
+            f"{per_hour}/hour; {per_day}/day; {per_week}/week</title>"
+            f'<text class="label" x="21" y="{y}">{_svg_text(label)}</text>'
+            f'<text class="value" x="136" y="{y}" text-anchor="end">'
+            f"{_svg_text(per_hour)}</text>"
+            f'<text class="value" x="234" y="{y}" text-anchor="end">'
+            f"{_svg_text(per_day)}</text>"
+            f'<text class="value" x="330" y="{y}" text-anchor="end">'
+            f"{_svg_text(per_week)}</text>"
+            "</g>"
+        )
+    return "\n".join(output)
+
+
 def _render_experimental_template(
     name: str,
     title: str,
@@ -1317,6 +1443,16 @@ def _generate_experimental_repo_portfolio(metrics: Dict[str, Any]) -> None:
     )
 
 
+def _generate_experimental_commit_velocity(metrics: Dict[str, Any]) -> None:
+    velocity = metrics["commit_velocity"]
+    _render_experimental_template(
+        "commit-velocity",
+        "Commit Velocity",
+        "Exact trailing averages",
+        _commit_velocity_table(velocity["windows"]),
+    )
+
+
 async def generate_experimental(s: Stats) -> Dict[str, Any]:
     metrics = await build_experimental_metrics(s)
     _generate_experimental_contribution_pulse(metrics)
@@ -1328,6 +1464,7 @@ async def generate_experimental(s: Stats) -> Dict[str, Any]:
     _generate_experimental_personal_bests(metrics)
     _generate_experimental_trading_card(metrics)
     _generate_experimental_repo_portfolio(metrics)
+    _generate_experimental_commit_velocity(metrics)
     return metrics
 
 

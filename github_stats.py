@@ -103,11 +103,15 @@ class StatsReport:
 
 
 @dataclass(frozen=True)
-class MonthWindow:
+class CommitWindow:
     key: str
     label: str
     since: str
     until: str
+
+
+@dataclass(frozen=True)
+class MonthWindow(CommitWindow):
     is_current: bool = False
 
 
@@ -126,6 +130,15 @@ class MonthlyCommitScanResult:
     scanned_months: int
     identity_patterns: List[str]
     degraded_months: Set[str] = field(default_factory=set)
+
+
+@dataclass(frozen=True)
+class CommitWindowScanResult:
+    counts: Dict[str, int]
+    repo_count: int
+    scanned_windows: int
+    identity_patterns: List[str]
+    degraded_windows: Set[str] = field(default_factory=set)
 
 
 @dataclass(frozen=True)
@@ -1858,14 +1871,14 @@ Languages:
         self._merged_pull_requests = int(result)
         return self._merged_pull_requests
 
-    async def scan_monthly_commits(
+    async def scan_commit_windows(
         self,
-        windows: List[MonthWindow],
+        windows: List[CommitWindow],
         identity_patterns: Optional[List[str]] = None,
         extra_repos: Optional[Set[str]] = None,
-    ) -> MonthlyCommitScanResult:
+    ) -> CommitWindowScanResult:
         """
-        Count commits by month using raw commit metadata identity matching.
+        Count commits in bounded windows using raw commit metadata identity matching.
         """
         patterns = (
             monthly_commit_identity_patterns(self.username)
@@ -1877,8 +1890,32 @@ Languages:
             repos.update(extra_repos)
 
         counts: Dict[str, int] = {window.key: 0 for window in windows}
-        seen_by_month: Dict[str, Set[str]] = {window.key: set() for window in windows}
-        degraded_months: Set[str] = set()
+        if not windows:
+            return CommitWindowScanResult(
+                counts=counts,
+                repo_count=len(repos),
+                scanned_windows=0,
+                identity_patterns=patterns,
+            )
+
+        parsed_windows = []
+        for window in windows:
+            since = _parse_github_datetime(window.since)
+            until = _parse_github_datetime(window.until)
+            if since is None or until is None or since >= until:
+                raise ValueError(f"Invalid commit window: {window.key}")
+            parsed_windows.append((window, since, until))
+
+        query_since = _format_github_datetime(
+            min(since for _, since, _ in parsed_windows)
+        )
+        query_until = _format_github_datetime(
+            max(until for _, _, until in parsed_windows)
+        )
+        seen_by_window: Dict[str, Set[str]] = {
+            window.key: set() for window in windows
+        }
+        degraded_windows: Set[str] = set()
         max_wait_seconds = _env_float("MONTHLY_COMMITS_WAIT_SECONDS", 12.0)
         request_delay_seconds = _env_float(
             "MONTHLY_COMMITS_REQUEST_DELAY_SECONDS",
@@ -1893,15 +1930,15 @@ Languages:
             max_concurrent_requests,
         )
 
-        async def scan_repo_window(repo: str, window: MonthWindow) -> None:
+        async def scan_repo(repo: str) -> None:
             page = 1
             while True:
                 result = await commit_request_throttle.run(
                     lambda: self.queries.query_rest_with_outcome(
                         f"/repos/{repo}/commits",
                         params={
-                            "since": window.since,
-                            "until": window.until,
+                            "since": query_since,
+                            "until": query_until,
                             "per_page": "100",
                             "page": str(page),
                         },
@@ -1915,7 +1952,7 @@ Languages:
                         "auth_or_permission_error",
                         "rate_limited",
                     }:
-                        degraded_months.add(window.key)
+                        degraded_windows.update(window.key for window in windows)
                     return
 
                 payload = result.payload if isinstance(result.payload, list) else []
@@ -1923,34 +1960,53 @@ Languages:
                     if not isinstance(item, dict):
                         continue
                     match_date = _commit_identity_match_date(item, patterns)
-                    if match_date is None or match_date.strftime("%Y-%m") != window.key:
+                    if match_date is None:
                         continue
                     sha = item.get("sha")
                     if not isinstance(sha, str) or not sha:
                         continue
-                    if sha in seen_by_month[window.key]:
-                        continue
-                    seen_by_month[window.key].add(sha)
-                    counts[window.key] += 1
+                    for window, since, until in parsed_windows:
+                        if not (since <= match_date < until):
+                            continue
+                        if sha in seen_by_window[window.key]:
+                            continue
+                        seen_by_window[window.key].add(sha)
+                        counts[window.key] += 1
 
                 if len(payload) < 100:
                     return
                 page += 1
 
-        await asyncio.gather(
-            *[
-                scan_repo_window(repo, window)
-                for repo in sorted(repos)
-                for window in windows
-            ]
-        )
+        await asyncio.gather(*[scan_repo(repo) for repo in sorted(repos)])
 
-        return MonthlyCommitScanResult(
+        return CommitWindowScanResult(
             counts=counts,
             repo_count=len(repos),
-            scanned_months=len(windows),
+            scanned_windows=len(windows),
             identity_patterns=patterns,
-            degraded_months=degraded_months,
+            degraded_windows=degraded_windows,
+        )
+
+    async def scan_monthly_commits(
+        self,
+        windows: List[MonthWindow],
+        identity_patterns: Optional[List[str]] = None,
+        extra_repos: Optional[Set[str]] = None,
+    ) -> MonthlyCommitScanResult:
+        """
+        Count commits by month using raw commit metadata identity matching.
+        """
+        scan_result = await self.scan_commit_windows(
+            windows,
+            identity_patterns=identity_patterns,
+            extra_repos=extra_repos,
+        )
+        return MonthlyCommitScanResult(
+            counts=scan_result.counts,
+            repo_count=scan_result.repo_count,
+            scanned_months=scan_result.scanned_windows,
+            identity_patterns=scan_result.identity_patterns,
+            degraded_months=scan_result.degraded_windows,
         )
 
     async def audit_monthly_commit_counts(

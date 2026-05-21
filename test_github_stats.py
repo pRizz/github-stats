@@ -312,6 +312,22 @@ class _ExperimentalStats:
     async def clones(self):
         return 6
 
+    async def scan_commit_windows(
+        self,
+        windows,
+        identity_patterns=None,
+        extra_repos=None,
+    ):
+        return github_stats.CommitWindowScanResult(
+            counts={
+                window.key: 72 if window.key == "trailing_30_days" else 365
+                for window in windows
+            },
+            repo_count=2,
+            scanned_windows=len(windows),
+            identity_patterns=identity_patterns or [],
+        )
+
 
 class _MonthlyCacheStats:
     username = "octocat"
@@ -906,6 +922,88 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(stats.queries.calls[0][1]["per_page"], "100")
         self.assertEqual(stats.report.rest_requests_total, 2)
 
+    async def test_commit_window_scan_counts_arbitrary_trailing_windows(self):
+        # Arrange
+        windows = [
+            github_stats.CommitWindow(
+                key="trailing_30_days",
+                label="30 days",
+                since="2026-04-02T00:00:00Z",
+                until="2026-05-02T00:00:00Z",
+            ),
+            github_stats.CommitWindow(
+                key="trailing_365_days",
+                label="365 days",
+                since="2025-05-02T00:00:00Z",
+                until="2026-05-02T00:00:00Z",
+            ),
+        ]
+        stats = Stats("octocat", "token", _FailingSession())
+        stats._repos = {"octocat/hello"}
+        stats.queries = _MonthlyCommitQueries(
+            {
+                ("/repos/octocat/hello/commits", "1"): github_stats.RestQueryResult(
+                    [
+                        _commit(
+                            "recent",
+                            author_name="Peter Ryszkiewicz",
+                            author_date="2026-05-01T12:00:00Z",
+                        ),
+                        _commit(
+                            "boundary-start",
+                            author_name="Peter Ryszkiewicz",
+                            author_date="2026-04-02T00:00:00Z",
+                        ),
+                        _commit(
+                            "year-only",
+                            author_name="Peter Ryszkiewicz",
+                            author_date="2025-06-01T12:00:00Z",
+                        ),
+                        _commit(
+                            "too-old",
+                            author_name="Peter Ryszkiewicz",
+                            author_date="2025-05-01T23:59:59Z",
+                        ),
+                        _commit(
+                            "until-boundary",
+                            author_name="Peter Ryszkiewicz",
+                            author_date="2026-05-02T00:00:00Z",
+                        ),
+                        _commit("other", author_name="Octocat"),
+                    ]
+                ),
+            }
+        )
+
+        # Act
+        with mock.patch.dict(
+            "os.environ",
+            {"MONTHLY_COMMITS_REQUEST_DELAY_SECONDS": "0"},
+        ):
+            result = await stats.scan_commit_windows(
+                windows,
+                identity_patterns=["Peter Ryszkiewicz"],
+            )
+
+        # Assert
+        self.assertEqual(
+            result.counts,
+            {
+                "trailing_30_days": 2,
+                "trailing_365_days": 3,
+            },
+        )
+        self.assertEqual(result.scanned_windows, 2)
+        self.assertEqual(len(stats.queries.calls), 1)
+        self.assertEqual(
+            stats.queries.calls[0][1]["since"],
+            "2025-05-02T00:00:00Z",
+        )
+        self.assertEqual(
+            stats.queries.calls[0][1]["until"],
+            "2026-05-02T00:00:00Z",
+        )
+
     async def test_monthly_commit_scan_uses_global_request_delay(self):
         # Arrange
         window = github_stats.MonthWindow(
@@ -1215,6 +1313,29 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("Apr &#x27;26", output)
         self.assertIn("12", output)
 
+    async def test_commit_velocity_metrics_compute_trailing_rates(self):
+        # Arrange
+        now = dt.datetime(2026, 5, 2, 10, 30, tzinfo=dt.timezone.utc)
+
+        # Act
+        metrics = await generate_images.build_commit_velocity_metrics(
+            _ExperimentalStats(),
+            now=now,
+        )
+
+        # Assert
+        self.assertEqual(metrics["source"]["counting"], "rest_commits_identity_scan")
+        self.assertEqual(metrics["source"]["timezone"], "UTC")
+        self.assertEqual(metrics["source"]["repo_count"], 2)
+        self.assertEqual(metrics["windows"][0]["key"], "trailing_30_days")
+        self.assertEqual(metrics["windows"][0]["commits"], 72)
+        self.assertEqual(metrics["windows"][0]["per_hour"], 0.1)
+        self.assertEqual(metrics["windows"][0]["per_day"], 2.4)
+        self.assertEqual(metrics["windows"][0]["per_week"], 16.8)
+        self.assertEqual(metrics["windows"][1]["key"], "trailing_365_days")
+        self.assertEqual(metrics["windows"][1]["commits"], 365)
+        self.assertEqual(metrics["windows"][1]["per_day"], 1.0)
+
     async def test_experimental_metrics_redact_private_repository_names(self):
         # Arrange
         now = dt.datetime(2026, 5, 2, 10, 30, tzinfo=dt.timezone.utc)
@@ -1260,18 +1381,32 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                 self.assertIn("octocat/public", serialized)
                 self.assertEqual(metrics["privacy"]["private_repositories"], 1)
                 self.assertNotIn("code_footprint", metrics)
+                self.assertIn("commit_velocity", metrics)
+                self.assertEqual(
+                    metrics["commit_velocity"]["windows"][0]["label"],
+                    "30 days",
+                )
             finally:
                 os.chdir(previous_cwd)
 
     def test_experimental_card_names_exclude_code_footprint(self):
         # Assert
         self.assertNotIn("code-footprint", generate_images.EXPERIMENTAL_CARD_NAMES)
+        self.assertIn("commit-velocity", generate_images.EXPERIMENTAL_CARD_NAMES)
+
+    def test_readme_lists_commit_velocity_card(self):
+        # Arrange
+        readme = Path("README.md").read_text(encoding="utf-8")
+
+        # Assert
+        self.assertIn("generated/experimental-commit-velocity.svg", readme)
 
     def test_experimental_renderer_type_hints_resolve(self):
         # Act / Assert
         typing.get_type_hints(generate_images._experimental_rows)
         typing.get_type_hints(generate_images._experimental_horizontal_bars)
         typing.get_type_hints(generate_images._experimental_stack_bar)
+        typing.get_type_hints(generate_images._commit_velocity_table)
 
     def test_experimental_stack_bar_matches_language_progress_style(self):
         # Arrange
@@ -1837,9 +1972,14 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                 trading_card = (
                     tmp_path / "generated" / "experimental-trading-card.svg"
                 ).read_text(encoding="utf-8")
+                commit_velocity = (
+                    tmp_path / "generated" / "experimental-commit-velocity.svg"
+                ).read_text(encoding="utf-8")
                 self.assertIn("experimental-language-icon", language_momentum)
                 self.assertIn("experimental-language-icon", trading_card)
                 self.assertIn("language-icon-dark-outline", language_momentum)
+                self.assertIn("Commit Velocity", commit_velocity)
+                self.assertIn("/ hour", commit_velocity)
                 self.assertNotIn("href=", language_momentum)
                 self.assertNotIn("href=", trading_card)
                 metrics = (

@@ -1,23 +1,23 @@
 {
   "stats": {
     "name": "Peter Ryszkiewicz",
-    "stargazers": 178,
-    "forks": 351,
-    "total_contributions": 8615,
-    "current_year_contributions": 5012,
-    "merged_pull_requests": 232,
-    "repos": 175,
-    "views": 202
+    "stargazers": 181,
+    "forks": 352,
+    "total_contributions": 8746,
+    "current_year_contributions": 5133,
+    "merged_pull_requests": 237,
+    "repos": 177,
+    "views": 280
   },
   "monthly_commits": {
-    "total": 4376,
+    "total": 4462,
     "current_month": {
       "key": "2026-05",
       "label": "May '26",
-      "count": 215,
+      "count": 301,
       "is_current": true,
       "scan_degraded": false,
-      "github_attributed_count": 234
+      "github_attributed_count": 350
     },
     "month_count": 13
   },
@@ -32,15 +32,16 @@
       "experimental-maintainer-health.svg",
       "experimental-personal-bests.svg",
       "experimental-trading-card.svg",
-      "experimental-repo-portfolio.svg"
+      "experimental-repo-portfolio.svg",
+      "experimental-commit-velocity.svg"
     ],
-    "private_repositories": 73,
+    "private_repositories": 74,
     "limited_data": [
       "monthly commit scan data degraded"
     ]
   },
   "api": {
-    "total_repos": 175,
+    "total_repos": 177,
     "traffic_degraded": [],
     "monthly_commits_degraded": [
       {
@@ -52,42 +53,29 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.15609745899564587
+        "elapsed_seconds": 0.1402934580000874
+      },
+      {
+        "repo": "pRizz/IotaSeedGeneratoriOS",
+        "endpoint": "commits",
+        "status": 409,
+        "category": "conflict",
+        "message": "REST returned HTTP 409: resource conflict; {\"message\":\"Git Repository is empty.\",\"documentation_url\":\"https://docs.github.com/rest/commits/commits#list-commits\",\"status\":\"409\"}",
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.17352516599930823
       }
     ],
     "critical_failures": [],
-    "rest_requests_total": 526,
+    "rest_requests_total": 748,
     "rest_retries_total": 0,
     "rest_wait_seconds_total": 0.0,
     "traffic_wait_seconds_total": 0.0,
     "monthly_commits_wait_seconds_total": 0.0,
     "slowest_requests": [
       {
-        "repo": "pRizz/free-the-world",
-        "endpoint": "traffic/clones",
-        "status": 200,
-        "category": "success_with_json",
-        "degraded": false,
-        "attempts": 1,
-        "retry_count": 0,
-        "wait_seconds": 0.0,
-        "elapsed_seconds": 0.6348837910045404,
-        "message": "response contains JSON"
-      },
-      {
-        "repo": "pRizz/acnh-prices",
-        "endpoint": "traffic/clones",
-        "status": 200,
-        "category": "success_with_json",
-        "degraded": false,
-        "attempts": 1,
-        "retry_count": 0,
-        "wait_seconds": 0.0,
-        "elapsed_seconds": 0.5306483340100385,
-        "message": "response contains JSON"
-      },
-      {
-        "repo": "pRizz/av-denoiser",
+        "repo": "pRizz/wiki-clone",
         "endpoint": "commits",
         "status": 200,
         "category": "success_with_json",
@@ -95,11 +83,11 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.36878433400124777,
+        "elapsed_seconds": 1.2106827499992505,
         "message": "response contains JSON"
       },
       {
-        "repo": "pRizz/av-denoiser",
+        "repo": "pRizz/wireless-phone-charger",
         "endpoint": "commits",
         "status": 200,
         "category": "success_with_json",
@@ -107,11 +95,11 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.3464027080044616,
+        "elapsed_seconds": 1.0368500000004133,
         "message": "response contains JSON"
       },
       {
-        "repo": "pRizz/text-2-audiobook",
+        "repo": "pRizz/github-stats",
         "endpoint": "commits",
         "status": 200,
         "category": "success_with_json",
@@ -119,11 +107,11 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.24304683299851604,
+        "elapsed_seconds": 0.9254146669991314,
         "message": "response contains JSON"
       },
       {
-        "repo": "pRizz/free-open-distilled-models",
+        "repo": "pRizz/open-links",
         "endpoint": "commits",
         "status": 200,
         "category": "success_with_json",
@@ -131,11 +119,11 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.21104958400246687,
+        "elapsed_seconds": 0.8730450000002747,
         "message": "response contains JSON"
       },
       {
-        "repo": "pRizz/audio-inspector-pro",
+        "repo": "pRizz/yolo-port",
         "endpoint": "commits",
         "status": 200,
         "category": "success_with_json",
@@ -143,11 +131,11 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.20940087499911897,
+        "elapsed_seconds": 0.7662449160015967,
         "message": "response contains JSON"
       },
       {
-        "repo": "pRizz/top-revenue-per-employee",
+        "repo": "pRizz/opencode-cloud",
         "endpoint": "commits",
         "status": 200,
         "category": "success_with_json",
@@ -155,11 +143,11 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.20821529200475197,
+        "elapsed_seconds": 0.6435914159992535,
         "message": "response contains JSON"
       },
       {
-        "repo": "pRizz/Chatangle-Bots",
+        "repo": "pRizz/open-links",
         "endpoint": "commits",
         "status": 200,
         "category": "success_with_json",
@@ -167,11 +155,11 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.20081437499902677,
+        "elapsed_seconds": 0.6028045419989212,
         "message": "response contains JSON"
       },
       {
-        "repo": "pRizz/kalshi-quant-dashboard",
+        "repo": "pRizz/opencode-cloud",
         "endpoint": "commits",
         "status": 200,
         "category": "success_with_json",
@@ -179,7 +167,31 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.19992679200368002,
+        "elapsed_seconds": 0.5782495830026164,
+        "message": "response contains JSON"
+      },
+      {
+        "repo": "pRizz/zeckendorf",
+        "endpoint": "commits",
+        "status": 200,
+        "category": "success_with_json",
+        "degraded": false,
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.5350763749993348,
+        "message": "response contains JSON"
+      },
+      {
+        "repo": "pRizz/open-links",
+        "endpoint": "commits",
+        "status": 200,
+        "category": "success_with_json",
+        "degraded": false,
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.528224958001374,
         "message": "response contains JSON"
       }
     ]
