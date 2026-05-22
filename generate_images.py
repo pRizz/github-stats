@@ -1187,45 +1187,54 @@ def _format_velocity_rate(value: Any, precision: int) -> str:
 
 
 def _commit_velocity_table(windows: List[Dict[str, Any]]) -> str:
-    headers = [
-        ("Window", 21, "start"),
-        ("/ hr", 106, "end"),
-        ("/ day", 176, "end"),
-        ("/ wk", 252, "end"),
-        ("/ mo", 330, "end"),
+    header_y = 86
+    divider_y = 96
+    first_row_y = 118
+    row_gap = 30
+    columns = [
+        ("label", "Window", 21, "label", "start"),
+        ("per_hour", "/ hr", 140, "value", "middle"),
+        ("per_day", "/ day", 200, "value", "middle"),
+        ("per_week", "/ wk", 258, "value", "middle"),
+        ("per_month", "/ mo", 316, "value", "middle"),
     ]
     output = [
         '<g class="row" style="animation-delay: 0ms">'
         + "".join(
-            f'<text class="label" x="{x}" y="76" text-anchor="{anchor}">'
+            f'<text class="label" x="{x}" y="{header_y}" text-anchor="{anchor}">'
             f"{_svg_text(label)}</text>"
-            for label, x, anchor in headers
+            for _, label, x, _, anchor in columns
         )
-        + "</g>"
+        + "</g>",
+        f'<line class="table-divider" x1="21" y1="{divider_y}" x2="339" y2="{divider_y}" />',
     ]
 
     for index, item in enumerate(windows[:3]):
-        y = 100 + (index * 30)
+        y = first_row_y + (index * row_gap)
         label = item.get("label", "Unknown")
         commits = _format_number(item.get("commits", 0))
         per_hour = _format_velocity_rate(item.get("per_hour", 0), 2)
         per_day = _format_velocity_rate(item.get("per_day", 0), 1)
         per_week = _format_velocity_rate(item.get("per_week", 0), 1)
         per_month = _format_velocity_rate(item.get("per_month", 0), 1)
+        row_values = {
+            "label": label,
+            "per_hour": per_hour,
+            "per_day": per_day,
+            "per_week": per_week,
+            "per_month": per_month,
+        }
+        row_cells = "".join(
+            f'<text class="{class_name}" x="{x}" y="{y}" text-anchor="{anchor}">'
+            f"{_svg_text(row_values[key])}</text>"
+            for key, _, x, class_name, anchor in columns
+        )
         output.append(
             f'<g class="row" style="animation-delay: {(index + 1) * 80}ms">'
             f"<title>{_svg_text(label)}: {commits} commits; "
             f"{per_hour}/hr; {per_day}/day; {per_week}/wk; "
             f"{per_month}/mo</title>"
-            f'<text class="label" x="21" y="{y}">{_svg_text(label)}</text>'
-            f'<text class="value" x="106" y="{y}" text-anchor="end">'
-            f"{_svg_text(per_hour)}</text>"
-            f'<text class="value" x="176" y="{y}" text-anchor="end">'
-            f"{_svg_text(per_day)}</text>"
-            f'<text class="value" x="252" y="{y}" text-anchor="end">'
-            f"{_svg_text(per_week)}</text>"
-            f'<text class="value" x="330" y="{y}" text-anchor="end">'
-            f"{_svg_text(per_month)}</text>"
+            f"{row_cells}"
             "</g>"
         )
     return "\n".join(output)

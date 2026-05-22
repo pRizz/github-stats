@@ -1427,6 +1427,62 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         typing.get_type_hints(generate_images._experimental_stack_bar)
         typing.get_type_hints(generate_images._commit_velocity_table)
 
+    def test_commit_velocity_table_aligns_columns(self):
+        # Arrange
+        windows = [
+            {
+                "label": "30 days",
+                "commits": 360,
+                "per_hour": 0.5,
+                "per_day": 12.0,
+                "per_week": 84.0,
+                "per_month": 360.0,
+            },
+            {
+                "label": "6 months",
+                "commits": 3720,
+                "per_hour": 0.86,
+                "per_day": 20.7,
+                "per_week": 144.7,
+                "per_month": 620.0,
+            },
+            {
+                "label": "365 days",
+                "commits": 3871,
+                "per_hour": 0.44,
+                "per_day": 10.6,
+                "per_week": 74.2,
+                "per_month": 318.2,
+            },
+        ]
+
+        # Act
+        output = generate_images._commit_velocity_table(windows)
+
+        # Assert
+        self.assertEqual(output.count('text-anchor="middle"'), 16)
+        self.assertEqual(output.count('text-anchor="start"'), 4)
+        self.assertNotIn('text-anchor="end"', output)
+        self.assertIn('x="21" y="86" text-anchor="start">Window</text>', output)
+        self.assertIn('x="140" y="86" text-anchor="middle">/ hr</text>', output)
+        self.assertIn('x="316" y="86" text-anchor="middle">/ mo</text>', output)
+        self.assertIn(
+            '<line class="table-divider" x1="21" y1="96" x2="339" y2="96" />',
+            output,
+        )
+        self.assertIn(
+            'class="label" x="21" y="118" text-anchor="start">30 days</text>',
+            output,
+        )
+        self.assertIn(
+            'class="value" x="140" y="118" text-anchor="middle">0.50</text>',
+            output,
+        )
+        self.assertIn(
+            'class="value" x="316" y="118" text-anchor="middle">360.0</text>',
+            output,
+        )
+
     def test_experimental_stack_bar_matches_language_progress_style(self):
         # Arrange
         values = [
