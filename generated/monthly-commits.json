@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-02T01:25:52Z",
+  "generated_at": "2026-06-03T01:30:21Z",
   "window": {
     "months": 13,
     "timezone": "UTC",
@@ -118,10 +118,10 @@
     {
       "key": "2026-06",
       "label": "Jun '26",
-      "count": 47,
+      "count": 101,
       "is_current": true,
       "scan_degraded": false,
-      "github_attributed_count": 1
+      "github_attributed_count": 60
     }
   ]
 }
