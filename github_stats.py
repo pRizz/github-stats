@@ -145,6 +145,7 @@ class CommitWindowScanResult:
 class RepoMetric:
     name_with_owner: str
     display_name: str
+    is_owned_by_viewer: bool
     is_private: bool
     is_fork: bool
     is_archived: bool
@@ -161,6 +162,7 @@ class RepoMetric:
     def to_safe_dict(self) -> Dict[str, Any]:
         return {
             "display_name": self.display_name,
+            "is_owned_by_viewer": self.is_owned_by_viewer,
             "is_private": self.is_private,
             "is_fork": self.is_fork,
             "is_archived": self.is_archived,
@@ -1542,8 +1544,8 @@ class Stats(object):
             [f"{k}: {v:0.4f}%" for k, v in languages.items()]
         )
         return f"""Name: {await self.name}
-Stargazers: {await self.stargazers:,}
-Forks: {await self.forks:,}
+Owned repo stargazers: {await self.stargazers:,}
+Owned repo forks: {await self.forks:,}
 All-time contributions: {await self.total_contributions:,}
 Current-year contributions: {await self.current_year_contributions:,}
 Merged pull requests: {await self.merged_pull_requests:,}
@@ -1556,8 +1558,8 @@ Languages:
         """
         Get lots of summary statistics using one big query. Sets many attributes
         """
-        stargazers = 0
-        forks = 0
+        owned_stargazers = 0
+        owned_forks = 0
         languages: Dict[str, Any] = dict()
         repos_set: Set[str] = set()
         raw_repo_metrics: Dict[str, Dict[str, Any]] = {}
@@ -1565,8 +1567,8 @@ Languages:
 
         exclude_langs_lower = {x.lower() for x in self._exclude_langs}
 
-        def record_repo(repo: Any) -> None:
-            nonlocal stargazers, forks
+        def record_repo(repo: Any, is_owned_by_viewer: bool) -> None:
+            nonlocal owned_stargazers, owned_forks
             if repo is None:
                 return
             name = repo.get("nameWithOwner")
@@ -1577,8 +1579,10 @@ Languages:
             repos_set.add(name)
             repo_stargazers = repo.get("stargazers", {}).get("totalCount", 0)
             repo_forks = repo.get("forkCount", 0)
-            stargazers += repo_stargazers
-            forks += repo.get("forkCount", 0)
+            is_fork = bool(repo.get("isFork", False))
+            if is_owned_by_viewer and not is_fork:
+                owned_stargazers += repo_stargazers
+                owned_forks += repo_forks
             raw_repo_languages: Dict[str, Dict[str, Any]] = {}
 
             for lang in repo.get("languages", {}).get("edges", []):
@@ -1599,8 +1603,9 @@ Languages:
                         "color": lang.get("node", {}).get("color"),
                     }
             raw_repo_metrics[name] = {
+                "is_owned_by_viewer": is_owned_by_viewer,
                 "is_private": bool(repo.get("isPrivate", False)),
-                "is_fork": bool(repo.get("isFork", False)),
+                "is_fork": is_fork,
                 "is_archived": bool(repo.get("isArchived", False)),
                 "stargazers": int(repo_stargazers),
                 "forks": int(repo_forks),
@@ -1615,14 +1620,14 @@ Languages:
                 "languages": raw_repo_languages,
             }
 
-        def maybe_record_repo(repo: Any) -> None:
+        def maybe_record_repo(repo: Any, is_owned_by_viewer: bool) -> None:
             if (
                 self._ignore_forked_repos
                 and isinstance(repo, dict)
                 and bool(repo.get("isFork", False))
             ):
                 return
-            record_repo(repo)
+            record_repo(repo, is_owned_by_viewer)
 
         next_owned = None
         while True:
@@ -1644,7 +1649,7 @@ Languages:
                     "GraphQL response has malformed owned repository data"
                 )
             for repo in owned_repos.get("nodes", []):
-                maybe_record_repo(repo)
+                maybe_record_repo(repo, is_owned_by_viewer=True)
 
             if owned_repos.get("pageInfo", {}).get("hasNextPage", False):
                 next_owned = owned_repos.get("pageInfo", {}).get(
@@ -1670,7 +1675,7 @@ Languages:
                     "GraphQL response has malformed contributed repository data"
                 )
             for repo in contrib_repos.get("nodes", []):
-                maybe_record_repo(repo)
+                maybe_record_repo(repo, is_owned_by_viewer=False)
 
             if contrib_repos.get("pageInfo", {}).get("hasNextPage", False):
                 next_contrib = contrib_repos.get("pageInfo", {}).get(
@@ -1687,8 +1692,8 @@ Languages:
                 v["prop"] = 100 * (v.get("size", 0) / langs_total)
 
         self._name = maybe_name or "No Name"
-        self._stargazers = stargazers
-        self._forks = forks
+        self._stargazers = owned_stargazers
+        self._forks = owned_forks
         self._languages = languages
         self._repos = repos_set
         private_labels = {
@@ -1706,6 +1711,7 @@ Languages:
             name: RepoMetric(
                 name_with_owner=name,
                 display_name=private_labels.get(name, name),
+                is_owned_by_viewer=data["is_owned_by_viewer"],
                 is_private=data["is_private"],
                 is_fork=data["is_fork"],
                 is_archived=data["is_archived"],
@@ -1737,7 +1743,7 @@ Languages:
     @property
     async def stargazers(self) -> int:
         """
-        :return: total number of stargazers on user's repos
+        :return: total number of stargazers on user's owned non-fork repos
         """
         if self._stargazers is not None:
             return self._stargazers
@@ -1748,7 +1754,7 @@ Languages:
     @property
     async def forks(self) -> int:
         """
-        :return: total number of forks on user's repos
+        :return: total number of forks on user's owned non-fork repos
         """
         if self._forks is not None:
             return self._forks

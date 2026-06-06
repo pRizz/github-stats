@@ -95,8 +95,8 @@ def validate_generated_output(output_folder: str = "generated") -> None:
 
     overview_is_empty_fallback = (
         "No Name's GitHub Statistics" in overview
-        and "Stars</td><td>0</td>" in overview
-        and "Forks</td><td>0</td>" in overview
+        and "Owned stars</td><td>0</td>" in overview
+        and "Owned forks</td><td>0</td>" in overview
         and "Repositories with contributions</td><td>0</td>" in overview
     )
     languages_are_empty = (
@@ -191,8 +191,8 @@ def render_action_summary(report: Dict[str, Any]) -> str:
 ## Generated Stats
 
 - Name: {stats["name"]}
-- Stargazers: {stats["stargazers"]:,}
-- Forks: {stats["forks"]:,}
+- Owned repo stargazers: {stats["stargazers"]:,}
+- Owned repo forks: {stats["forks"]:,}
 - All-time contributions: {stats["total_contributions"]:,}
 - Current-year contributions: {stats["current_year_contributions"]:,}
 - Merged pull requests: {stats["merged_pull_requests"]:,}
@@ -475,7 +475,11 @@ def write_star_history_cache(
         os.makedirs(parent)
     sorted_records = sorted(records, key=lambda item: item["date"])
     with open(path, "w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=STAR_HISTORY_FIELDNAMES)
+        writer = csv.DictWriter(
+            f,
+            fieldnames=STAR_HISTORY_FIELDNAMES,
+            lineterminator="\n",
+        )
         writer.writeheader()
         for record in sorted_records:
             writer.writerow(
@@ -827,6 +831,15 @@ def _repo_score(repo: Dict[str, Any]) -> int:
     )
 
 
+def _owned_non_fork_repos(repos: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    return [
+        repo
+        for repo in repos
+        if bool(repo.get("is_owned_by_viewer", False))
+        and not bool(repo.get("is_fork", False))
+    ]
+
+
 def _top_repositories(repos: List[Dict[str, Any]], limit: int = 6) -> List[Dict[str, Any]]:
     ranked = sorted(
         repos,
@@ -866,7 +879,13 @@ async def build_experimental_metrics(
 
     repo_values = [repo.to_safe_dict() for repo in (await s.repo_metrics).values()]
     private_repo_count = sum(1 for repo in repo_values if repo["is_private"])
-    public_repo_count = len(repo_values) - private_repo_count
+    owned_non_fork_repo_values = _owned_non_fork_repos(repo_values)
+    portfolio_private_repo_count = sum(
+        1 for repo in owned_non_fork_repo_values if repo["is_private"]
+    )
+    portfolio_public_repo_count = (
+        len(owned_non_fork_repo_values) - portfolio_private_repo_count
+    )
     archived_repo_count = sum(1 for repo in repo_values if repo["is_archived"])
     recently_updated_count = sum(
         1
@@ -886,7 +905,7 @@ async def build_experimental_metrics(
         1 for repo in repo_values if int(repo.get("releases", 0)) > 0
     )
     tag_repo_count = sum(1 for repo in repo_values if int(repo.get("tags", 0)) > 0)
-    owned_repo_count = sum(1 for repo in repo_values if not repo["is_fork"])
+    owned_repo_count = sum(1 for repo in repo_values if repo["is_owned_by_viewer"])
     external_repo_count = len(repo_values) - owned_repo_count
 
     breakdown = await _optional_metric(
@@ -970,7 +989,7 @@ async def build_experimental_metrics(
         )[:8]
     ]
 
-    top_repositories = _top_repositories(repo_values)
+    top_repositories = _top_repositories(owned_non_fork_repo_values)
     top_public_repo = next(
         (repo for repo in top_repositories if not repo["is_private"]),
         {"display_name": "No public repo", "score": 0, "stars": 0, "forks": 0},
@@ -1058,8 +1077,8 @@ async def build_experimental_metrics(
         },
         "repo_portfolio": {
             "repositories": top_repositories,
-            "public_repositories": public_repo_count,
-            "private_repositories": private_repo_count,
+            "public_repositories": portfolio_public_repo_count,
+            "private_repositories": portfolio_private_repo_count,
         },
         "commit_velocity": commit_velocity,
         "star_history": star_history,
@@ -1647,8 +1666,8 @@ def _generate_experimental_impact(metrics: Dict[str, Any]) -> None:
     impact = metrics["impact"]
     top_repo = impact["top_public_repo"]
     rows = [
-        ("Stars", _format_number(impact["stars"])),
-        ("Forks", _format_number(impact["forks"])),
+        ("Owned stars", _format_number(impact["stars"])),
+        ("Owned forks", _format_number(impact["forks"])),
         ("Views, 14 days", _format_number(impact["views_14_days"])),
         ("Clones, 14 days", _format_number(impact["clones_14_days"])),
         ("Top public repo", top_repo["display_name"]),
@@ -1657,7 +1676,7 @@ def _generate_experimental_impact(metrics: Dict[str, Any]) -> None:
     _render_experimental_template(
         "impact",
         "Impact",
-        f"Traffic is time-limited; {_limited_suffix(metrics)}",
+        f"Owned repo popularity; {_limited_suffix(metrics)}",
         _experimental_rows(rows),
     )
 
@@ -1814,7 +1833,7 @@ def _generate_experimental_star_history(metrics: Dict[str, Any]) -> None:
             subtitle = "Collecting daily star snapshots"
         _render_star_history_template(
             card_name,
-            f"Stars: {window['label']}",
+            f"Owned Stars: {window['label']}",
             subtitle,
             _star_history_chart(window),
         )
@@ -1877,9 +1896,14 @@ async def main() -> None:
             ignore_forked_repos=ignore_forked_repos,
         )
         await s.get_stats()
+        popularity_repo_count = sum(
+            1
+            for repo in (await s.repo_metrics).values()
+            if repo.is_owned_by_viewer and not repo.is_fork
+        )
         record_star_history_sample(
             await s.stargazers,
-            len(await s.repos),
+            popularity_repo_count,
         )
         await asyncio.gather(
             generate_languages(s),

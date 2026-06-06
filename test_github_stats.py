@@ -152,6 +152,45 @@ class _FakeStats:
     async def repos(self):
         return {"octocat/hello", "octocat/world"}
 
+    @property
+    async def repo_metrics(self):
+        return {
+            "octocat/hello": github_stats.RepoMetric(
+                name_with_owner="octocat/hello",
+                display_name="octocat/hello",
+                is_owned_by_viewer=True,
+                is_private=False,
+                is_fork=False,
+                is_archived=False,
+                stargazers=10,
+                forks=1,
+                updated_at="2026-06-01T00:00:00Z",
+                pushed_at="2026-06-01T00:00:00Z",
+                open_issues=0,
+                open_pull_requests=0,
+                releases=0,
+                tags=0,
+                languages={},
+            ),
+            "octocat/world": github_stats.RepoMetric(
+                name_with_owner="octocat/world",
+                display_name="octocat/world",
+                is_owned_by_viewer=True,
+                is_private=False,
+                is_fork=False,
+                is_archived=False,
+                stargazers=7,
+                forks=1,
+                updated_at="2026-06-01T00:00:00Z",
+                pushed_at="2026-06-01T00:00:00Z",
+                open_issues=0,
+                open_pull_requests=0,
+                releases=0,
+                tags=0,
+                languages={},
+            ),
+        }
+
 
 class _FailingStats:
     def __init__(self, *args, **kwargs):
@@ -251,6 +290,7 @@ class _ExperimentalStats:
             "octocat/public": github_stats.RepoMetric(
                 name_with_owner="octocat/public",
                 display_name="octocat/public",
+                is_owned_by_viewer=True,
                 is_private=False,
                 is_fork=False,
                 is_archived=False,
@@ -270,6 +310,7 @@ class _ExperimentalStats:
             "octocat/secret": github_stats.RepoMetric(
                 name_with_owner="octocat/secret",
                 display_name="Private repo #1",
+                is_owned_by_viewer=True,
                 is_private=True,
                 is_fork=True,
                 is_archived=False,
@@ -283,15 +324,32 @@ class _ExperimentalStats:
                 tags=0,
                 languages={"Rust": {"size": 50, "color": "#dea584"}},
             ),
+            "example/huge": github_stats.RepoMetric(
+                name_with_owner="example/huge",
+                display_name="example/huge",
+                is_owned_by_viewer=False,
+                is_private=False,
+                is_fork=False,
+                is_archived=False,
+                stargazers=10_000,
+                forks=2_000,
+                updated_at="2026-05-01T00:00:00Z",
+                pushed_at="2026-05-01T00:00:00Z",
+                open_issues=0,
+                open_pull_requests=0,
+                releases=0,
+                tags=0,
+                languages={"Python": {"size": 10, "color": "#3572A5"}},
+            ),
         }
 
     @property
     async def stargazers(self):
-        return 13
+        return 8
 
     @property
     async def forks(self):
-        return 4
+        return 3
 
     @property
     async def merged_pull_requests(self):
@@ -417,7 +475,7 @@ def _commit(
     }
 
 
-def _repo_node(name, is_fork=False):
+def _repo_node(name, is_fork=False, stargazers=0, forks=0):
     return {
         "nameWithOwner": name,
         "isPrivate": False,
@@ -425,8 +483,8 @@ def _repo_node(name, is_fork=False):
         "isArchived": False,
         "updatedAt": "2026-06-01T00:00:00Z",
         "pushedAt": "2026-06-01T00:00:00Z",
-        "stargazers": {"totalCount": 0},
-        "forkCount": 0,
+        "stargazers": {"totalCount": stargazers},
+        "forkCount": forks,
         "issues": {"totalCount": 0},
         "pullRequests": {"totalCount": 0},
         "refs": {"totalCount": 0},
@@ -692,8 +750,8 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
             generated.mkdir()
             (generated / "overview.svg").write_text(
                 "No Name's GitHub Statistics\n"
-                "Stars</td><td>0</td>\n"
-                "Forks</td><td>0</td>\n"
+                "Owned stars</td><td>0</td>\n"
+                "Owned forks</td><td>0</td>\n"
                 "Repositories with contributions</td><td>0</td>\n",
                 encoding="utf-8",
             )
@@ -784,14 +842,24 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         stats.queries.query.side_effect = [
             _owned_repo_response(
                 [
-                    _repo_node("octocat/owned"),
-                    _repo_node("octocat/owned-fork", is_fork=True),
+                    _repo_node("octocat/owned", stargazers=10, forks=2),
+                    _repo_node(
+                        "octocat/owned-fork",
+                        is_fork=True,
+                        stargazers=500,
+                        forks=50,
+                    ),
                 ]
             ),
             _contributed_repo_response(
                 [
-                    _repo_node("example/contributed"),
-                    _repo_node("example/contributed-fork", is_fork=True),
+                    _repo_node("example/contributed", stargazers=10_000, forks=1_000),
+                    _repo_node(
+                        "example/contributed-fork",
+                        is_fork=True,
+                        stargazers=20_000,
+                        forks=2_000,
+                    ),
                 ]
             ),
         ]
@@ -804,6 +872,11 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
             await stats.repos,
             {"octocat/owned", "example/contributed"},
         )
+        self.assertEqual(await stats.stargazers, 10)
+        self.assertEqual(await stats.forks, 2)
+        repo_metrics = await stats.repo_metrics
+        self.assertTrue(repo_metrics["octocat/owned"].is_owned_by_viewer)
+        self.assertFalse(repo_metrics["example/contributed"].is_owned_by_viewer)
         self.assertEqual(stats.queries.query.await_count, 2)
         owned_query = stats.queries.query.await_args_list[0].args[0]
         contributed_query = stats.queries.query.await_args_list[1].args[0]
@@ -822,14 +895,24 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         stats.queries.query.side_effect = [
             _owned_repo_response(
                 [
-                    _repo_node("octocat/owned"),
-                    _repo_node("octocat/owned-fork", is_fork=True),
+                    _repo_node("octocat/owned", stargazers=10, forks=2),
+                    _repo_node(
+                        "octocat/owned-fork",
+                        is_fork=True,
+                        stargazers=500,
+                        forks=50,
+                    ),
                 ]
             ),
             _contributed_repo_response(
                 [
-                    _repo_node("example/contributed"),
-                    _repo_node("example/contributed-fork", is_fork=True),
+                    _repo_node("example/contributed", stargazers=10_000, forks=1_000),
+                    _repo_node(
+                        "example/contributed-fork",
+                        is_fork=True,
+                        stargazers=20_000,
+                        forks=2_000,
+                    ),
                 ]
             ),
         ]
@@ -847,6 +930,13 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                 "example/contributed-fork",
             },
         )
+        self.assertEqual(await stats.stargazers, 10)
+        self.assertEqual(await stats.forks, 2)
+        repo_metrics = await stats.repo_metrics
+        self.assertTrue(repo_metrics["octocat/owned"].is_owned_by_viewer)
+        self.assertTrue(repo_metrics["octocat/owned-fork"].is_owned_by_viewer)
+        self.assertFalse(repo_metrics["example/contributed"].is_owned_by_viewer)
+        self.assertFalse(repo_metrics["example/contributed-fork"].is_owned_by_viewer)
         owned_query = stats.queries.query.await_args_list[0].args[0]
         self.assertNotIn("isFork: false", owned_query)
 
@@ -1779,7 +1869,41 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                 self.assertIn("Private repo #1", serialized)
                 self.assertNotIn("octocat/secret", serialized)
                 self.assertIn("octocat/public", serialized)
+                self.assertIn("example/huge", serialized)
                 self.assertEqual(metrics["privacy"]["private_repositories"], 1)
+                self.assertEqual(metrics["impact"]["stars"], 8)
+                self.assertEqual(metrics["impact"]["forks"], 3)
+                self.assertEqual(
+                    metrics["impact"]["top_public_repo"]["display_name"],
+                    "octocat/public",
+                )
+                self.assertEqual(
+                    metrics["personal_bests"]["top_public_repo"],
+                    "octocat/public",
+                )
+                self.assertEqual(
+                    [
+                        repo["display_name"]
+                        for repo in metrics["repo_portfolio"]["repositories"]
+                    ],
+                    ["octocat/public"],
+                )
+                self.assertEqual(
+                    metrics["repo_portfolio"]["public_repositories"],
+                    1,
+                )
+                self.assertEqual(
+                    metrics["repo_portfolio"]["private_repositories"],
+                    0,
+                )
+                self.assertEqual(
+                    metrics["collaboration"]["owned_repositories"],
+                    2,
+                )
+                self.assertEqual(
+                    metrics["collaboration"]["external_repositories"],
+                    1,
+                )
                 self.assertNotIn("code_footprint", metrics)
                 self.assertIn("commit_velocity", metrics)
                 self.assertEqual(
@@ -2451,7 +2575,7 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                 self.assertIn("Commit Velocity", commit_velocity)
                 self.assertIn("/ mo", commit_velocity)
                 self.assertIn("6 months", commit_velocity)
-                self.assertIn("Stars: 30 days", star_history)
+                self.assertIn("Owned Stars: 30 days", star_history)
                 self.assertIn("Collecting daily star snapshots", star_history)
                 self.assertNotIn("href=", language_momentum)
                 self.assertNotIn("href=", trading_card)
@@ -2487,7 +2611,7 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         with TemporaryDirectory() as tmpdir:
             generated = Path(tmpdir)
             (generated / "overview.svg").write_text(
-                "Octocat Stars</td><td>1</td> Forks</td><td>2</td> "
+                "Octocat Owned stars</td><td>1</td> Owned forks</td><td>2</td> "
                 "Repositories with contributions</td><td>1</td>",
                 encoding="utf-8",
             )
@@ -2514,7 +2638,7 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         with TemporaryDirectory() as tmpdir:
             generated = Path(tmpdir)
             (generated / "overview.svg").write_text(
-                "Octocat Stars</td><td>1</td> Forks</td><td>2</td> "
+                "Octocat Owned stars</td><td>1</td> Owned forks</td><td>2</td> "
                 "Repositories with contributions</td><td>1</td>",
                 encoding="utf-8",
             )

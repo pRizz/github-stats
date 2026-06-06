@@ -16,6 +16,10 @@ Generate visualizations of GitHub user and repository statistics with GitHub
 Actions. Visualizations can include data for both private repositories, and for
 repositories you have contributed to, but do not own.
 
+Stars and forks are reported for owned, non-fork repositories. Contribution
+metrics can include repositories you have contributed to when those repositories
+are visible to the configured token.
+
 Generated images automatically switch between GitHub light theme and GitHub
 dark theme.
 
@@ -172,11 +176,11 @@ tokens into READMEs, issues, workflow logs, or bug reports.
    - To ignore certain languages, add them (separated by commas) to a new
      secret called `EXCLUDED_LANGS`. For example, to exclude HTML and TeX you
      could set the value to `html,tex`.
-   - To show statistics only for "owned" repositories and not forks with
-     contributions, add an environment variable (under the `env` header in the
-     [main
-     workflow](.github/workflows/main.yml))
-     called `EXCLUDE_FORKED_REPOS` with a value of `true`.
+   - To exclude forked repositories from repository discovery, add an
+     environment variable (under the `env` header in the [main
+     workflow](.github/workflows/main.yml)) called `EXCLUDE_FORKED_REPOS` with
+     a value of `true`. Non-fork repositories you contributed to may still be
+     included in contribution-oriented metrics when visible to the token.
    - These other values are added as secrets by default to prevent leaking
      information about private repositories. If you're not worried about that,
      you can change the values directly [in the Actions workflow

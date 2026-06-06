@@ -2,24 +2,30 @@
   "stats": {
     "name": "Peter Ryszkiewicz",
     "stargazers": 181,
-    "forks": 352,
-    "total_contributions": 8747,
-    "current_year_contributions": 5134,
-    "merged_pull_requests": 237,
-    "repos": 177,
-    "views": 280
+    "forks": 351,
+    "total_contributions": 9304,
+    "current_year_contributions": 5691,
+    "merged_pull_requests": 239,
+    "repos": 355,
+    "views": 484
   },
   "monthly_commits": {
-    "total": 4463,
+    "total": 7550,
     "current_month": {
-      "key": "2026-05",
-      "label": "May '26",
-      "count": 302,
+      "key": "2026-06",
+      "label": "Jun '26",
+      "count": 563,
       "is_current": true,
       "scan_degraded": false,
-      "github_attributed_count": 351
+      "github_attributed_count": 199
     },
     "month_count": 13
+  },
+  "star_history": {
+    "samples": 1,
+    "latest_date": "2026-06-06",
+    "latest_total": 181,
+    "card_count": 3
   },
   "experimental": {
     "enabled": true,
@@ -33,16 +39,219 @@
       "experimental-personal-bests.svg",
       "experimental-trading-card.svg",
       "experimental-repo-portfolio.svg",
-      "experimental-commit-velocity.svg"
+      "experimental-commit-velocity.svg",
+      "experimental-star-history-30-days.svg",
+      "experimental-star-history-90-days.svg",
+      "experimental-star-history-365-days.svg"
     ],
-    "private_repositories": 74,
+    "private_repositories": 76,
     "limited_data": [
-      "monthly commit scan data degraded"
+      "monthly commit scan data degraded",
+      "repository traffic data degraded"
     ]
   },
   "api": {
-    "total_repos": 177,
-    "traffic_degraded": [],
+    "total_repos": 355,
+    "traffic_degraded": [
+      {
+        "repo": "prusa3d/PrusaSlicer",
+        "endpoint": "traffic/views",
+        "status": 403,
+        "category": "auth_or_permission_error",
+        "message": "REST returned HTTP 403: authentication or permission failure; {\"message\":\"Must have push access to repository\",\"documentation_url\":\"https://docs.github.com/rest/metrics/traffic#get-page-views\",\"status\":\"403\"}",
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.10684791702078655
+      },
+      {
+        "repo": "rust-num/num-bigint",
+        "endpoint": "traffic/views",
+        "status": 403,
+        "category": "auth_or_permission_error",
+        "message": "REST returned HTTP 403: authentication or permission failure; {\"message\":\"Must have push access to repository\",\"documentation_url\":\"https://docs.github.com/rest/metrics/traffic#get-page-views\",\"status\":\"403\"}",
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.1052934589679353
+      },
+      {
+        "repo": "mrshu/github-statuses",
+        "endpoint": "traffic/views",
+        "status": 403,
+        "category": "auth_or_permission_error",
+        "message": "REST returned HTTP 403: authentication or permission failure; {\"message\":\"Must have push access to repository\",\"documentation_url\":\"https://docs.github.com/rest/metrics/traffic#get-page-views\",\"status\":\"403\"}",
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.10598391701932997
+      },
+      {
+        "repo": "solidjs/solid-start",
+        "endpoint": "traffic/views",
+        "status": 403,
+        "category": "auth_or_permission_error",
+        "message": "REST returned HTTP 403: authentication or permission failure; {\"message\":\"Must have push access to repository\",\"documentation_url\":\"https://docs.github.com/rest/metrics/traffic#get-page-views\",\"status\":\"403\"}",
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.12422854197211564
+      },
+      {
+        "repo": "anomalyco/opencode",
+        "endpoint": "traffic/views",
+        "status": 403,
+        "category": "auth_or_permission_error",
+        "message": "REST returned HTTP 403: authentication or permission failure; {\"message\":\"Must have push access to repository\",\"documentation_url\":\"https://docs.github.com/rest/metrics/traffic#get-page-views\",\"status\":\"403\"}",
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.11542250000638887
+      },
+      {
+        "repo": "wasm-bindgen/wasm-pack",
+        "endpoint": "traffic/views",
+        "status": 403,
+        "category": "auth_or_permission_error",
+        "message": "REST returned HTTP 403: authentication or permission failure; {\"message\":\"Must have push access to repository\",\"documentation_url\":\"https://docs.github.com/rest/metrics/traffic#get-page-views\",\"status\":\"403\"}",
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.12673704099142924
+      },
+      {
+        "repo": "prusa3d/Prusa-Link-Web",
+        "endpoint": "traffic/views",
+        "status": 403,
+        "category": "auth_or_permission_error",
+        "message": "REST returned HTTP 403: authentication or permission failure; {\"message\":\"Must have push access to repository\",\"documentation_url\":\"https://docs.github.com/rest/metrics/traffic#get-page-views\",\"status\":\"403\"}",
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.12330212502274662
+      },
+      {
+        "repo": "pingdotgg/t3code",
+        "endpoint": "traffic/views",
+        "status": 403,
+        "category": "auth_or_permission_error",
+        "message": "REST returned HTTP 403: authentication or permission failure; {\"message\":\"Must have push access to repository\",\"documentation_url\":\"https://docs.github.com/rest/metrics/traffic#get-page-views\",\"status\":\"403\"}",
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.12830224999925122
+      },
+      {
+        "repo": "gastownhall/gastown",
+        "endpoint": "traffic/views",
+        "status": 403,
+        "category": "auth_or_permission_error",
+        "message": "REST returned HTTP 403: authentication or permission failure; {\"message\":\"Must have push access to repository\",\"documentation_url\":\"https://docs.github.com/rest/metrics/traffic#get-page-views\",\"status\":\"403\"}",
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.12871841696323827
+      },
+      {
+        "repo": "prusa3d/PrusaSlicer",
+        "endpoint": "traffic/clones",
+        "status": 403,
+        "category": "auth_or_permission_error",
+        "message": "REST returned HTTP 403: authentication or permission failure; {\"message\":\"Must have push access to repository\",\"documentation_url\":\"https://docs.github.com/rest/metrics/traffic#get-repository-clones\",\"status\":\"403\"}",
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.21458445803727955
+      },
+      {
+        "repo": "rust-num/num-bigint",
+        "endpoint": "traffic/clones",
+        "status": 403,
+        "category": "auth_or_permission_error",
+        "message": "REST returned HTTP 403: authentication or permission failure; {\"message\":\"Must have push access to repository\",\"documentation_url\":\"https://docs.github.com/rest/metrics/traffic#get-repository-clones\",\"status\":\"403\"}",
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.09750087501015514
+      },
+      {
+        "repo": "mrshu/github-statuses",
+        "endpoint": "traffic/clones",
+        "status": 403,
+        "category": "auth_or_permission_error",
+        "message": "REST returned HTTP 403: authentication or permission failure; {\"message\":\"Must have push access to repository\",\"documentation_url\":\"https://docs.github.com/rest/metrics/traffic#get-repository-clones\",\"status\":\"403\"}",
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.09768420801265165
+      },
+      {
+        "repo": "solidjs/solid-start",
+        "endpoint": "traffic/clones",
+        "status": 403,
+        "category": "auth_or_permission_error",
+        "message": "REST returned HTTP 403: authentication or permission failure; {\"message\":\"Must have push access to repository\",\"documentation_url\":\"https://docs.github.com/rest/metrics/traffic#get-repository-clones\",\"status\":\"403\"}",
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.09970862499903888
+      },
+      {
+        "repo": "anomalyco/opencode",
+        "endpoint": "traffic/clones",
+        "status": 403,
+        "category": "auth_or_permission_error",
+        "message": "REST returned HTTP 403: authentication or permission failure; {\"message\":\"Must have push access to repository\",\"documentation_url\":\"https://docs.github.com/rest/metrics/traffic#get-repository-clones\",\"status\":\"403\"}",
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.12349966599140316
+      },
+      {
+        "repo": "wasm-bindgen/wasm-pack",
+        "endpoint": "traffic/clones",
+        "status": 403,
+        "category": "auth_or_permission_error",
+        "message": "REST returned HTTP 403: authentication or permission failure; {\"message\":\"Must have push access to repository\",\"documentation_url\":\"https://docs.github.com/rest/metrics/traffic#get-repository-clones\",\"status\":\"403\"}",
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.1238528749672696
+      },
+      {
+        "repo": "prusa3d/Prusa-Link-Web",
+        "endpoint": "traffic/clones",
+        "status": 403,
+        "category": "auth_or_permission_error",
+        "message": "REST returned HTTP 403: authentication or permission failure; {\"message\":\"Must have push access to repository\",\"documentation_url\":\"https://docs.github.com/rest/metrics/traffic#get-repository-clones\",\"status\":\"403\"}",
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.10332224995363504
+      },
+      {
+        "repo": "pingdotgg/t3code",
+        "endpoint": "traffic/clones",
+        "status": 403,
+        "category": "auth_or_permission_error",
+        "message": "REST returned HTTP 403: authentication or permission failure; {\"message\":\"Must have push access to repository\",\"documentation_url\":\"https://docs.github.com/rest/metrics/traffic#get-repository-clones\",\"status\":\"403\"}",
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.10804766602814198
+      },
+      {
+        "repo": "gastownhall/gastown",
+        "endpoint": "traffic/clones",
+        "status": 403,
+        "category": "auth_or_permission_error",
+        "message": "REST returned HTTP 403: authentication or permission failure; {\"message\":\"Must have push access to repository\",\"documentation_url\":\"https://docs.github.com/rest/metrics/traffic#get-repository-clones\",\"status\":\"403\"}",
+        "attempts": 1,
+        "retry_count": 0,
+        "wait_seconds": 0.0,
+        "elapsed_seconds": 0.10701745795086026
+      }
+    ],
     "monthly_commits_degraded": [
       {
         "repo": "pRizz/IotaSeedGeneratoriOS",
@@ -53,7 +262,7 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.15959220800141338
+        "elapsed_seconds": 0.14610912499483675
       },
       {
         "repo": "pRizz/IotaSeedGeneratoriOS",
@@ -64,18 +273,18 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.14252591600234155
+        "elapsed_seconds": 0.1500446250429377
       }
     ],
     "critical_failures": [],
-    "rest_requests_total": 748,
+    "rest_requests_total": 2270,
     "rest_retries_total": 0,
     "rest_wait_seconds_total": 0.0,
     "traffic_wait_seconds_total": 0.0,
     "monthly_commits_wait_seconds_total": 0.0,
     "slowest_requests": [
       {
-        "repo": "pRizz/curl-transaction-ccurl-impl",
+        "repo": "pRizz/t3code",
         "endpoint": "commits",
         "status": 200,
         "category": "success_with_json",
@@ -83,11 +292,11 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 1.3614115419986774,
+        "elapsed_seconds": 1.2963186250417493,
         "message": "response contains JSON"
       },
       {
-        "repo": "pRizz/wireless-phone-charger",
+        "repo": "anomalyco/opencode",
         "endpoint": "commits",
         "status": 200,
         "category": "success_with_json",
@@ -95,11 +304,11 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 1.324286833005317,
+        "elapsed_seconds": 1.2608256670064293,
         "message": "response contains JSON"
       },
       {
-        "repo": "pRizz/opencode-cloud",
+        "repo": "pRizz/chrome-tab-counter",
         "endpoint": "commits",
         "status": 200,
         "category": "success_with_json",
@@ -107,11 +316,11 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.9922000840015244,
+        "elapsed_seconds": 1.2179619999951683,
         "message": "response contains JSON"
       },
       {
-        "repo": "pRizz/local-docker-cache",
+        "repo": "pRizz/goose",
         "endpoint": "commits",
         "status": 200,
         "category": "success_with_json",
@@ -119,11 +328,11 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.7536965410035918,
+        "elapsed_seconds": 0.8292089579626918,
         "message": "response contains JSON"
       },
       {
-        "repo": "pRizz/open-bitcoin-web-miner",
+        "repo": "gastownhall/gastown",
         "endpoint": "commits",
         "status": 200,
         "category": "success_with_json",
@@ -131,11 +340,11 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.6993849159989622,
+        "elapsed_seconds": 0.7848038750234991,
         "message": "response contains JSON"
       },
       {
-        "repo": "pRizz/opencode-cloud",
+        "repo": "pRizz/go2rtc",
         "endpoint": "commits",
         "status": 200,
         "category": "success_with_json",
@@ -143,11 +352,11 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.635275915999955,
+        "elapsed_seconds": 0.7686046250164509,
         "message": "response contains JSON"
       },
       {
-        "repo": "pRizz/open-links",
+        "repo": "pRizz/oh-my-codex",
         "endpoint": "commits",
         "status": 200,
         "category": "success_with_json",
@@ -155,11 +364,11 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.5110692500020377,
+        "elapsed_seconds": 0.7475971659878269,
         "message": "response contains JSON"
       },
       {
-        "repo": "pRizz/twitter-feels",
+        "repo": "anomalyco/opencode",
         "endpoint": "commits",
         "status": 200,
         "category": "success_with_json",
@@ -167,11 +376,11 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.4914592920031282,
+        "elapsed_seconds": 0.7434778749593534,
         "message": "response contains JSON"
       },
       {
-        "repo": "pRizz/twitter-feels",
+        "repo": "pRizz/get-shit-done",
         "endpoint": "commits",
         "status": 200,
         "category": "success_with_json",
@@ -179,11 +388,11 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.4808882080033072,
+        "elapsed_seconds": 0.736877084011212,
         "message": "response contains JSON"
       },
       {
-        "repo": "pRizz/av-denoiser",
+        "repo": "pRizz/oh-my-codex",
         "endpoint": "commits",
         "status": 200,
         "category": "success_with_json",
@@ -191,7 +400,7 @@
         "attempts": 1,
         "retry_count": 0,
         "wait_seconds": 0.0,
-        "elapsed_seconds": 0.4489799170041806,
+        "elapsed_seconds": 0.7132470840006135,
         "message": "response contains JSON"
       }
     ]
