@@ -19,8 +19,8 @@ svg { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial
 </style>
 <rect x="5" y="5" id="background" />
 <text class="title" x="21" y="36">Stars: 365 days</text>
-<text class="subtitle" x="21" y="55">Collecting daily star snapshots</text>
+<text class="subtitle" x="21" y="55">180 total; 0 in window</text>
 <line class="axis" x1="24" y1="156" x2="336" y2="156" />
-<text class="empty" x="180" y="120" text-anchor="middle">Collecting star history</text>
-<g class="summary-row"><text class="label" x="21" y="181">Latest</text><text class="value" x="106" y="181" text-anchor="end">0</text><text class="label" x="141" y="181">Change</text><text class="value" x="229" y="181" text-anchor="end">0</text><text class="label" x="265" y="181">Samples</text><text class="value" x="339" y="181" text-anchor="end">0</text></g>
+<circle class="chart-point" cx="336.0" cy="117.0" r="3.5" style="animation-delay: 0ms"><title>2026-06-06: 180 stars</title></circle>
+<g class="summary-row"><text class="label" x="21" y="181">Latest</text><text class="value" x="106" y="181" text-anchor="end">180</text><text class="label" x="141" y="181">Change</text><text class="value" x="229" y="181" text-anchor="end">0</text><text class="label" x="265" y="181">Samples</text><text class="value" x="339" y="181" text-anchor="end">1</text></g>
 </svg>

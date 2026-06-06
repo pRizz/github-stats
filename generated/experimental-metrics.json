@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-06T01:16:06Z",
+  "generated_at": "2026-06-06T03:17:30Z",
   "limited_data": [
     "repository traffic data degraded"
   ],
@@ -8,24 +8,24 @@
     "private_repositories": 0
   },
   "contribution_pulse": {
-    "total": 4763,
+    "total": 4764,
     "active_months": 13,
     "month_count": 13,
-    "average_monthly": 366.4,
+    "average_monthly": 366.5,
     "best_month": "Jan '26",
     "best_month_count": 1867,
     "current_month": "Jun '26",
-    "current_month_count": 175,
+    "current_month_count": 176,
     "active_streak_months": 13
   },
   "contribution_mix": {
-    "commits": 4941,
+    "commits": 4942,
     "issues": 23,
     "pull_requests": 221,
     "pull_request_reviews": 2,
     "repositories": 86,
     "restricted": 385,
-    "total": 5658
+    "total": 5659
   },
   "impact": {
     "stars": 180,
@@ -43,19 +43,19 @@
   "language_momentum": [
     {
       "language": "TypeScript",
-      "percent": 43.17,
+      "percent": 43.15,
       "color": "#3178c6",
       "repos": 43
     },
     {
       "language": "Rust",
-      "percent": 31.79,
+      "percent": 31.78,
       "color": "#dea584",
       "repos": 9
     },
     {
       "language": "HTML",
-      "percent": 22.14,
+      "percent": 22.13,
       "color": "#e34c26",
       "repos": 49
     },
@@ -73,7 +73,7 @@
     },
     {
       "language": "Python",
-      "percent": 0.49,
+      "percent": 0.53,
       "color": "#3572A5",
       "repos": 5
     },
@@ -174,33 +174,33 @@
         "key": "trailing_30_days",
         "label": "30 days",
         "days": 30,
-        "commits": 377,
-        "per_hour": 0.5236,
-        "per_day": 12.57,
-        "per_week": 87.97,
-        "per_month": 377.0,
+        "commits": 378,
+        "per_hour": 0.525,
+        "per_day": 12.6,
+        "per_week": 88.2,
+        "per_month": 378.0,
         "scan_degraded": false
       },
       {
         "key": "trailing_180_days",
         "label": "6 months",
         "days": 180,
-        "commits": 4071,
-        "per_hour": 0.9424,
+        "commits": 4072,
+        "per_hour": 0.9426,
         "per_day": 22.62,
-        "per_week": 158.32,
-        "per_month": 678.5,
+        "per_week": 158.36,
+        "per_month": 678.67,
         "scan_degraded": false
       },
       {
         "key": "trailing_365_days",
         "label": "365 days",
         "days": 365,
-        "commits": 4223,
-        "per_hour": 0.4821,
+        "commits": 4224,
+        "per_hour": 0.4822,
         "per_day": 11.57,
-        "per_week": 80.99,
-        "per_month": 347.1,
+        "per_week": 81.01,
+        "per_month": 347.18,
         "scan_degraded": false
       }
     ],
@@ -211,7 +211,96 @@
       "degraded_windows": 0
     }
   },
+  "star_history": {
+    "source": {
+      "counting": "daily_aggregate_stargazer_snapshot",
+      "path": "generated/star-history.csv",
+      "timezone": "UTC",
+      "samples": 1,
+      "latest_date": "2026-06-06",
+      "latest_total": 180
+    },
+    "windows": [
+      {
+        "key": "30_days",
+        "label": "30 days",
+        "days": 30,
+        "bucket_days": 1,
+        "latest_total": 180,
+        "delta": 0,
+        "latest_date": "2026-06-06",
+        "sample_count": 1,
+        "raw_sample_count": 1,
+        "points": [
+          {
+            "date": "2026-06-06",
+            "offset_days": 29,
+            "total_stargazers": 180,
+            "repo_count": 104
+          }
+        ]
+      },
+      {
+        "key": "90_days",
+        "label": "90 days",
+        "days": 90,
+        "bucket_days": 3,
+        "latest_total": 180,
+        "delta": 0,
+        "latest_date": "2026-06-06",
+        "sample_count": 1,
+        "raw_sample_count": 1,
+        "points": [
+          {
+            "date": "2026-06-06",
+            "offset_days": 89,
+            "total_stargazers": 180,
+            "repo_count": 104
+          }
+        ]
+      },
+      {
+        "key": "365_days",
+        "label": "365 days",
+        "days": 365,
+        "bucket_days": 7,
+        "latest_total": 180,
+        "delta": 0,
+        "latest_date": "2026-06-06",
+        "sample_count": 1,
+        "raw_sample_count": 1,
+        "points": [
+          {
+            "date": "2026-06-06",
+            "offset_days": 364,
+            "total_stargazers": 180,
+            "repo_count": 104
+          }
+        ]
+      }
+    ]
+  },
   "repositories": [
+    {
+      "display_name": "pRizz/github-stats",
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-06-06T03:15:12Z",
+      "pushed_at": "2026-06-06T03:15:08Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "Python": {
+          "size": 247128,
+          "color": "#3572A5"
+        }
+      }
+    },
     {
       "display_name": "pRizz/open-links-sites",
       "is_private": false,
@@ -285,26 +374,6 @@
         "Dockerfile": {
           "size": 1948,
           "color": "#384d54"
-        }
-      }
-    },
-    {
-      "display_name": "pRizz/github-stats",
-      "is_private": false,
-      "is_fork": false,
-      "is_archived": false,
-      "stargazers": 0,
-      "forks": 0,
-      "updated_at": "2026-06-05T01:23:16Z",
-      "pushed_at": "2026-06-05T01:23:12Z",
-      "open_issues": 0,
-      "open_pull_requests": 0,
-      "releases": 0,
-      "tags": 0,
-      "languages": {
-        "Python": {
-          "size": 227765,
-          "color": "#3572A5"
         }
       }
     },
