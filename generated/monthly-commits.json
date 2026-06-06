@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-06T14:41:57Z",
+  "generated_at": "2026-06-06T15:12:10Z",
   "window": {
     "months": 13,
     "timezone": "UTC",
@@ -13,10 +13,10 @@
       "prizz",
       "pRizz"
     ],
-    "repo_count": 279,
-    "scanned_months": 1,
+    "repo_count": 355,
+    "scanned_months": 13,
     "degraded_months": 0,
-    "degraded_repo_months": 0
+    "degraded_repo_months": 1
   },
   "months": [
     {
@@ -25,15 +25,15 @@
       "count": 161,
       "is_current": false,
       "scan_degraded": false,
-      "github_attributed_count": 113
+      "github_attributed_count": 168
     },
     {
       "key": "2025-07",
       "label": "Jul '25",
-      "count": 95,
+      "count": 96,
       "is_current": false,
       "scan_degraded": false,
-      "github_attributed_count": 44
+      "github_attributed_count": 95
     },
     {
       "key": "2025-08",
@@ -41,7 +41,7 @@
       "count": 20,
       "is_current": false,
       "scan_degraded": false,
-      "github_attributed_count": 0
+      "github_attributed_count": 20
     },
     {
       "key": "2025-09",
@@ -49,7 +49,7 @@
       "count": 49,
       "is_current": false,
       "scan_degraded": false,
-      "github_attributed_count": 0
+      "github_attributed_count": 52
     },
     {
       "key": "2025-10",
@@ -57,7 +57,7 @@
       "count": 34,
       "is_current": false,
       "scan_degraded": false,
-      "github_attributed_count": 0
+      "github_attributed_count": 34
     },
     {
       "key": "2025-11",
@@ -65,7 +65,7 @@
       "count": 13,
       "is_current": false,
       "scan_degraded": false,
-      "github_attributed_count": 2
+      "github_attributed_count": 13
     },
     {
       "key": "2025-12",
@@ -73,55 +73,55 @@
       "count": 106,
       "is_current": false,
       "scan_degraded": false,
-      "github_attributed_count": 126
+      "github_attributed_count": 132
     },
     {
       "key": "2026-01",
       "label": "Jan '26",
-      "count": 1867,
+      "count": 2363,
       "is_current": false,
       "scan_degraded": false,
-      "github_attributed_count": 1727
+      "github_attributed_count": 1870
     },
     {
       "key": "2026-02",
       "label": "Feb '26",
-      "count": 651,
+      "count": 1079,
       "is_current": false,
       "scan_degraded": false,
-      "github_attributed_count": 615
+      "github_attributed_count": 632
     },
     {
       "key": "2026-03",
       "label": "Mar '26",
-      "count": 713,
+      "count": 920,
       "is_current": false,
       "scan_degraded": false,
-      "github_attributed_count": 839
+      "github_attributed_count": 906
     },
     {
       "key": "2026-04",
       "label": "Apr '26",
-      "count": 442,
+      "count": 1355,
       "is_current": false,
       "scan_degraded": false,
-      "github_attributed_count": 1136
+      "github_attributed_count": 1249
     },
     {
       "key": "2026-05",
       "label": "May '26",
-      "count": 437,
+      "count": 791,
       "is_current": false,
       "scan_degraded": false,
-      "github_attributed_count": 557
+      "github_attributed_count": 710
     },
     {
       "key": "2026-06",
       "label": "Jun '26",
-      "count": 480,
+      "count": 536,
       "is_current": true,
       "scan_degraded": false,
-      "github_attributed_count": 163
+      "github_attributed_count": 172
     }
   ]
 }
