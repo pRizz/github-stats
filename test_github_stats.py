@@ -417,6 +417,53 @@ def _commit(
     }
 
 
+def _repo_node(name, is_fork=False):
+    return {
+        "nameWithOwner": name,
+        "isPrivate": False,
+        "isFork": is_fork,
+        "isArchived": False,
+        "updatedAt": "2026-06-01T00:00:00Z",
+        "pushedAt": "2026-06-01T00:00:00Z",
+        "stargazers": {"totalCount": 0},
+        "forkCount": 0,
+        "issues": {"totalCount": 0},
+        "pullRequests": {"totalCount": 0},
+        "refs": {"totalCount": 0},
+        "languages": {"edges": []},
+    }
+
+
+def _owned_repo_response(nodes):
+    return {
+        "data": {
+            "viewer": {
+                "login": "octocat",
+                "name": "Octocat",
+                "repositories": {
+                    "pageInfo": {"hasNextPage": False, "endCursor": None},
+                    "nodes": nodes,
+                },
+            }
+        }
+    }
+
+
+def _contributed_repo_response(nodes):
+    return {
+        "data": {
+            "viewer": {
+                "login": "octocat",
+                "name": "Octocat",
+                "repositoriesContributedTo": {
+                    "pageInfo": {"hasNextPage": False, "endCursor": None},
+                    "nodes": nodes,
+                },
+            }
+        }
+    }
+
+
 class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
     def test_rolling_month_windows_include_current_plus_prior_12_months(self):
         # Arrange
@@ -712,6 +759,97 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn("first: 100", owned_query)
         self.assertNotIn("first: 100", contributed_query)
 
+    def test_owned_repository_query_can_include_forks(self):
+        # Arrange / Act
+        default_query = github_stats.Queries.owned_repos_overview()
+        include_forks_query = github_stats.Queries.owned_repos_overview(
+            include_forks=True
+        )
+
+        # Assert
+        self.assertIn("isFork: false", default_query)
+        self.assertNotIn("isFork: false", include_forks_query)
+
+    async def test_get_stats_includes_non_fork_contributed_repos_when_ignoring_forks(
+        self,
+    ):
+        # Arrange
+        stats = Stats(
+            "octocat",
+            "token",
+            _FailingSession(),
+            ignore_forked_repos=True,
+        )
+        stats.queries = mock.AsyncMock()
+        stats.queries.query.side_effect = [
+            _owned_repo_response(
+                [
+                    _repo_node("octocat/owned"),
+                    _repo_node("octocat/owned-fork", is_fork=True),
+                ]
+            ),
+            _contributed_repo_response(
+                [
+                    _repo_node("example/contributed"),
+                    _repo_node("example/contributed-fork", is_fork=True),
+                ]
+            ),
+        ]
+
+        # Act
+        await stats.get_stats()
+
+        # Assert
+        self.assertEqual(
+            await stats.repos,
+            {"octocat/owned", "example/contributed"},
+        )
+        self.assertEqual(stats.queries.query.await_count, 2)
+        owned_query = stats.queries.query.await_args_list[0].args[0]
+        contributed_query = stats.queries.query.await_args_list[1].args[0]
+        self.assertIn("isFork: false", owned_query)
+        self.assertIn("repositoriesContributedTo", contributed_query)
+
+    async def test_get_stats_includes_owned_and_contributed_forks_when_enabled(self):
+        # Arrange
+        stats = Stats(
+            "octocat",
+            "token",
+            _FailingSession(),
+            ignore_forked_repos=False,
+        )
+        stats.queries = mock.AsyncMock()
+        stats.queries.query.side_effect = [
+            _owned_repo_response(
+                [
+                    _repo_node("octocat/owned"),
+                    _repo_node("octocat/owned-fork", is_fork=True),
+                ]
+            ),
+            _contributed_repo_response(
+                [
+                    _repo_node("example/contributed"),
+                    _repo_node("example/contributed-fork", is_fork=True),
+                ]
+            ),
+        ]
+
+        # Act
+        await stats.get_stats()
+
+        # Assert
+        self.assertEqual(
+            await stats.repos,
+            {
+                "octocat/owned",
+                "octocat/owned-fork",
+                "example/contributed",
+                "example/contributed-fork",
+            },
+        )
+        owned_query = stats.queries.query.await_args_list[0].args[0]
+        self.assertNotIn("isFork: false", owned_query)
+
     async def test_rest_query_returns_empty_for_unavailable_commit_listing(self):
         # Arrange
         queries = Queries("octocat", "token", _FailingSession())
@@ -933,6 +1071,47 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(stats.queries.calls), 2)
         self.assertEqual(stats.queries.calls[0][1]["per_page"], "100")
         self.assertEqual(stats.report.rest_requests_total, 2)
+
+    async def test_monthly_commit_scan_dedupes_sha_across_repositories(self):
+        # Arrange
+        window = github_stats.MonthWindow(
+            key="2026-05",
+            label="May '26",
+            since="2026-05-01T00:00:00Z",
+            until="2026-05-02T00:00:00Z",
+            is_current=True,
+        )
+        stats = Stats("octocat", "token", _FailingSession())
+        stats._repos = {"octocat/upstream", "octocat/fork"}
+        stats.queries = _MonthlyCommitQueries(
+            {
+                (
+                    "/repos/octocat/fork/commits",
+                    "1",
+                ): github_stats.RestQueryResult(
+                    [_commit("same-sha", author_name="Peter Ryszkiewicz")]
+                ),
+                (
+                    "/repos/octocat/upstream/commits",
+                    "1",
+                ): github_stats.RestQueryResult(
+                    [_commit("same-sha", author_name="Peter Ryszkiewicz")]
+                ),
+            }
+        )
+
+        # Act
+        with mock.patch.dict(
+            "os.environ",
+            {"MONTHLY_COMMITS_REQUEST_DELAY_SECONDS": "0"},
+        ):
+            result = await stats.scan_monthly_commits(
+                [window],
+                identity_patterns=["Peter Ryszkiewicz"],
+            )
+
+        # Assert
+        self.assertEqual(result.counts, {"2026-05": 1})
 
     async def test_commit_window_scan_counts_arbitrary_trailing_windows(self):
         # Arrange

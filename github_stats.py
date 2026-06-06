@@ -610,6 +610,12 @@ class Queries(object):
     GRAPHQL_MAX_ITERATIONS = 6
     REPOSITORY_OVERVIEW_PAGE_SIZE = 25
 
+    @staticmethod
+    def _fork_filter(include_forks: bool) -> str:
+        if include_forks:
+            return ""
+        return "        isFork: false,\n"
+
     def __init__(
         self,
         username: str,
@@ -1084,11 +1090,14 @@ class Queries(object):
 
     @staticmethod
     def repos_overview(
-        contrib_cursor: Optional[str] = None, owned_cursor: Optional[str] = None
+        contrib_cursor: Optional[str] = None,
+        owned_cursor: Optional[str] = None,
+        include_forks: bool = False,
     ) -> str:
         """
         :return: GraphQL query with overview of user repositories
         """
+        fork_filter = Queries._fork_filter(include_forks)
         return f"""{{
   viewer {{
     login,
@@ -1099,8 +1108,7 @@ class Queries(object):
             field: UPDATED_AT,
             direction: DESC
         }},
-        isFork: false,
-        after: {"null" if owned_cursor is None else '"'+ owned_cursor +'"'}
+{fork_filter}        after: {"null" if owned_cursor is None else '"'+ owned_cursor +'"'}
     ) {{
       pageInfo {{
         hasNextPage
@@ -1192,10 +1200,14 @@ class Queries(object):
 """
 
     @staticmethod
-    def owned_repos_overview(owned_cursor: Optional[str] = None) -> str:
+    def owned_repos_overview(
+        owned_cursor: Optional[str] = None,
+        include_forks: bool = False,
+    ) -> str:
         """
         :return: GraphQL query with overview of repositories owned by the user
         """
+        fork_filter = Queries._fork_filter(include_forks)
         return f"""{{
   viewer {{
     login,
@@ -1206,8 +1218,7 @@ class Queries(object):
             field: UPDATED_AT,
             direction: DESC
         }},
-        isFork: false,
-        after: {"null" if owned_cursor is None else '"'+ owned_cursor +'"'}
+{fork_filter}        after: {"null" if owned_cursor is None else '"'+ owned_cursor +'"'}
     ) {{
       pageInfo {{
         hasNextPage
@@ -1604,10 +1615,22 @@ Languages:
                 "languages": raw_repo_languages,
             }
 
+        def maybe_record_repo(repo: Any) -> None:
+            if (
+                self._ignore_forked_repos
+                and isinstance(repo, dict)
+                and bool(repo.get("isFork", False))
+            ):
+                return
+            record_repo(repo)
+
         next_owned = None
         while True:
             raw_results = await self.queries.query(
-                Queries.owned_repos_overview(owned_cursor=next_owned)
+                Queries.owned_repos_overview(
+                    owned_cursor=next_owned,
+                    include_forks=not self._ignore_forked_repos,
+                )
             )
             viewer = raw_results.get("data", {}).get("viewer")
             if not isinstance(viewer, dict) or "repositories" not in viewer:
@@ -1621,7 +1644,7 @@ Languages:
                     "GraphQL response has malformed owned repository data"
                 )
             for repo in owned_repos.get("nodes", []):
-                record_repo(repo)
+                maybe_record_repo(repo)
 
             if owned_repos.get("pageInfo", {}).get("hasNextPage", False):
                 next_owned = owned_repos.get("pageInfo", {}).get(
@@ -1631,7 +1654,7 @@ Languages:
                 break
 
         next_contrib = None
-        while not self._ignore_forked_repos:
+        while True:
             raw_results = await self.queries.query(
                 Queries.contributed_repos_overview(contrib_cursor=next_contrib)
             )
@@ -1647,7 +1670,7 @@ Languages:
                     "GraphQL response has malformed contributed repository data"
                 )
             for repo in contrib_repos.get("nodes", []):
-                record_repo(repo)
+                maybe_record_repo(repo)
 
             if contrib_repos.get("pageInfo", {}).get("hasNextPage", False):
                 next_contrib = contrib_repos.get("pageInfo", {}).get(
