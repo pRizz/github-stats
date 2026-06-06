@@ -29,6 +29,9 @@ experimental metrics are written to generated SVGs or JSON reports.
 <a href="https://github.com/pRizz/github-stats">
 <img src="generated/experimental-contribution-pulse.svg#gh-dark-mode-only" />
 <img src="generated/experimental-commit-velocity.svg#gh-dark-mode-only" />
+<img src="generated/experimental-star-history-30-days.svg#gh-dark-mode-only" />
+<img src="generated/experimental-star-history-90-days.svg#gh-dark-mode-only" />
+<img src="generated/experimental-star-history-365-days.svg#gh-dark-mode-only" />
 <img src="generated/experimental-contribution-mix.svg#gh-dark-mode-only" />
 <img src="generated/experimental-impact.svg#gh-dark-mode-only" />
 <img src="generated/experimental-language-momentum.svg#gh-dark-mode-only" />
@@ -39,6 +42,9 @@ experimental metrics are written to generated SVGs or JSON reports.
 <img src="generated/experimental-repo-portfolio.svg#gh-dark-mode-only" />
 <img src="generated/experimental-contribution-pulse.svg#gh-light-mode-only" />
 <img src="generated/experimental-commit-velocity.svg#gh-light-mode-only" />
+<img src="generated/experimental-star-history-30-days.svg#gh-light-mode-only" />
+<img src="generated/experimental-star-history-90-days.svg#gh-light-mode-only" />
+<img src="generated/experimental-star-history-365-days.svg#gh-light-mode-only" />
 <img src="generated/experimental-contribution-mix.svg#gh-light-mode-only" />
 <img src="generated/experimental-impact.svg#gh-light-mode-only" />
 <img src="generated/experimental-language-momentum.svg#gh-light-mode-only" />
@@ -204,6 +210,12 @@ tokens into READMEs, issues, workflow logs, or bug reports.
    ![](https://raw.githubusercontent.com/username/github-stats/master/generated/experimental-contribution-pulse.svg#gh-light-mode-only)
    ![](https://raw.githubusercontent.com/username/github-stats/master/generated/experimental-commit-velocity.svg#gh-dark-mode-only)
    ![](https://raw.githubusercontent.com/username/github-stats/master/generated/experimental-commit-velocity.svg#gh-light-mode-only)
+   ![](https://raw.githubusercontent.com/username/github-stats/master/generated/experimental-star-history-30-days.svg#gh-dark-mode-only)
+   ![](https://raw.githubusercontent.com/username/github-stats/master/generated/experimental-star-history-30-days.svg#gh-light-mode-only)
+   ![](https://raw.githubusercontent.com/username/github-stats/master/generated/experimental-star-history-90-days.svg#gh-dark-mode-only)
+   ![](https://raw.githubusercontent.com/username/github-stats/master/generated/experimental-star-history-90-days.svg#gh-light-mode-only)
+   ![](https://raw.githubusercontent.com/username/github-stats/master/generated/experimental-star-history-365-days.svg#gh-dark-mode-only)
+   ![](https://raw.githubusercontent.com/username/github-stats/master/generated/experimental-star-history-365-days.svg#gh-light-mode-only)
    ![](https://raw.githubusercontent.com/username/github-stats/master/generated/experimental-contribution-mix.svg#gh-dark-mode-only)
    ![](https://raw.githubusercontent.com/username/github-stats/master/generated/experimental-contribution-mix.svg#gh-light-mode-only)
    ![](https://raw.githubusercontent.com/username/github-stats/master/generated/experimental-impact.svg#gh-dark-mode-only)

@@ -1,0 +1,26 @@
+<svg id="gh-dark-mode-only" width="360" height="210" xmlns="http://www.w3.org/2000/svg">
+<style>
+svg { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif; font-size: 12px; }
+#background { width: calc(100% - 10px); height: calc(100% - 10px); fill: white; stroke: rgb(225, 228, 232); stroke-width: 1px; rx: 6px; ry: 6px; }
+#gh-dark-mode-only:target #background { fill: #0d1117; stroke-width: 0.5px; }
+.title { font-size: 16px; font-weight: 600; fill: rgb(36, 41, 46); }
+#gh-dark-mode-only:target .title { fill: #c9d1d9; }
+.subtitle, .label, .empty { fill: rgb(88, 96, 105); }
+#gh-dark-mode-only:target .subtitle, #gh-dark-mode-only:target .label, #gh-dark-mode-only:target .empty { fill: #8b949e; }
+.value { fill: rgb(36, 41, 46); font-weight: 600; }
+#gh-dark-mode-only:target .value { fill: #c9d1d9; }
+.axis { stroke: rgb(225, 228, 232); stroke-width: 1; }
+#gh-dark-mode-only:target .axis { stroke: #30363d; }
+.chart-line { fill: none; stroke: #2da44e; stroke-width: 2.25; stroke-linecap: round; stroke-linejoin: round; }
+.chart-point { fill: #2da44e; opacity: 0; animation: pointIn 500ms ease-out forwards; }
+.summary-row { opacity: 0; animation: fadeIn 600ms ease-out 200ms forwards; }
+@keyframes pointIn { to { opacity: 1; } }
+@keyframes fadeIn { to { opacity: 1; } }
+</style>
+<rect x="5" y="5" id="background" />
+<text class="title" x="21" y="36">Stars: 30 days</text>
+<text class="subtitle" x="21" y="55">Collecting daily star snapshots</text>
+<line class="axis" x1="24" y1="156" x2="336" y2="156" />
+<text class="empty" x="180" y="120" text-anchor="middle">Collecting star history</text>
+<g class="summary-row"><text class="label" x="21" y="181">Latest</text><text class="value" x="106" y="181" text-anchor="end">0</text><text class="label" x="141" y="181">Change</text><text class="value" x="229" y="181" text-anchor="end">0</text><text class="label" x="265" y="181">Samples</text><text class="value" x="339" y="181" text-anchor="end">0</text></g>
+</svg>

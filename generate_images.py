@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import asyncio
+import csv
 import datetime as dt
 import html
 import json
@@ -25,6 +26,13 @@ from language_icons import render_language_icon
 
 MONTHLY_COMMITS_CACHE = os.path.join("generated", "monthly-commits.json")
 EXPERIMENTAL_METRICS_CACHE = os.path.join("generated", "experimental-metrics.json")
+STAR_HISTORY_CACHE = os.path.join("generated", "star-history.csv")
+STAR_HISTORY_FIELDNAMES = [
+    "date",
+    "total_stargazers",
+    "repo_count",
+    "captured_at",
+]
 EXPERIMENTAL_CARD_NAMES = [
     "contribution-pulse",
     "contribution-mix",
@@ -36,12 +44,20 @@ EXPERIMENTAL_CARD_NAMES = [
     "trading-card",
     "repo-portfolio",
     "commit-velocity",
+    "star-history-30-days",
+    "star-history-90-days",
+    "star-history-365-days",
 ]
 EXPERIMENTAL_LANGUAGE_ICON_BASELINE_OFFSET = 3
 COMMIT_VELOCITY_WINDOW_SPECS = (
     ("trailing_30_days", "30 days", 30),
     ("trailing_180_days", "6 months", 180),
     ("trailing_365_days", "365 days", 365),
+)
+STAR_HISTORY_WINDOW_SPECS = (
+    ("30_days", "30 days", 30, 1),
+    ("90_days", "90 days", 90, 3),
+    ("365_days", "365 days", 365, 7),
 )
 
 
@@ -168,6 +184,7 @@ def render_action_summary(report: Dict[str, Any]) -> str:
     monthly_current = monthly.get("current_month", {})
     experimental = report.get("experimental", {})
     experimental_limited = experimental.get("limited_data", [])
+    star_history = report.get("star_history", {})
 
     return f"""# GitHub Stats Image Generation
 
@@ -183,6 +200,9 @@ def render_action_summary(report: Dict[str, Any]) -> str:
 - Current month commits: {monthly_current.get("count", 0):,}
 - Repositories: {stats["repos"]:,}
 - Repository views: {stats["views"]:,}
+- Star history samples: {star_history.get("samples", 0):,}
+- Latest star snapshot: {star_history.get("latest_date", "none")} ({star_history.get("latest_total", 0):,})
+- Star history cards: {star_history.get("card_count", 0):,}
 
 ## Experimental Stats
 
@@ -248,10 +268,15 @@ def validate_run_report(report: Dict[str, Any]) -> None:
 async def build_run_report(s: Stats) -> Dict[str, Any]:
     monthly_cache = load_monthly_commits_cache()
     experimental_cache = load_monthly_commits_cache(EXPERIMENTAL_METRICS_CACHE)
+    star_history_records = load_star_history_cache()
     months = monthly_cache.get("months", [])
     current_month = next(
         (item for item in months if item.get("is_current")),
         {},
+    )
+    latest_star_history = star_history_records[-1] if star_history_records else {}
+    star_history_cards = len(
+        experimental_cache.get("star_history", {}).get("windows", [])
     )
     return {
         "stats": {
@@ -268,6 +293,14 @@ async def build_run_report(s: Stats) -> Dict[str, Any]:
             "total": sum(int(item.get("count", 0)) for item in months),
             "current_month": current_month,
             "month_count": len(months),
+        },
+        "star_history": {
+            "samples": len(star_history_records),
+            "latest_date": latest_star_history.get("date", ""),
+            "latest_total": int(latest_star_history.get("total_stargazers", 0))
+            if latest_star_history
+            else 0,
+            "card_count": star_history_cards,
         },
         "experimental": {
             "enabled": env_truthy("GENERATE_EXPERIMENTAL", default=True),
@@ -393,6 +426,91 @@ def write_experimental_metrics_cache(
     with open(path, "w") as f:
         json.dump(data, f, indent=2)
         f.write("\n")
+
+
+def _parse_star_history_row(row: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    date_value = str(row.get("date", "")).strip()
+    if not date_value:
+        return None
+    try:
+        dt.date.fromisoformat(date_value)
+        total_stargazers = int(row.get("total_stargazers", ""))
+        repo_count = int(row.get("repo_count", 0))
+    except (TypeError, ValueError):
+        return None
+
+    captured_at = str(row.get("captured_at", "")).strip()
+    if not captured_at:
+        captured_at = f"{date_value}T00:00:00Z"
+    return {
+        "date": date_value,
+        "total_stargazers": total_stargazers,
+        "repo_count": repo_count,
+        "captured_at": captured_at,
+    }
+
+
+def load_star_history_cache(
+    path: str = STAR_HISTORY_CACHE,
+) -> List[Dict[str, Any]]:
+    if not os.path.exists(path):
+        return []
+    with open(path, "r", newline="") as f:
+        reader = csv.DictReader(f)
+        records = [
+            parsed
+            for row in reader
+            if (parsed := _parse_star_history_row(row)) is not None
+        ]
+    return sorted(records, key=lambda item: item["date"])
+
+
+def write_star_history_cache(
+    records: List[Dict[str, Any]],
+    path: str = STAR_HISTORY_CACHE,
+) -> None:
+    generate_output_folder()
+    parent = os.path.dirname(path)
+    if parent and not os.path.isdir(parent):
+        os.makedirs(parent)
+    sorted_records = sorted(records, key=lambda item: item["date"])
+    with open(path, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=STAR_HISTORY_FIELDNAMES)
+        writer.writeheader()
+        for record in sorted_records:
+            writer.writerow(
+                {
+                    "date": record["date"],
+                    "total_stargazers": int(record["total_stargazers"]),
+                    "repo_count": int(record.get("repo_count", 0)),
+                    "captured_at": record["captured_at"],
+                }
+            )
+
+
+def record_star_history_sample(
+    total_stargazers: int,
+    repo_count: int,
+    now: Optional[dt.datetime] = None,
+    path: str = STAR_HISTORY_CACHE,
+) -> Dict[str, Any]:
+    current_time = _as_utc(now or dt.datetime.now(dt.timezone.utc))
+    record = {
+        "date": current_time.date().isoformat(),
+        "total_stargazers": int(total_stargazers),
+        "repo_count": int(repo_count),
+        "captured_at": _format_utc_datetime(current_time),
+    }
+    records_by_date = {
+        item["date"]: item for item in load_star_history_cache(path)
+    }
+    records_by_date[record["date"]] = record
+    records = sorted(records_by_date.values(), key=lambda item: item["date"])
+    write_star_history_cache(records, path)
+    return {
+        "latest": record,
+        "samples": len(records),
+    }
 
 
 def _monthly_cache_records(cache: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
@@ -592,6 +710,101 @@ async def build_commit_velocity_metrics(
     }
 
 
+def _parse_star_history_date(value: str) -> Optional[dt.date]:
+    try:
+        return dt.date.fromisoformat(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _star_history_window_points(
+    records: List[Dict[str, Any]],
+    now: dt.datetime,
+    window_days: int,
+    bucket_days: int,
+) -> Tuple[List[Dict[str, Any]], int]:
+    current_date = _as_utc(now).date()
+    start_date = current_date - dt.timedelta(days=window_days - 1)
+    filtered = []
+    for record in records:
+        maybe_date = _parse_star_history_date(str(record.get("date", "")))
+        if maybe_date is None or maybe_date < start_date or maybe_date > current_date:
+            continue
+        filtered.append((maybe_date, record))
+
+    latest_by_bucket: Dict[int, Tuple[dt.date, Dict[str, Any]]] = {}
+    for record_date, record in filtered:
+        bucket_index = (record_date - start_date).days // bucket_days
+        existing = latest_by_bucket.get(bucket_index)
+        if existing is None or record_date >= existing[0]:
+            latest_by_bucket[bucket_index] = (record_date, record)
+
+    points = []
+    for record_date, record in sorted(latest_by_bucket.values(), key=lambda item: item[0]):
+        points.append(
+            {
+                "date": record_date.isoformat(),
+                "offset_days": (record_date - start_date).days,
+                "total_stargazers": int(record.get("total_stargazers", 0)),
+                "repo_count": int(record.get("repo_count", 0)),
+            }
+        )
+    return points, len(filtered)
+
+
+def build_star_history_metrics(
+    now: Optional[dt.datetime] = None,
+    cache_path: str = STAR_HISTORY_CACHE,
+) -> Dict[str, Any]:
+    current_time = _as_utc(now or dt.datetime.now(dt.timezone.utc))
+    records = load_star_history_cache(cache_path)
+    windows = []
+    for key, label, days, bucket_days in STAR_HISTORY_WINDOW_SPECS:
+        points, raw_sample_count = _star_history_window_points(
+            records,
+            current_time,
+            days,
+            bucket_days,
+        )
+        if points:
+            latest_total = int(points[-1]["total_stargazers"])
+            delta = latest_total - int(points[0]["total_stargazers"])
+            latest_date = points[-1]["date"]
+        else:
+            latest_total = 0
+            delta = 0
+            latest_date = ""
+        windows.append(
+            {
+                "key": key,
+                "label": label,
+                "days": days,
+                "bucket_days": bucket_days,
+                "latest_total": latest_total,
+                "delta": delta,
+                "latest_date": latest_date,
+                "sample_count": len(points),
+                "raw_sample_count": raw_sample_count,
+                "points": points,
+            }
+        )
+
+    latest_record = records[-1] if records else {}
+    return {
+        "source": {
+            "counting": "daily_aggregate_stargazer_snapshot",
+            "path": cache_path,
+            "timezone": "UTC",
+            "samples": len(records),
+            "latest_date": latest_record.get("date", ""),
+            "latest_total": int(latest_record.get("total_stargazers", 0))
+            if latest_record
+            else 0,
+        },
+        "windows": windows,
+    }
+
+
 def _bounded_score(value: float, maximum: float) -> int:
     if maximum <= 0:
         return 0
@@ -715,6 +928,7 @@ async def build_experimental_metrics(
     commit_velocity = await build_commit_velocity_metrics(s, now=current_time)
     if int(commit_velocity["source"].get("degraded_windows", 0)) > 0:
         limited_data.append("commit velocity scan data degraded")
+    star_history = build_star_history_metrics(now=current_time)
 
     languages: Dict[str, Dict[str, Any]] = {}
     for repo in repo_values:
@@ -848,6 +1062,7 @@ async def build_experimental_metrics(
             "private_repositories": private_repo_count,
         },
         "commit_velocity": commit_velocity,
+        "star_history": star_history,
         "repositories": repo_values,
     }
     write_experimental_metrics_cache(metrics)
@@ -1256,8 +1471,103 @@ def _render_experimental_template(
         f.write(output)
 
 
+def _render_star_history_template(
+    name: str,
+    title: str,
+    subtitle: str,
+    body: str,
+) -> None:
+    with open("templates/experimental-star-history.svg", "r") as f:
+        output = f.read()
+    output = re.sub(r"{{ title }}", _svg_text(title), output)
+    output = re.sub(r"{{ subtitle }}", _svg_text(subtitle), output)
+    output = re.sub(r"{{ body }}", body, output)
+    generate_output_folder()
+    with open(f"generated/experimental-{name}.svg", "w") as f:
+        f.write(output)
+
+
 def _limited_suffix(metrics: Dict[str, Any]) -> str:
     return "limited data" if metrics.get("limited_data") else "experimental"
+
+
+def _format_signed_number(value: Any) -> str:
+    try:
+        number = int(value)
+    except (TypeError, ValueError):
+        return str(value)
+    if number > 0:
+        return f"+{number:,}"
+    return f"{number:,}"
+
+
+def _star_history_chart(window: Dict[str, Any]) -> str:
+    points = [
+        point for point in window.get("points", []) if isinstance(point, dict)
+    ]
+    chart_x = 24
+    chart_y = 78
+    chart_width = 312
+    chart_height = 78
+    chart_bottom = chart_y + chart_height
+    output = [
+        f'<line class="axis" x1="{chart_x}" y1="{chart_bottom}" '
+        f'x2="{chart_x + chart_width}" y2="{chart_bottom}" />'
+    ]
+
+    if not points:
+        output.append(
+            '<text class="empty" x="180" y="120" text-anchor="middle">'
+            "Collecting star history</text>"
+        )
+    else:
+        values = [int(point.get("total_stargazers", 0)) for point in points]
+        min_value = min(values)
+        max_value = max(values)
+        if min_value == max_value:
+            min_value -= 1
+            max_value += 1
+        value_range = max(max_value - min_value, 1)
+        day_range = max(int(window.get("days", 1)) - 1, 1)
+        coordinates = []
+        for point in points:
+            offset_days = max(0, min(day_range, int(point.get("offset_days", 0))))
+            value = int(point.get("total_stargazers", 0))
+            x = chart_x + ((offset_days / day_range) * chart_width)
+            y = chart_y + (((max_value - value) / value_range) * chart_height)
+            coordinates.append((x, y, point))
+
+        if len(coordinates) > 1:
+            path = " ".join(
+                f"{'M' if index == 0 else 'L'} {x:.1f} {y:.1f}"
+                for index, (x, y, _point) in enumerate(coordinates)
+            )
+            output.append(f'<path class="chart-line" d="{path}" />')
+
+        for index, (x, y, point) in enumerate(coordinates):
+            total = int(point.get("total_stargazers", 0))
+            date_value = str(point.get("date", ""))
+            output.append(
+                f'<circle class="chart-point" cx="{x:.1f}" cy="{y:.1f}" '
+                f'r="3.5" style="animation-delay: {index * 55}ms">'
+                f"<title>{_svg_text(date_value)}: {total:,} stars</title>"
+                "</circle>"
+            )
+
+    latest_total = _format_number(window.get("latest_total", 0))
+    delta = _format_signed_number(window.get("delta", 0))
+    sample_count = _format_number(window.get("sample_count", 0))
+    output.append(
+        '<g class="summary-row">'
+        '<text class="label" x="21" y="181">Latest</text>'
+        f'<text class="value" x="106" y="181" text-anchor="end">{latest_total}</text>'
+        '<text class="label" x="141" y="181">Change</text>'
+        f'<text class="value" x="229" y="181" text-anchor="end">{delta}</text>'
+        '<text class="label" x="265" y="181">Samples</text>'
+        f'<text class="value" x="339" y="181" text-anchor="end">{sample_count}</text>'
+        "</g>"
+    )
+    return "\n".join(output)
 
 
 def _generate_experimental_contribution_pulse(metrics: Dict[str, Any]) -> None:
@@ -1471,6 +1781,24 @@ def _generate_experimental_commit_velocity(metrics: Dict[str, Any]) -> None:
     )
 
 
+def _generate_experimental_star_history(metrics: Dict[str, Any]) -> None:
+    for window in metrics["star_history"]["windows"]:
+        card_name = f"star-history-{str(window['key']).replace('_', '-')}"
+        if int(window.get("sample_count", 0)) > 0:
+            subtitle = (
+                f"{_format_number(window['latest_total'])} total; "
+                f"{_format_signed_number(window['delta'])} in window"
+            )
+        else:
+            subtitle = "Collecting daily star snapshots"
+        _render_star_history_template(
+            card_name,
+            f"Stars: {window['label']}",
+            subtitle,
+            _star_history_chart(window),
+        )
+
+
 async def generate_experimental(s: Stats) -> Dict[str, Any]:
     metrics = await build_experimental_metrics(s)
     _generate_experimental_contribution_pulse(metrics)
@@ -1483,6 +1811,7 @@ async def generate_experimental(s: Stats) -> Dict[str, Any]:
     _generate_experimental_trading_card(metrics)
     _generate_experimental_repo_portfolio(metrics)
     _generate_experimental_commit_velocity(metrics)
+    _generate_experimental_star_history(metrics)
     return metrics
 
 
@@ -1527,6 +1856,10 @@ async def main() -> None:
             ignore_forked_repos=ignore_forked_repos,
         )
         await s.get_stats()
+        record_star_history_sample(
+            await s.stargazers,
+            len(await s.repos),
+        )
         await asyncio.gather(
             generate_languages(s),
             generate_overview(s),

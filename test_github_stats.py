@@ -144,6 +144,14 @@ class _FakeStats:
         type(self).loaded = True
         type(self).get_stats_calls += 1
 
+    @property
+    async def stargazers(self):
+        return 17
+
+    @property
+    async def repos(self):
+        return {"octocat/hello", "octocat/world"}
+
 
 class _FailingStats:
     def __init__(self, *args, **kwargs):
@@ -1132,6 +1140,8 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         ), mock.patch(
             "generate_images.generate_experimental", assert_loaded_before_render
         ), mock.patch(
+            "generate_images.record_star_history_sample"
+        ), mock.patch(
             "generate_images.validate_generated_output"
         ), mock.patch(
             "generate_images.build_run_report",
@@ -1317,6 +1327,144 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("Apr &#x27;26", output)
         self.assertIn("12", output)
 
+    def test_star_history_cache_writes_header_upserts_and_sorts(self):
+        # Arrange
+        with TemporaryDirectory() as tmpdir:
+            cache_path = Path(tmpdir) / "generated" / "star-history.csv"
+
+            # Act
+            generate_images.record_star_history_sample(
+                10,
+                2,
+                now=dt.datetime(2026, 5, 3, 10, 0, tzinfo=dt.timezone.utc),
+                path=str(cache_path),
+            )
+            generate_images.record_star_history_sample(
+                8,
+                1,
+                now=dt.datetime(2026, 5, 1, 10, 0, tzinfo=dt.timezone.utc),
+                path=str(cache_path),
+            )
+            result = generate_images.record_star_history_sample(
+                13,
+                2,
+                now=dt.datetime(2026, 5, 3, 11, 0, tzinfo=dt.timezone.utc),
+                path=str(cache_path),
+            )
+            records = generate_images.load_star_history_cache(str(cache_path))
+
+            # Assert
+            self.assertEqual(result["samples"], 2)
+            self.assertEqual([record["date"] for record in records], ["2026-05-01", "2026-05-03"])
+            self.assertEqual(records[-1]["total_stargazers"], 13)
+            self.assertEqual(records[-1]["repo_count"], 2)
+            self.assertEqual(records[-1]["captured_at"], "2026-05-03T11:00:00Z")
+            self.assertEqual(
+                cache_path.read_text(encoding="utf-8").splitlines()[0],
+                "date,total_stargazers,repo_count,captured_at",
+            )
+            self.assertEqual(set(records[0].keys()), set(generate_images.STAR_HISTORY_FIELDNAMES))
+
+    def test_star_history_metrics_bucket_sparse_windows(self):
+        # Arrange
+        now = dt.datetime(2026, 6, 5, 10, 30, tzinfo=dt.timezone.utc)
+        with TemporaryDirectory() as tmpdir:
+            cache_path = Path(tmpdir) / "generated" / "star-history.csv"
+            generate_images.write_star_history_cache(
+                [
+                    {
+                        "date": "2025-06-06",
+                        "total_stargazers": 70,
+                        "repo_count": 2,
+                        "captured_at": "2025-06-06T01:00:00Z",
+                    },
+                    {
+                        "date": "2025-06-07",
+                        "total_stargazers": 71,
+                        "repo_count": 2,
+                        "captured_at": "2025-06-07T01:00:00Z",
+                    },
+                    {
+                        "date": "2026-03-08",
+                        "total_stargazers": 90,
+                        "repo_count": 2,
+                        "captured_at": "2026-03-08T01:00:00Z",
+                    },
+                    {
+                        "date": "2026-03-10",
+                        "total_stargazers": 95,
+                        "repo_count": 2,
+                        "captured_at": "2026-03-10T01:00:00Z",
+                    },
+                    {
+                        "date": "2026-05-07",
+                        "total_stargazers": 120,
+                        "repo_count": 2,
+                        "captured_at": "2026-05-07T01:00:00Z",
+                    },
+                    {
+                        "date": "2026-06-05",
+                        "total_stargazers": 130,
+                        "repo_count": 2,
+                        "captured_at": "2026-06-05T01:00:00Z",
+                    },
+                ],
+                path=str(cache_path),
+            )
+
+            # Act
+            metrics = generate_images.build_star_history_metrics(
+                now=now,
+                cache_path=str(cache_path),
+            )
+            windows = {window["key"]: window for window in metrics["windows"]}
+
+            # Assert
+            self.assertEqual(windows["30_days"]["bucket_days"], 1)
+            self.assertEqual(windows["30_days"]["delta"], 10)
+            self.assertEqual(
+                [point["date"] for point in windows["30_days"]["points"]],
+                ["2026-05-07", "2026-06-05"],
+            )
+            self.assertEqual(windows["90_days"]["bucket_days"], 3)
+            self.assertEqual(windows["90_days"]["points"][0]["date"], "2026-03-10")
+            self.assertEqual(windows["90_days"]["raw_sample_count"], 4)
+            self.assertEqual(windows["365_days"]["bucket_days"], 7)
+            self.assertEqual(windows["365_days"]["points"][0]["date"], "2025-06-07")
+            self.assertEqual(windows["365_days"]["latest_total"], 130)
+
+    def test_star_history_chart_handles_single_sample_inside_card(self):
+        # Arrange
+        window = {
+            "days": 30,
+            "latest_total": 42,
+            "delta": 0,
+            "sample_count": 1,
+            "points": [
+                {
+                    "date": "2026-06-05",
+                    "offset_days": 29,
+                    "total_stargazers": 42,
+                    "repo_count": 2,
+                }
+            ],
+        }
+
+        # Act
+        output = generate_images._star_history_chart(window)
+        coordinates = [
+            float(value)
+            for value in re.findall(r'(?:cx|cy)="([0-9.]+)"', output)
+        ]
+
+        # Assert
+        self.assertIn("<circle", output)
+        self.assertNotIn('<path class="chart-line"', output)
+        self.assertGreaterEqual(coordinates[0], 24)
+        self.assertLessEqual(coordinates[0], 336)
+        self.assertGreaterEqual(coordinates[1], 78)
+        self.assertLessEqual(coordinates[1], 156)
+
     async def test_commit_velocity_metrics_compute_trailing_rates(self):
         # Arrange
         now = dt.datetime(2026, 5, 2, 10, 30, tzinfo=dt.timezone.utc)
@@ -1412,13 +1560,19 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         # Assert
         self.assertNotIn("code-footprint", generate_images.EXPERIMENTAL_CARD_NAMES)
         self.assertIn("commit-velocity", generate_images.EXPERIMENTAL_CARD_NAMES)
+        self.assertIn("star-history-30-days", generate_images.EXPERIMENTAL_CARD_NAMES)
+        self.assertIn("star-history-90-days", generate_images.EXPERIMENTAL_CARD_NAMES)
+        self.assertIn("star-history-365-days", generate_images.EXPERIMENTAL_CARD_NAMES)
 
-    def test_readme_lists_commit_velocity_card(self):
+    def test_readme_lists_commit_velocity_and_star_history_cards(self):
         # Arrange
         readme = Path("README.md").read_text(encoding="utf-8")
 
         # Assert
         self.assertIn("generated/experimental-commit-velocity.svg", readme)
+        self.assertIn("generated/experimental-star-history-30-days.svg", readme)
+        self.assertIn("generated/experimental-star-history-90-days.svg", readme)
+        self.assertIn("generated/experimental-star-history-365-days.svg", readme)
 
     def test_experimental_renderer_type_hints_resolve(self):
         # Act / Assert
@@ -1426,6 +1580,7 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         typing.get_type_hints(generate_images._experimental_horizontal_bars)
         typing.get_type_hints(generate_images._experimental_stack_bar)
         typing.get_type_hints(generate_images._commit_velocity_table)
+        typing.get_type_hints(generate_images._star_history_chart)
 
     def test_commit_velocity_table_aligns_columns(self):
         # Arrange
@@ -2024,6 +2179,10 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                     template,
                     encoding="utf-8",
                 )
+            (tmp_path / "templates" / "experimental-star-history.svg").write_text(
+                template,
+                encoding="utf-8",
+            )
             previous_cwd = Path.cwd()
 
             try:
@@ -2050,12 +2209,17 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                 commit_velocity = (
                     tmp_path / "generated" / "experimental-commit-velocity.svg"
                 ).read_text(encoding="utf-8")
+                star_history = (
+                    tmp_path / "generated" / "experimental-star-history-30-days.svg"
+                ).read_text(encoding="utf-8")
                 self.assertIn("experimental-language-icon", language_momentum)
                 self.assertIn("experimental-language-icon", trading_card)
                 self.assertIn("language-icon-dark-outline", language_momentum)
                 self.assertIn("Commit Velocity", commit_velocity)
                 self.assertIn("/ mo", commit_velocity)
                 self.assertIn("6 months", commit_velocity)
+                self.assertIn("Stars: 30 days", star_history)
+                self.assertIn("Collecting daily star snapshots", star_history)
                 self.assertNotIn("href=", language_momentum)
                 self.assertNotIn("href=", trading_card)
                 metrics = (
@@ -2143,6 +2307,9 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(report["stats"]["merged_pull_requests"], 5)
         self.assertNotIn("lines_changed", report["stats"])
         self.assertEqual(report["stats"]["views"], 6)
+        self.assertIn("star_history", report)
+        self.assertIn("samples", report["star_history"])
+        self.assertIn("card_count", report["star_history"])
 
     def test_action_summary_includes_degraded_repo_names(self):
         # Arrange
@@ -2156,6 +2323,12 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                 "merged_pull_requests": 5,
                 "repos": 4,
                 "views": 0,
+            },
+            "star_history": {
+                "samples": 3,
+                "latest_date": "2026-06-05",
+                "latest_total": 13,
+                "card_count": 3,
             },
             "api": {
                 "total_repos": 4,
@@ -2206,6 +2379,9 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("Merged pull requests", summary)
         self.assertIn("API Wait Summary", summary)
         self.assertIn("Slowest API Waits", summary)
+        self.assertIn("Star history samples: 3", summary)
+        self.assertIn("Latest star snapshot: 2026-06-05 (13)", summary)
+        self.assertIn("Star history cards: 3", summary)
         self.assertIn("4.3s", summary)
         self.assertNotIn("Contributor stats", summary)
 
@@ -2482,6 +2658,11 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(args[0], "env-file-user")
                 self.assertEqual(args[1], "token-from-env-file")
                 self.assertEqual(_FakeStats.get_stats_calls, 1)
+                history = generate_images.load_star_history_cache(
+                    str(tmp_path / "generated" / "star-history.csv")
+                )
+                self.assertEqual(history[0]["total_stargazers"], 17)
+                self.assertEqual(history[0]["repo_count"], 2)
             finally:
                 os.chdir(previous_cwd)
 
