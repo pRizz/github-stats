@@ -1456,6 +1456,11 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
             float(value)
             for value in re.findall(r'(?:cx|cy)="([0-9.]+)"', output)
         ]
+        endpoint_labels = re.findall(
+            r'<text class="endpoint-label" x="([0-9.]+)" y="([0-9.]+)" '
+            r'text-anchor="([^"]+)">([^<]+)</text>',
+            output,
+        )
 
         # Assert
         self.assertIn("<circle", output)
@@ -1464,6 +1469,55 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertLessEqual(coordinates[0], 336)
         self.assertGreaterEqual(coordinates[1], 78)
         self.assertLessEqual(coordinates[1], 156)
+        self.assertEqual(len(endpoint_labels), 1)
+        self.assertEqual(endpoint_labels[0][3], "42")
+
+    def test_star_history_chart_labels_first_and_last_points(self):
+        # Arrange
+        window = {
+            "days": 30,
+            "latest_total": 1_250,
+            "delta": 250,
+            "sample_count": 3,
+            "points": [
+                {
+                    "date": "2026-05-07",
+                    "offset_days": 0,
+                    "total_stargazers": 1_000,
+                    "repo_count": 2,
+                },
+                {
+                    "date": "2026-05-20",
+                    "offset_days": 13,
+                    "total_stargazers": 1_125,
+                    "repo_count": 2,
+                },
+                {
+                    "date": "2026-06-05",
+                    "offset_days": 29,
+                    "total_stargazers": 1_250,
+                    "repo_count": 2,
+                },
+            ],
+        }
+
+        # Act
+        output = generate_images._star_history_chart(window)
+        endpoint_labels = re.findall(
+            r'<text class="endpoint-label" x="([0-9.]+)" y="([0-9.]+)" '
+            r'text-anchor="([^"]+)">([^<]+)</text>',
+            output,
+        )
+
+        # Assert
+        self.assertEqual(len(endpoint_labels), 2)
+        self.assertEqual([label[3] for label in endpoint_labels], ["1,000", "1,250"])
+        self.assertEqual([label[2] for label in endpoint_labels], ["start", "end"])
+        for x, y, _anchor, _value in endpoint_labels:
+            self.assertGreaterEqual(float(x), 21)
+            self.assertLessEqual(float(x), 339)
+            self.assertGreaterEqual(float(y), 68)
+            self.assertLessEqual(float(y), 148)
 
     async def test_commit_velocity_metrics_compute_trailing_rates(self):
         # Arrange

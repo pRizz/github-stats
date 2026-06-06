@@ -1554,6 +1554,27 @@ def _star_history_chart(window: Dict[str, Any]) -> str:
                 "</circle>"
             )
 
+        endpoints = [coordinates[0]]
+        if len(coordinates) > 1:
+            endpoints.append(coordinates[-1])
+        center_x = chart_x + (chart_width / 2)
+        for endpoint_index, (x, y, point) in enumerate(endpoints):
+            if len(endpoints) == 1:
+                text_anchor = "end" if x > center_x else "start"
+            elif endpoint_index == 0:
+                text_anchor = "start" if x <= center_x else "end"
+            else:
+                text_anchor = "end" if x >= center_x else "start"
+            label_offset = -6 if text_anchor == "end" else 6
+            label_x = max(21, min(339, x + label_offset))
+            label_y = max(68, min(chart_bottom - 8, y - 8))
+            total = int(point.get("total_stargazers", 0))
+            output.append(
+                f'<text class="endpoint-label" x="{label_x:.1f}" '
+                f'y="{label_y:.1f}" text-anchor="{text_anchor}">'
+                f"{total:,}</text>"
+            )
+
     latest_total = _format_number(window.get("latest_total", 0))
     delta = _format_signed_number(window.get("delta", 0))
     sample_count = _format_number(window.get("sample_count", 0))
