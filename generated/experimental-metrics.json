@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-16T01:33:32Z",
+  "generated_at": "2026-06-16T15:32:06Z",
   "limited_data": [
     "repository traffic data degraded"
   ],
@@ -8,24 +8,24 @@
     "private_repositories": 0
   },
   "contribution_pulse": {
-    "total": 7975,
+    "total": 8034,
     "active_months": 13,
     "month_count": 13,
-    "average_monthly": 613.5,
+    "average_monthly": 618.0,
     "best_month": "Jan '26",
     "best_month_count": 2363,
     "current_month": "Jun '26",
-    "current_month_count": 988,
+    "current_month_count": 1047,
     "active_streak_months": 13
   },
   "contribution_mix": {
-    "commits": 5201,
+    "commits": 5260,
     "issues": 23,
     "pull_requests": 223,
     "pull_request_reviews": 2,
     "repositories": 86,
-    "restricted": 392,
-    "total": 5927
+    "restricted": 393,
+    "total": 5987
   },
   "impact": {
     "stars": 179,
@@ -43,13 +43,13 @@
   "language_momentum": [
     {
       "language": "C++",
-      "percent": 25.72,
+      "percent": 25.71,
       "color": "#f34b7d",
       "repos": 26
     },
     {
       "language": "TypeScript",
-      "percent": 20.8,
+      "percent": 20.81,
       "color": "#3178c6",
       "repos": 86
     },
@@ -73,13 +73,13 @@
     },
     {
       "language": "Rust",
-      "percent": 5.08,
+      "percent": 5.09,
       "color": "#dea584",
       "repos": 38
     },
     {
       "language": "Go",
-      "percent": 3.08,
+      "percent": 3.07,
       "color": "#00ADD8",
       "repos": 9
     },
@@ -98,9 +98,9 @@
     "external_repositories": 21
   },
   "maintainer_health": {
-    "open_issues": 12799,
-    "open_pull_requests": 2033,
-    "recently_updated": 72,
+    "open_issues": 12814,
+    "open_pull_requests": 2059,
+    "recently_updated": 70,
     "stale_repositories": 144,
     "archived_repositories": 0,
     "release_repositories": 0,
@@ -174,33 +174,33 @@
         "key": "trailing_30_days",
         "label": "30 days",
         "days": 30,
-        "commits": 1409,
-        "per_hour": 1.9569,
-        "per_day": 46.97,
-        "per_week": 328.77,
-        "per_month": 1409.0,
+        "commits": 1468,
+        "per_hour": 2.0389,
+        "per_day": 48.93,
+        "per_week": 342.53,
+        "per_month": 1468.0,
         "scan_degraded": false
       },
       {
         "key": "trailing_180_days",
         "label": "6 months",
         "days": 180,
-        "commits": 7200,
-        "per_hour": 1.6667,
-        "per_day": 40.0,
-        "per_week": 280.0,
-        "per_month": 1200.0,
+        "commits": 7259,
+        "per_hour": 1.6803,
+        "per_day": 40.33,
+        "per_week": 282.29,
+        "per_month": 1209.83,
         "scan_degraded": false
       },
       {
         "key": "trailing_365_days",
         "label": "365 days",
         "days": 365,
-        "commits": 7355,
-        "per_hour": 0.8396,
-        "per_day": 20.15,
-        "per_week": 141.05,
-        "per_month": 604.52,
+        "commits": 7414,
+        "per_hour": 0.8463,
+        "per_day": 20.31,
+        "per_week": 142.19,
+        "per_month": 609.37,
         "scan_degraded": false
       }
     ],
@@ -372,6 +372,204 @@
   },
   "repositories": [
     {
+      "display_name": "pRizz/pRizz",
+      "is_owned_by_viewer": true,
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-06-16T15:23:36Z",
+      "pushed_at": "2026-06-16T15:18:47Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "JavaScript": {
+          "size": 6536,
+          "color": "#f1e05a"
+        },
+        "Python": {
+          "size": 1192,
+          "color": "#3572A5"
+        }
+      }
+    },
+    {
+      "display_name": "thebitcoinnova/open-links",
+      "is_owned_by_viewer": true,
+      "is_private": false,
+      "is_fork": true,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-06-16T12:17:40Z",
+      "pushed_at": "2026-06-16T12:17:29Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 3,
+      "languages": {
+        "TypeScript": {
+          "size": 3033721,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 96868,
+          "color": "#663399"
+        },
+        "Shell": {
+          "size": 51480,
+          "color": "#89e051"
+        },
+        "JavaScript": {
+          "size": 36921,
+          "color": "#f1e05a"
+        },
+        "HTML": {
+          "size": 2536,
+          "color": "#e34c26"
+        },
+        "Dockerfile": {
+          "size": 1948,
+          "color": "#384d54"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/open-links-sites",
+      "is_owned_by_viewer": true,
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-06-16T10:43:31Z",
+      "pushed_at": "2026-06-16T10:43:27Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 510034,
+          "color": "#3178c6"
+        },
+        "Shell": {
+          "size": 14178,
+          "color": "#89e051"
+        },
+        "CSS": {
+          "size": 13546,
+          "color": "#663399"
+        },
+        "HTML": {
+          "size": 714,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 83,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/open-links",
+      "is_owned_by_viewer": true,
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 1,
+      "forks": 1,
+      "updated_at": "2026-06-16T09:06:45Z",
+      "pushed_at": "2026-06-16T09:06:30Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 3,
+      "languages": {
+        "TypeScript": {
+          "size": 3004293,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 96868,
+          "color": "#663399"
+        },
+        "Shell": {
+          "size": 50905,
+          "color": "#89e051"
+        },
+        "JavaScript": {
+          "size": 36295,
+          "color": "#f1e05a"
+        },
+        "HTML": {
+          "size": 2536,
+          "color": "#e34c26"
+        },
+        "Dockerfile": {
+          "size": 1948,
+          "color": "#384d54"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/github-stats",
+      "is_owned_by_viewer": true,
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-06-16T01:48:20Z",
+      "pushed_at": "2026-06-16T15:25:19Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "Python": {
+          "size": 262496,
+          "color": "#3572A5"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/bright-builds-portfolio-website",
+      "is_owned_by_viewer": true,
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-06-16T01:39:38Z",
+      "pushed_at": "2026-06-16T01:39:34Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 3,
+      "languages": {
+        "TypeScript": {
+          "size": 352006,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 15959,
+          "color": "#663399"
+        },
+        "Shell": {
+          "size": 8674,
+          "color": "#89e051"
+        },
+        "JavaScript": {
+          "size": 83,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
       "display_name": "pRizz/Prusa-Firmware-Buddy",
       "is_owned_by_viewer": true,
       "is_private": false,
@@ -425,84 +623,6 @@
         "CSS": {
           "size": 293798,
           "color": "#663399"
-        }
-      }
-    },
-    {
-      "display_name": "thebitcoinnova/open-links",
-      "is_owned_by_viewer": true,
-      "is_private": false,
-      "is_fork": true,
-      "is_archived": false,
-      "stargazers": 0,
-      "forks": 0,
-      "updated_at": "2026-06-15T18:21:38Z",
-      "pushed_at": "2026-06-15T18:19:57Z",
-      "open_issues": 0,
-      "open_pull_requests": 0,
-      "releases": 0,
-      "tags": 3,
-      "languages": {
-        "TypeScript": {
-          "size": 3033721,
-          "color": "#3178c6"
-        },
-        "CSS": {
-          "size": 96868,
-          "color": "#663399"
-        },
-        "Shell": {
-          "size": 51480,
-          "color": "#89e051"
-        },
-        "JavaScript": {
-          "size": 36921,
-          "color": "#f1e05a"
-        },
-        "HTML": {
-          "size": 2536,
-          "color": "#e34c26"
-        },
-        "Dockerfile": {
-          "size": 1948,
-          "color": "#384d54"
-        }
-      }
-    },
-    {
-      "display_name": "pRizz/open-links-sites",
-      "is_owned_by_viewer": true,
-      "is_private": false,
-      "is_fork": false,
-      "is_archived": false,
-      "stargazers": 0,
-      "forks": 0,
-      "updated_at": "2026-06-15T16:43:12Z",
-      "pushed_at": "2026-06-15T16:43:07Z",
-      "open_issues": 0,
-      "open_pull_requests": 0,
-      "releases": 0,
-      "tags": 0,
-      "languages": {
-        "TypeScript": {
-          "size": 510034,
-          "color": "#3178c6"
-        },
-        "Shell": {
-          "size": 14178,
-          "color": "#89e051"
-        },
-        "CSS": {
-          "size": 13546,
-          "color": "#663399"
-        },
-        "HTML": {
-          "size": 714,
-          "color": "#e34c26"
-        },
-        "JavaScript": {
-          "size": 83,
-          "color": "#f1e05a"
         }
       }
     },
@@ -565,80 +685,6 @@
       }
     },
     {
-      "display_name": "pRizz/bright-builds-portfolio-website",
-      "is_owned_by_viewer": true,
-      "is_private": false,
-      "is_fork": false,
-      "is_archived": false,
-      "stargazers": 0,
-      "forks": 0,
-      "updated_at": "2026-06-15T16:01:47Z",
-      "pushed_at": "2026-06-15T16:00:22Z",
-      "open_issues": 0,
-      "open_pull_requests": 0,
-      "releases": 0,
-      "tags": 3,
-      "languages": {
-        "TypeScript": {
-          "size": 340514,
-          "color": "#3178c6"
-        },
-        "CSS": {
-          "size": 15959,
-          "color": "#663399"
-        },
-        "Shell": {
-          "size": 8674,
-          "color": "#89e051"
-        },
-        "JavaScript": {
-          "size": 83,
-          "color": "#f1e05a"
-        }
-      }
-    },
-    {
-      "display_name": "pRizz/open-links",
-      "is_owned_by_viewer": true,
-      "is_private": false,
-      "is_fork": false,
-      "is_archived": false,
-      "stargazers": 1,
-      "forks": 1,
-      "updated_at": "2026-06-15T16:01:47Z",
-      "pushed_at": "2026-06-15T16:00:22Z",
-      "open_issues": 0,
-      "open_pull_requests": 0,
-      "releases": 0,
-      "tags": 3,
-      "languages": {
-        "TypeScript": {
-          "size": 3004293,
-          "color": "#3178c6"
-        },
-        "CSS": {
-          "size": 96868,
-          "color": "#663399"
-        },
-        "Shell": {
-          "size": 50905,
-          "color": "#89e051"
-        },
-        "JavaScript": {
-          "size": 36295,
-          "color": "#f1e05a"
-        },
-        "HTML": {
-          "size": 2536,
-          "color": "#e34c26"
-        },
-        "Dockerfile": {
-          "size": 1948,
-          "color": "#384d54"
-        }
-      }
-    },
-    {
       "display_name": "pRizz/zeckendorf",
       "is_owned_by_viewer": true,
       "is_private": false,
@@ -693,27 +739,6 @@
         "CSS": {
           "size": 7134,
           "color": "#663399"
-        }
-      }
-    },
-    {
-      "display_name": "pRizz/github-stats",
-      "is_owned_by_viewer": true,
-      "is_private": false,
-      "is_fork": false,
-      "is_archived": false,
-      "stargazers": 0,
-      "forks": 0,
-      "updated_at": "2026-06-15T01:47:13Z",
-      "pushed_at": "2026-06-15T01:47:09Z",
-      "open_issues": 0,
-      "open_pull_requests": 0,
-      "releases": 0,
-      "tags": 0,
-      "languages": {
-        "Python": {
-          "size": 262496,
-          "color": "#3572A5"
         }
       }
     },
@@ -1178,31 +1203,6 @@
         "Roff": {
           "size": 42517,
           "color": "#ecdebe"
-        }
-      }
-    },
-    {
-      "display_name": "pRizz/pRizz",
-      "is_owned_by_viewer": true,
-      "is_private": false,
-      "is_fork": false,
-      "is_archived": false,
-      "stargazers": 0,
-      "forks": 0,
-      "updated_at": "2026-05-22T14:50:35Z",
-      "pushed_at": "2026-05-22T14:50:31Z",
-      "open_issues": 0,
-      "open_pull_requests": 0,
-      "releases": 0,
-      "tags": 0,
-      "languages": {
-        "JavaScript": {
-          "size": 6536,
-          "color": "#f1e05a"
-        },
-        "Python": {
-          "size": 1192,
-          "color": "#3572A5"
         }
       }
     },
@@ -8590,7 +8590,7 @@
       "is_fork": false,
       "is_archived": false,
       "stargazers": 9138,
-      "forks": 2269,
+      "forks": 2270,
       "updated_at": "2026-06-15T21:03:17Z",
       "pushed_at": "2026-05-26T10:47:02Z",
       "open_issues": 5356,
@@ -8646,9 +8646,9 @@
       "is_private": false,
       "is_fork": false,
       "is_archived": false,
-      "stargazers": 600,
+      "stargazers": 601,
       "forks": 218,
-      "updated_at": "2026-05-26T09:21:42Z",
+      "updated_at": "2026-06-16T08:40:05Z",
       "pushed_at": "2026-04-21T21:45:40Z",
       "open_issues": 55,
       "open_pull_requests": 31,
@@ -8671,9 +8671,9 @@
       "is_private": false,
       "is_fork": false,
       "is_archived": false,
-      "stargazers": 7205,
+      "stargazers": 7206,
       "forks": 483,
-      "updated_at": "2026-06-15T04:40:54Z",
+      "updated_at": "2026-06-16T13:47:44Z",
       "pushed_at": "2026-06-12T18:26:29Z",
       "open_issues": 333,
       "open_pull_requests": 60,
@@ -8733,9 +8733,9 @@
       "is_private": false,
       "is_fork": false,
       "is_archived": false,
-      "stargazers": 5876,
+      "stargazers": 5878,
       "forks": 421,
-      "updated_at": "2026-06-15T15:40:53Z",
+      "updated_at": "2026-06-16T14:37:29Z",
       "pushed_at": "2026-06-12T03:26:08Z",
       "open_issues": 134,
       "open_pull_requests": 25,
@@ -8764,8 +8764,8 @@
       "is_archived": false,
       "stargazers": 478,
       "forks": 21,
-      "updated_at": "2026-06-15T10:34:07Z",
-      "pushed_at": "2026-06-15T10:34:04Z",
+      "updated_at": "2026-06-16T09:40:07Z",
+      "pushed_at": "2026-06-16T09:35:51Z",
       "open_issues": 10,
       "open_pull_requests": 6,
       "releases": 0,
@@ -8795,17 +8795,17 @@
       "is_private": false,
       "is_fork": false,
       "is_archived": false,
-      "stargazers": 174888,
-      "forks": 21173,
-      "updated_at": "2026-06-16T01:23:45Z",
-      "pushed_at": "2026-06-16T00:01:31Z",
-      "open_issues": 6091,
-      "open_pull_requests": 1025,
+      "stargazers": 175176,
+      "forks": 21247,
+      "updated_at": "2026-06-16T15:27:13Z",
+      "pushed_at": "2026-06-16T14:40:04Z",
+      "open_issues": 6104,
+      "open_pull_requests": 1045,
       "releases": 0,
       "tags": 1050,
       "languages": {
         "TypeScript": {
-          "size": 18078693,
+          "size": 18079945,
           "color": "#3178c6"
         },
         "MDX": {
@@ -8821,11 +8821,11 @@
           "color": "#e34c26"
         },
         "JavaScript": {
-          "size": 35376,
+          "size": 35441,
           "color": "#f1e05a"
         },
         "Astro": {
-          "size": 31596,
+          "size": 32509,
           "color": "#ff5a03"
         },
         "Shell": {
@@ -8852,11 +8852,11 @@
       "is_private": false,
       "is_fork": false,
       "is_archived": false,
-      "stargazers": 15920,
-      "forks": 1486,
-      "updated_at": "2026-06-15T22:58:26Z",
+      "stargazers": 15931,
+      "forks": 1487,
+      "updated_at": "2026-06-16T15:21:01Z",
       "pushed_at": "2026-06-15T20:40:03Z",
-      "open_issues": 182,
+      "open_issues": 183,
       "open_pull_requests": 80,
       "releases": 0,
       "tags": 26,
@@ -8909,17 +8909,17 @@
       "is_private": false,
       "is_fork": false,
       "is_archived": false,
-      "stargazers": 12645,
-      "forks": 2531,
-      "updated_at": "2026-06-16T01:12:00Z",
-      "pushed_at": "2026-06-16T00:27:56Z",
-      "open_issues": 434,
-      "open_pull_requests": 349,
+      "stargazers": 12671,
+      "forks": 2535,
+      "updated_at": "2026-06-16T14:10:16Z",
+      "pushed_at": "2026-06-16T08:21:42Z",
+      "open_issues": 435,
+      "open_pull_requests": 355,
       "releases": 0,
-      "tags": 140,
+      "tags": 141,
       "languages": {
         "TypeScript": {
-          "size": 45460902,
+          "size": 45479265,
           "color": "#3178c6"
         },
         "MDX": {
@@ -8927,7 +8927,7 @@
           "color": "#fcb32c"
         },
         "JavaScript": {
-          "size": 271756,
+          "size": 276373,
           "color": "#f1e05a"
         },
         "Astro": {
@@ -9199,11 +9199,11 @@
       "stargazers": 0,
       "forks": 0,
       "updated_at": "2026-06-15T18:58:27Z",
-      "pushed_at": "2026-06-15T18:58:19Z",
+      "pushed_at": "2026-06-16T14:19:38Z",
       "open_issues": 0,
       "open_pull_requests": 0,
       "releases": 0,
-      "tags": 64,
+      "tags": 65,
       "languages": {
         "C++": {
           "size": 4121255,
@@ -9271,23 +9271,23 @@
       "is_archived": false,
       "stargazers": 0,
       "forks": 0,
-      "updated_at": "2026-06-15T17:51:24Z",
-      "pushed_at": "2026-06-15T17:51:17Z",
+      "updated_at": "2026-06-16T04:09:48Z",
+      "pushed_at": "2026-06-16T04:09:39Z",
       "open_issues": 0,
       "open_pull_requests": 0,
       "releases": 0,
       "tags": 6,
       "languages": {
         "Rust": {
-          "size": 3390660,
+          "size": 3470773,
           "color": "#dea584"
         },
         "TypeScript": {
-          "size": 353372,
+          "size": 381288,
           "color": "#3178c6"
         },
         "Shell": {
-          "size": 113137,
+          "size": 115632,
           "color": "#89e051"
         },
         "Starlark": {

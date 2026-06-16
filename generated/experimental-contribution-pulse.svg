@@ -19,10 +19,10 @@ svg { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial
 <rect x="5" y="5" id="background" />
 <text class="title" x="21" y="36">Contribution Pulse</text>
 <text class="subtitle" x="21" y="55">Recent activity — last 13 months</text>
-<g class="row" style="animation-delay: 0ms"><text class="label" x="21" y="76">Total commits shown</text><text class="value" x="330" y="76" text-anchor="end">7,975</text></g>
+<g class="row" style="animation-delay: 0ms"><text class="label" x="21" y="76">Total commits shown</text><text class="value" x="330" y="76" text-anchor="end">8,034</text></g>
 <g class="row" style="animation-delay: 80ms"><text class="label" x="21" y="94">Active months</text><text class="value" x="330" y="94" text-anchor="end">13/13</text></g>
-<g class="row" style="animation-delay: 160ms"><text class="label" x="21" y="112">Average per month</text><text class="value" x="330" y="112" text-anchor="end">613.5</text></g>
+<g class="row" style="animation-delay: 160ms"><text class="label" x="21" y="112">Average per month</text><text class="value" x="330" y="112" text-anchor="end">618.0</text></g>
 <g class="row" style="animation-delay: 240ms"><text class="label" x="21" y="130">Best month</text><text class="value" x="330" y="130" text-anchor="end">Jan &#x27;26 (2,363)</text></g>
-<g class="row" style="animation-delay: 320ms"><text class="label" x="21" y="148">Current month</text><text class="value" x="330" y="148" text-anchor="end">Jun &#x27;26 (988)</text></g>
+<g class="row" style="animation-delay: 320ms"><text class="label" x="21" y="148">Current month</text><text class="value" x="330" y="148" text-anchor="end">Jun &#x27;26 (1,047)</text></g>
 <g class="row" style="animation-delay: 400ms"><text class="label" x="21" y="166">Active streak</text><text class="value" x="330" y="166" text-anchor="end">13 months</text></g>
 </svg>
