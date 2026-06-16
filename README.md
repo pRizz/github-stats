@@ -181,6 +181,11 @@ tokens into READMEs, issues, workflow logs, or bug reports.
      workflow](.github/workflows/main.yml)) called `EXCLUDE_FORKED_REPOS` with
      a value of `true`. Non-fork repositories you contributed to may still be
      included in contribution-oriented metrics when visible to the token.
+   - Owned forks are included by default, but their language totals are adjusted
+     by subtracting the parent repository's current language byte totals. This
+     prevents inherited upstream code from dominating the `languages.svg` card.
+     To restore raw full-repository language totals for owned forks, set
+     `RAW_FORK_LANGUAGE_TOTALS` to `true`.
    - These other values are added as secrets by default to prevent leaking
      information about private repositories. If you're not worried about that,
      you can change the values directly [in the Actions workflow

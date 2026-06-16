@@ -176,6 +176,7 @@ def render_action_summary(report: Dict[str, Any]) -> str:
     monthly_commit_items = [
         ApiDegradation(**item) for item in api.get("monthly_commits_degraded", [])
     ]
+    language_items = api.get("language_degraded", [])
     slowest_items = [
         ApiWaitStat(**item) for item in api["slowest_requests"]
     ]
@@ -215,6 +216,7 @@ def render_action_summary(report: Dict[str, Any]) -> str:
 
 - Traffic views degraded: {len(traffic_items)}
 - Monthly commit scans degraded: {len(monthly_commit_items)}
+- Fork language corrections limited: {len(language_items)}
 
 ## API Wait Summary
 
@@ -944,6 +946,8 @@ async def build_experimental_metrics(
         limited_data.append("repository traffic data degraded")
     if s.report.monthly_commits_degraded:
         limited_data.append("monthly commit scan data degraded")
+    if s.report.language_degraded:
+        limited_data.append("fork parent language data unavailable")
     commit_velocity = await build_commit_velocity_metrics(s, now=current_time)
     if int(commit_velocity["source"].get("degraded_windows", 0)) > 0:
         limited_data.append("commit velocity scan data degraded")

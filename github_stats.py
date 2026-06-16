@@ -57,6 +57,7 @@ class StatsReport:
     total_repos: int = 0
     traffic_degraded: List[ApiDegradation] = field(default_factory=list)
     monthly_commits_degraded: List[ApiDegradation] = field(default_factory=list)
+    language_degraded: List[str] = field(default_factory=list)
     critical_failures: List[str] = field(default_factory=list)
     rest_requests_total: int = 0
     rest_retries_total: int = 0
@@ -88,6 +89,7 @@ class StatsReport:
             "monthly_commits_degraded": [
                 asdict(item) for item in self.monthly_commits_degraded
             ],
+            "language_degraded": self.language_degraded,
             "critical_failures": self.critical_failures,
             "rest_requests_total": self.rest_requests_total,
             "rest_retries_total": self.rest_retries_total,
@@ -447,6 +449,13 @@ def _env_int(name: str, default: int) -> int:
         return default
 
 
+def _env_truthy(name: str, default: bool = False) -> bool:
+    raw_value = os.getenv(name)
+    if raw_value is None:
+        return default
+    return raw_value.strip().lower() not in {"", "0", "false", "no", "off"}
+
+
 def _current_utc_year() -> int:
     return dt.datetime.now(dt.timezone.utc).year
 
@@ -533,6 +542,70 @@ def _field_matches(value: Any, patterns: List[str]) -> bool:
         return False
     lowered = value.casefold()
     return any(pattern.casefold() in lowered for pattern in patterns)
+
+
+def _extract_language_edges(
+    repo: Dict[str, Any],
+    exclude_langs_lower: Set[str],
+) -> Dict[str, Dict[str, Any]]:
+    languages: Dict[str, Dict[str, Any]] = {}
+    for lang in repo.get("languages", {}).get("edges", []):
+        language_name = lang.get("node", {}).get("name", "Other")
+        if language_name.lower() in exclude_langs_lower:
+            continue
+        languages[language_name] = {
+            "size": int(lang.get("size", 0)),
+            "color": lang.get("node", {}).get("color"),
+        }
+    return languages
+
+
+def _language_contribution_for_repo(
+    repo_name: str,
+    is_owned_by_viewer: bool,
+    is_fork: bool,
+    raw_languages: Dict[str, Dict[str, Any]],
+    parent_languages: Optional[Dict[str, Dict[str, Any]]],
+    raw_fork_language_totals: bool,
+    report: StatsReport,
+) -> Dict[str, Dict[str, Any]]:
+    if not is_owned_by_viewer or not is_fork or raw_fork_language_totals:
+        return raw_languages
+    if parent_languages is None:
+        report.language_degraded.append(
+            f"{repo_name}: fork parent language data unavailable"
+        )
+        return {}
+
+    language_names = set(raw_languages) | set(parent_languages)
+    contributions: Dict[str, Dict[str, Any]] = {}
+    for language_name in language_names:
+        raw_data = raw_languages.get(language_name, {})
+        parent_data = parent_languages.get(language_name, {})
+        delta = int(raw_data.get("size", 0)) - int(parent_data.get("size", 0))
+        if delta <= 0:
+            continue
+        contributions[language_name] = {
+            "size": delta,
+            "color": raw_data.get("color") or parent_data.get("color"),
+        }
+    return contributions
+
+
+def _add_language_totals(
+    totals: Dict[str, Any],
+    languages: Dict[str, Dict[str, Any]],
+) -> None:
+    for language_name, data in languages.items():
+        if language_name in totals:
+            totals[language_name]["size"] += int(data.get("size", 0))
+            totals[language_name]["occurrences"] += 1
+        else:
+            totals[language_name] = {
+                "size": int(data.get("size", 0)),
+                "occurrences": 1,
+                "color": data.get("color"),
+            }
 
 
 def _commit_identity_match_date(
@@ -1255,6 +1328,17 @@ class Queries(object):
             }}
           }}
         }}
+        parent {{
+          languages(first: 10, orderBy: {{field: SIZE, direction: DESC}}) {{
+            edges {{
+              size
+              node {{
+                name
+                color
+              }}
+            }}
+          }}
+        }}
       }}
     }}
   }}
@@ -1566,6 +1650,7 @@ Languages:
         maybe_name: Optional[str] = None
 
         exclude_langs_lower = {x.lower() for x in self._exclude_langs}
+        raw_fork_language_totals = _env_truthy("RAW_FORK_LANGUAGE_TOTALS")
 
         def record_repo(repo: Any, is_owned_by_viewer: bool) -> None:
             nonlocal owned_stargazers, owned_forks
@@ -1583,25 +1668,28 @@ Languages:
             if is_owned_by_viewer and not is_fork:
                 owned_stargazers += repo_stargazers
                 owned_forks += repo_forks
-            raw_repo_languages: Dict[str, Dict[str, Any]] = {}
-
-            for lang in repo.get("languages", {}).get("edges", []):
-                language_name = lang.get("node", {}).get("name", "Other")
-                if language_name.lower() in exclude_langs_lower:
-                    continue
-                raw_repo_languages[language_name] = {
-                    "size": lang.get("size", 0),
-                    "color": lang.get("node", {}).get("color"),
-                }
-                if language_name in languages:
-                    languages[language_name]["size"] += lang.get("size", 0)
-                    languages[language_name]["occurrences"] += 1
-                else:
-                    languages[language_name] = {
-                        "size": lang.get("size", 0),
-                        "occurrences": 1,
-                        "color": lang.get("node", {}).get("color"),
-                    }
+            raw_repo_languages = _extract_language_edges(repo, exclude_langs_lower)
+            parent_languages: Optional[Dict[str, Dict[str, Any]]] = None
+            if is_owned_by_viewer and is_fork and not raw_fork_language_totals:
+                parent = repo.get("parent")
+                if isinstance(parent, dict) and isinstance(
+                    parent.get("languages"),
+                    dict,
+                ):
+                    parent_languages = _extract_language_edges(
+                        parent,
+                        exclude_langs_lower,
+                    )
+            language_contribution = _language_contribution_for_repo(
+                name,
+                is_owned_by_viewer,
+                is_fork,
+                raw_repo_languages,
+                parent_languages,
+                raw_fork_language_totals,
+                self.report,
+            )
+            _add_language_totals(languages, language_contribution)
             raw_repo_metrics[name] = {
                 "is_owned_by_viewer": is_owned_by_viewer,
                 "is_private": bool(repo.get("isPrivate", False)),

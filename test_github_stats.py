@@ -475,8 +475,34 @@ def _commit(
     }
 
 
-def _repo_node(name, is_fork=False, stargazers=0, forks=0):
-    return {
+def _language_edges(languages):
+    colors = {
+        "C++": "#f34b7d",
+        "Rust": "#dea584",
+        "Python": "#3572A5",
+        "TypeScript": "#3178c6",
+    }
+    return [
+        {
+            "size": size,
+            "node": {
+                "name": language,
+                "color": colors.get(language, "#8b949e"),
+            },
+        }
+        for language, size in languages.items()
+    ]
+
+
+def _repo_node(
+    name,
+    is_fork=False,
+    stargazers=0,
+    forks=0,
+    languages=None,
+    parent_languages=None,
+):
+    node = {
         "nameWithOwner": name,
         "isPrivate": False,
         "isFork": is_fork,
@@ -488,8 +514,11 @@ def _repo_node(name, is_fork=False, stargazers=0, forks=0):
         "issues": {"totalCount": 0},
         "pullRequests": {"totalCount": 0},
         "refs": {"totalCount": 0},
-        "languages": {"edges": []},
+        "languages": {"edges": _language_edges(languages or {})},
     }
+    if parent_languages is not None:
+        node["parent"] = {"languages": {"edges": _language_edges(parent_languages)}}
+    return node
 
 
 def _owned_repo_response(nodes):
@@ -827,6 +856,8 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         # Assert
         self.assertIn("isFork: false", default_query)
         self.assertNotIn("isFork: false", include_forks_query)
+        self.assertIn("parent", include_forks_query)
+        self.assertIn("languages(first: 10", include_forks_query)
 
     async def test_get_stats_includes_non_fork_contributed_repos_when_ignoring_forks(
         self,
@@ -939,6 +970,179 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(repo_metrics["example/contributed-fork"].is_owned_by_viewer)
         owned_query = stats.queries.query.await_args_list[0].args[0]
         self.assertNotIn("isFork: false", owned_query)
+
+    async def test_owned_fork_languages_subtract_parent_linguist_bytes(self):
+        # Arrange
+        stats = Stats(
+            "octocat",
+            "token",
+            _FailingSession(),
+            ignore_forked_repos=False,
+        )
+        stats.queries = mock.AsyncMock()
+        stats.queries.query.side_effect = [
+            _owned_repo_response(
+                [
+                    _repo_node(
+                        "octocat/owned",
+                        languages={"TypeScript": 40},
+                    ),
+                    _repo_node(
+                        "octocat/rust-port",
+                        is_fork=True,
+                        languages={"C++": 1000, "Rust": 500},
+                        parent_languages={"C++": 1000},
+                    ),
+                ]
+            ),
+            _contributed_repo_response([]),
+        ]
+
+        # Act
+        with mock.patch.dict("os.environ", {}, clear=True):
+            await stats.get_stats()
+            languages = await stats.languages
+
+        # Assert
+        self.assertNotIn("C++", languages)
+        self.assertEqual(languages["Rust"]["size"], 500)
+        self.assertEqual(languages["TypeScript"]["size"], 40)
+        self.assertAlmostEqual(languages["Rust"]["prop"], 500 / 540 * 100)
+
+    async def test_owned_fork_language_negative_deltas_are_clamped(self):
+        # Arrange
+        stats = Stats(
+            "octocat",
+            "token",
+            _FailingSession(),
+            ignore_forked_repos=False,
+        )
+        stats.queries = mock.AsyncMock()
+        stats.queries.query.side_effect = [
+            _owned_repo_response(
+                [
+                    _repo_node(
+                        "octocat/fork",
+                        is_fork=True,
+                        languages={"C++": 700},
+                        parent_languages={"C++": 1000, "Python": 200},
+                    ),
+                ]
+            ),
+            _contributed_repo_response([]),
+        ]
+
+        # Act
+        with mock.patch.dict("os.environ", {}, clear=True):
+            await stats.get_stats()
+            languages = await stats.languages
+
+        # Assert
+        self.assertEqual(languages, {})
+        self.assertEqual(stats.report.language_degraded, [])
+
+    async def test_raw_fork_language_totals_env_restores_owned_fork_bytes(self):
+        # Arrange
+        stats = Stats(
+            "octocat",
+            "token",
+            _FailingSession(),
+            ignore_forked_repos=False,
+        )
+        stats.queries = mock.AsyncMock()
+        stats.queries.query.side_effect = [
+            _owned_repo_response(
+                [
+                    _repo_node(
+                        "octocat/rust-port",
+                        is_fork=True,
+                        languages={"C++": 1000, "Rust": 500},
+                        parent_languages={"C++": 1000},
+                    ),
+                ]
+            ),
+            _contributed_repo_response([]),
+        ]
+
+        # Act
+        with mock.patch.dict(
+            "os.environ",
+            {"RAW_FORK_LANGUAGE_TOTALS": "true"},
+            clear=True,
+        ):
+            await stats.get_stats()
+            languages = await stats.languages
+
+        # Assert
+        self.assertEqual(languages["C++"]["size"], 1000)
+        self.assertEqual(languages["Rust"]["size"], 500)
+
+    async def test_excluded_languages_apply_after_fork_language_correction(self):
+        # Arrange
+        stats = Stats(
+            "octocat",
+            "token",
+            _FailingSession(),
+            exclude_langs={"C++"},
+            ignore_forked_repos=False,
+        )
+        stats.queries = mock.AsyncMock()
+        stats.queries.query.side_effect = [
+            _owned_repo_response(
+                [
+                    _repo_node(
+                        "octocat/rust-port",
+                        is_fork=True,
+                        languages={"C++": 1200, "Rust": 500},
+                        parent_languages={"C++": 1000},
+                    ),
+                ]
+            ),
+            _contributed_repo_response([]),
+        ]
+
+        # Act
+        with mock.patch.dict("os.environ", {}, clear=True):
+            await stats.get_stats()
+            languages = await stats.languages
+
+        # Assert
+        self.assertEqual(set(languages), {"Rust"})
+        self.assertEqual(languages["Rust"]["size"], 500)
+
+    async def test_owned_fork_missing_parent_language_data_is_omitted(self):
+        # Arrange
+        stats = Stats(
+            "octocat",
+            "token",
+            _FailingSession(),
+            ignore_forked_repos=False,
+        )
+        stats.queries = mock.AsyncMock()
+        stats.queries.query.side_effect = [
+            _owned_repo_response(
+                [
+                    _repo_node(
+                        "octocat/fork-without-parent",
+                        is_fork=True,
+                        languages={"C++": 1000},
+                    ),
+                ]
+            ),
+            _contributed_repo_response([]),
+        ]
+
+        # Act
+        with mock.patch.dict("os.environ", {}, clear=True):
+            await stats.get_stats()
+            languages = await stats.languages
+
+        # Assert
+        self.assertEqual(languages, {})
+        self.assertEqual(
+            stats.report.language_degraded,
+            ["octocat/fork-without-parent: fork parent language data unavailable"],
+        )
 
     async def test_rest_query_returns_empty_for_unavailable_commit_listing(self):
         # Arrange
@@ -1930,6 +2134,7 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("generated/experimental-star-history-30-days.svg", readme)
         self.assertIn("generated/experimental-star-history-90-days.svg", readme)
         self.assertIn("generated/experimental-star-history-365-days.svg", readme)
+        self.assertIn("RAW_FORK_LANGUAGE_TOTALS", readme)
 
     def test_experimental_renderer_type_hints_resolve(self):
         # Act / Assert
@@ -2703,6 +2908,9 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                     }
                 ],
                 "critical_failures": [],
+                "language_degraded": [
+                    "octocat/fork: fork parent language data unavailable"
+                ],
                 "rest_requests_total": 1,
                 "rest_retries_total": 2,
                 "rest_wait_seconds_total": 4.3,
@@ -2732,6 +2940,7 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         # Assert
         self.assertIn("octocat/private", summary)
         self.assertIn("Traffic views degraded: 1", summary)
+        self.assertIn("Fork language corrections limited: 1", summary)
         self.assertIn("Current-year contributions", summary)
         self.assertIn("Merged pull requests", summary)
         self.assertIn("API Wait Summary", summary)
