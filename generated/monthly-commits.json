@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-20T01:23:32Z",
+  "generated_at": "2026-06-21T01:32:59Z",
   "window": {
     "months": 13,
     "timezone": "UTC",
@@ -13,7 +13,7 @@
       "prizz",
       "pRizz"
     ],
-    "repo_count": 279,
+    "repo_count": 280,
     "scanned_months": 1,
     "degraded_months": 0,
     "degraded_repo_months": 0
@@ -118,10 +118,10 @@
     {
       "key": "2026-06",
       "label": "Jun '26",
-      "count": 1387,
+      "count": 1461,
       "is_current": true,
       "scan_degraded": false,
-      "github_attributed_count": 623
+      "github_attributed_count": 639
     }
   ]
 }
