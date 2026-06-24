@@ -19,10 +19,10 @@ svg { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial
 <rect x="5" y="5" id="background" />
 <text class="title" x="21" y="36">Repo Portfolio</text>
 <text class="subtitle" x="21" y="55">104 public; 0 private redacted</text>
-<g class="row" style="animation-delay: 0ms"><text class="label" x="21" y="74">pRizz/CryptoNoter</text><rect class="metric-bar" x="182" y="64" width="96" height="10" rx="2" style="fill:#2da44e" /><text class="value" x="330" y="74" text-anchor="end">545</text></g>
+<g class="row" style="animation-delay: 0ms"><text class="label" x="21" y="74">pRizz/CryptoNoter</text><rect class="metric-bar" x="182" y="64" width="96" height="10" rx="2" style="fill:#2da44e" /><text class="value" x="330" y="74" text-anchor="end">547</text></g>
 <g class="row" style="animation-delay: 80ms"><text class="label" x="21" y="94">pRizz/Chatangle</text><rect class="metric-bar" x="182" y="84" width="17" height="10" rx="2" style="fill:#2da44e" /><text class="value" x="330" y="94" text-anchor="end">98</text></g>
 <g class="row" style="animation-delay: 160ms"><title>pRizz/iota-transaction-spammer-webapp: 75</title><text class="label" x="21" y="114">pRizz/iota-transacti...</text><rect class="metric-bar" x="182" y="104" width="13" height="10" rx="2" style="fill:#2da44e" /><text class="value" x="330" y="114" text-anchor="end">75</text></g>
 <g class="row" style="animation-delay: 240ms"><text class="label" x="21" y="134">pRizz/nanocurrency-node</text><rect class="metric-bar" x="182" y="124" width="8" height="10" rx="2" style="fill:#2da44e" /><text class="value" x="330" y="134" text-anchor="end">46</text></g>
 <g class="row" style="animation-delay: 320ms"><title>pRizz/SVG-Navigator---Chrome-Extension: 42</title><text class="label" x="21" y="154">pRizz/SVG-Navigator-...</text><rect class="metric-bar" x="182" y="144" width="7" height="10" rx="2" style="fill:#2da44e" /><text class="value" x="330" y="154" text-anchor="end">42</text></g>
-<g class="row" style="animation-delay: 400ms"><text class="label" x="21" y="174">pRizz/iota-buy-strategy</text><rect class="metric-bar" x="182" y="164" width="7" height="10" rx="2" style="fill:#2da44e" /><text class="value" x="330" y="174" text-anchor="end">37</text></g>
+<g class="row" style="animation-delay: 400ms"><text class="label" x="21" y="174">pRizz/iota-buy-strategy</text><rect class="metric-bar" x="182" y="164" width="6" height="10" rx="2" style="fill:#2da44e" /><text class="value" x="330" y="174" text-anchor="end">37</text></g>
 </svg>
