@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-30T01:20:13Z",
+  "generated_at": "2026-07-01T01:25:33Z",
   "window": {
     "months": 13,
     "timezone": "UTC",
@@ -19,14 +19,6 @@
     "degraded_repo_months": 0
   },
   "months": [
-    {
-      "key": "2025-06",
-      "label": "Jun '25",
-      "count": 161,
-      "is_current": false,
-      "scan_degraded": false,
-      "github_attributed_count": 168
-    },
     {
       "key": "2025-07",
       "label": "Jul '25",
@@ -119,9 +111,17 @@
       "key": "2026-06",
       "label": "Jun '26",
       "count": 2588,
-      "is_current": true,
+      "is_current": false,
       "scan_degraded": false,
       "github_attributed_count": 1408
+    },
+    {
+      "key": "2026-07",
+      "label": "Jul '26",
+      "count": 2,
+      "is_current": true,
+      "scan_degraded": false,
+      "github_attributed_count": 0
     }
   ]
 }

@@ -19,8 +19,8 @@ svg { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial
 <rect x="5" y="5" id="background" />
 <text class="title" x="21" y="36">Maintainer Health</text>
 <text class="subtitle" x="21" y="55">Repository maintenance signals</text>
-<g class="row" style="animation-delay: 0ms"><text class="label" x="21" y="76">Open issues</text><text class="value" x="330" y="76" text-anchor="end">12,598</text></g>
-<g class="row" style="animation-delay: 80ms"><text class="label" x="21" y="94">Open pull requests</text><text class="value" x="330" y="94" text-anchor="end">1,974</text></g>
+<g class="row" style="animation-delay: 0ms"><text class="label" x="21" y="76">Open issues</text><text class="value" x="330" y="76" text-anchor="end">12,638</text></g>
+<g class="row" style="animation-delay: 80ms"><text class="label" x="21" y="94">Open pull requests</text><text class="value" x="330" y="94" text-anchor="end">1,966</text></g>
 <g class="row" style="animation-delay: 160ms"><text class="label" x="21" y="112">Updated in 90 days</text><text class="value" x="330" y="112" text-anchor="end">57</text></g>
 <g class="row" style="animation-delay: 240ms"><text class="label" x="21" y="130">Stale over 1 year</text><text class="value" x="330" y="130" text-anchor="end">146</text></g>
 <g class="row" style="animation-delay: 320ms"><text class="label" x="21" y="148">Archived</text><text class="value" x="330" y="148" text-anchor="end">0</text></g>
