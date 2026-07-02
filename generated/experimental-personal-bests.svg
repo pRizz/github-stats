@@ -22,6 +22,6 @@ svg { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial
 <g class="row" style="animation-delay: 0ms"><text class="label" x="21" y="76">Best month</text><text class="value" x="330" y="76" text-anchor="end">Jun &#x27;26 (2,588)</text></g>
 <g class="row" style="animation-delay: 80ms"><text class="label" x="21" y="94">Active streak</text><text class="value" x="330" y="94" text-anchor="end">13 months</text></g>
 <g class="row" style="animation-delay: 160ms"><text class="label" x="21" y="112">Top public repo</text><text class="value" x="330" y="112" text-anchor="end">pRizz/CryptoNoter</text></g>
-<g class="row" style="animation-delay: 240ms"><text class="label" x="21" y="130">Top repo score</text><text class="value" x="330" y="130" text-anchor="end">545</text></g>
+<g class="row" style="animation-delay: 240ms"><text class="label" x="21" y="130">Top repo score</text><text class="value" x="330" y="130" text-anchor="end">543</text></g>
 <g class="row" style="animation-delay: 320ms"><text class="label" x="21" y="148">Private repos redacted</text><text class="value" x="330" y="148" text-anchor="end">0</text></g>
 </svg>
