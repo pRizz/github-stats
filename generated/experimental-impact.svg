@@ -20,9 +20,9 @@ svg { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial
 <text class="title" x="21" y="36">Impact</text>
 <text class="subtitle" x="21" y="55">Owned repo popularity; limited data</text>
 <g class="row" style="animation-delay: 0ms"><text class="label" x="21" y="76">Owned stars</text><text class="value" x="330" y="76" text-anchor="end">180</text></g>
-<g class="row" style="animation-delay: 80ms"><text class="label" x="21" y="94">Owned forks</text><text class="value" x="330" y="94" text-anchor="end">348</text></g>
+<g class="row" style="animation-delay: 80ms"><text class="label" x="21" y="94">Owned forks</text><text class="value" x="330" y="94" text-anchor="end">347</text></g>
 <g class="row" style="animation-delay: 160ms"><text class="label" x="21" y="112">Views, 14 days</text><text class="value" x="330" y="112" text-anchor="end">0</text></g>
 <g class="row" style="animation-delay: 240ms"><text class="label" x="21" y="130">Clones, 14 days</text><text class="value" x="330" y="130" text-anchor="end">0</text></g>
 <g class="row" style="animation-delay: 320ms"><text class="label" x="21" y="148">Top public repo</text><text class="value" x="330" y="148" text-anchor="end">pRizz/CryptoNoter</text></g>
-<g class="row" style="animation-delay: 400ms"><text class="label" x="21" y="166">Top repo score</text><text class="value" x="330" y="166" text-anchor="end">543</text></g>
+<g class="row" style="animation-delay: 400ms"><text class="label" x="21" y="166">Top repo score</text><text class="value" x="330" y="166" text-anchor="end">541</text></g>
 </svg>
