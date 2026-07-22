@@ -21,17 +21,18 @@ svg { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial
 </style>
 <rect x="5" y="5" id="background" />
 <text class="title" x="21" y="36">Owned Stars: 365 days</text>
-<text class="subtitle" x="21" y="55">180 total; +1 in window</text>
+<text class="subtitle" x="21" y="55">180 total; 0 in window</text>
 <line class="axis" x1="24" y1="156" x2="336" y2="156" />
-<path class="chart-line" d="M 305.1 156.0 L 311.1 156.0 L 317.1 78.0 L 323.1 78.0 L 329.1 78.0 L 335.1 78.0 L 336.0 78.0" />
-<circle class="chart-point" cx="305.1" cy="156.0" r="3.5" style="animation-delay: 0ms"><title>2026-06-10: 179 stars</title></circle>
-<circle class="chart-point" cx="311.1" cy="156.0" r="3.5" style="animation-delay: 55ms"><title>2026-06-17: 179 stars</title></circle>
-<circle class="chart-point" cx="317.1" cy="78.0" r="3.5" style="animation-delay: 110ms"><title>2026-06-24: 180 stars</title></circle>
-<circle class="chart-point" cx="323.1" cy="78.0" r="3.5" style="animation-delay: 165ms"><title>2026-07-01: 180 stars</title></circle>
-<circle class="chart-point" cx="329.1" cy="78.0" r="3.5" style="animation-delay: 220ms"><title>2026-07-08: 180 stars</title></circle>
-<circle class="chart-point" cx="335.1" cy="78.0" r="3.5" style="animation-delay: 275ms"><title>2026-07-15: 180 stars</title></circle>
-<circle class="chart-point" cx="336.0" cy="78.0" r="3.5" style="animation-delay: 330ms"><title>2026-07-16: 180 stars</title></circle>
-<text class="endpoint-label" x="299.1" y="148.0" text-anchor="end">179</text>
+<path class="chart-line" d="M 299.1 78.0 L 305.1 156.0 L 311.1 78.0 L 317.1 78.0 L 323.1 78.0 L 329.1 78.0 L 330.9 78.0 L 336.0 78.0" />
+<circle class="chart-point" cx="299.1" cy="78.0" r="3.5" style="animation-delay: 0ms"><title>2026-06-09: 180 stars</title></circle>
+<circle class="chart-point" cx="305.1" cy="156.0" r="3.5" style="animation-delay: 55ms"><title>2026-06-16: 179 stars</title></circle>
+<circle class="chart-point" cx="311.1" cy="78.0" r="3.5" style="animation-delay: 110ms"><title>2026-06-23: 180 stars</title></circle>
+<circle class="chart-point" cx="317.1" cy="78.0" r="3.5" style="animation-delay: 165ms"><title>2026-06-30: 180 stars</title></circle>
+<circle class="chart-point" cx="323.1" cy="78.0" r="3.5" style="animation-delay: 220ms"><title>2026-07-07: 180 stars</title></circle>
+<circle class="chart-point" cx="329.1" cy="78.0" r="3.5" style="animation-delay: 275ms"><title>2026-07-14: 180 stars</title></circle>
+<circle class="chart-point" cx="330.9" cy="78.0" r="3.5" style="animation-delay: 330ms"><title>2026-07-16: 180 stars</title></circle>
+<circle class="chart-point" cx="336.0" cy="78.0" r="3.5" style="animation-delay: 385ms"><title>2026-07-22: 180 stars</title></circle>
+<text class="endpoint-label" x="293.1" y="70.0" text-anchor="end">180</text>
 <text class="endpoint-label" x="330.0" y="70.0" text-anchor="end">180</text>
-<g class="summary-row"><text class="label" x="21" y="181">Latest</text><text class="value" x="106" y="181" text-anchor="end">180</text><text class="label" x="141" y="181">Change</text><text class="value" x="229" y="181" text-anchor="end">+1</text><text class="label" x="265" y="181">Samples</text><text class="value" x="339" y="181" text-anchor="end">7</text></g>
+<g class="summary-row"><text class="label" x="21" y="181">Latest</text><text class="value" x="106" y="181" text-anchor="end">180</text><text class="label" x="141" y="181">Change</text><text class="value" x="229" y="181" text-anchor="end">0</text><text class="label" x="265" y="181">Samples</text><text class="value" x="339" y="181" text-anchor="end">8</text></g>
 </svg>
