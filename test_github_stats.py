@@ -18,6 +18,7 @@ import github_stats
 import generate_images
 import language_icons
 from github_stats import Queries, Stats
+from scripts import backfill_monthly_commits
 
 
 class _FakeResponse:
@@ -417,16 +418,22 @@ class _MonthlyCacheStats:
         extra_repos=None,
     ):
         self.scanned_window_keys = [window.key for window in windows]
+        self.extra_repos = set(extra_repos or set())
         return github_stats.MonthlyCommitScanResult(
             counts={window.key: 7 for window in windows},
-            repo_count=1,
+            repo_count=1 + len(self.extra_repos),
             scanned_months=len(windows),
             identity_patterns=identity_patterns or [],
         )
 
-    async def audit_monthly_commit_counts(self, windows):
-        return {window.key: 3 for window in windows}
-
+    async def discover_monthly_commit_repositories(self, windows):
+        return github_stats.MonthlyCommitDiscoveryResult(
+            attributed_counts={window.key: 3 for window in windows},
+            repositories={"example/external"},
+            repositories_by_month={
+                window.key: {"example/external"} for window in windows
+            },
+        )
 
 class _DegradedMonthlyCacheStats(_MonthlyCacheStats):
     async def scan_monthly_commits(
@@ -442,6 +449,34 @@ class _DegradedMonthlyCacheStats(_MonthlyCacheStats):
             scanned_months=len(windows),
             identity_patterns=identity_patterns or [],
             degraded_months={window.key for window in windows},
+        )
+
+
+class _RegressingMonthlyCacheStats(_MonthlyCacheStats):
+    async def scan_monthly_commits(
+        self,
+        windows,
+        identity_patterns=None,
+        extra_repos=None,
+    ):
+        self.scanned_window_keys = [window.key for window in windows]
+        return github_stats.MonthlyCommitScanResult(
+            counts={window.key: 7 for window in windows},
+            repo_count=2,
+            scanned_months=len(windows),
+            identity_patterns=identity_patterns or [],
+        )
+
+
+class _IncompleteDiscoveryMonthlyCacheStats(_MonthlyCacheStats):
+    async def discover_monthly_commit_repositories(self, windows):
+        return github_stats.MonthlyCommitDiscoveryResult(
+            attributed_counts={window.key: 10 for window in windows},
+            repositories={"example/external"},
+            repositories_by_month={
+                window.key: {"example/external"} for window in windows
+            },
+            incomplete_months={window.key for window in windows},
         )
 
 
@@ -716,7 +751,7 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn('query: "author:octocat is:pr is:merged"', query)
         self.assertIn("issueCount", query)
 
-    async def test_monthly_commit_audit_reads_graphql_commit_contribution_counts(self):
+    async def test_monthly_commit_discovery_recovers_external_repositories(self):
         # Arrange
         windows = [
             github_stats.MonthWindow(
@@ -724,7 +759,6 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                 label="Apr '26",
                 since="2026-04-01T00:00:00Z",
                 until="2026-05-01T00:00:00Z",
-                is_current=False,
             ),
             github_stats.MonthWindow(
                 key="2026-05",
@@ -735,24 +769,136 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
             ),
         ]
         stats = Stats("octocat", "token", _FailingSession())
+        stats._repos = {"octocat/owned"}
         stats.queries = mock.AsyncMock()
-        stats.queries.query.return_value = {
-            "data": {
-                "viewer": {
-                    "m0": {"totalCommitContributions": 4},
-                    "m1": {"totalCommitContributions": 5},
+        stats.queries.query.side_effect = [
+            {
+                "data": {
+                    "viewer": {
+                        "contributionsCollection": {
+                            "totalCommitContributions": 3,
+                            "restrictedContributionsCount": 0,
+                            "commitContributionsByRepository": [
+                                {
+                                    "repository": {
+                                        "nameWithOwner": "example/external"
+                                    },
+                                    "contributions": {"totalCount": 3},
+                                }
+                            ],
+                        }
+                    }
                 }
-            }
-        }
+            },
+            {
+                "data": {
+                    "viewer": {
+                        "contributionsCollection": {
+                            "totalCommitContributions": 0,
+                            "restrictedContributionsCount": 0,
+                            "commitContributionsByRepository": [],
+                        }
+                    }
+                }
+            },
+        ]
 
         # Act
-        result = await stats.audit_monthly_commit_counts(windows)
+        result = await stats.discover_monthly_commit_repositories(windows)
 
         # Assert
-        self.assertEqual(result, {"2026-04": 4, "2026-05": 5})
-        query = stats.queries.query.await_args.args[0]
-        self.assertIn("totalCommitContributions", query)
-        self.assertIn('from: "2026-04-01T00:00:00Z"', query)
+        self.assertEqual(
+            result.attributed_counts,
+            {"2026-04": 3, "2026-05": 0},
+        )
+        self.assertEqual(result.repositories, {"example/external"})
+        self.assertEqual(
+            result.repositories_by_month["2026-04"],
+            {"example/external"},
+        )
+        self.assertEqual(result.incomplete_months, set())
+        self.assertEqual(await stats.repos, {"octocat/owned"})
+        self.assertEqual(stats.queries.query.await_count, 2)
+        for call in stats.queries.query.await_args_list:
+            query = call.args[0]
+            self.assertIn("commitContributionsByRepository(maxRepositories: 100)", query)
+            self.assertNotIn("repositoriesContributedTo", query)
+
+    async def test_monthly_commit_discovery_marks_incomplete_coverage(self):
+        # Arrange
+        windows = [
+            github_stats.MonthWindow(
+                key=key,
+                label=key,
+                since=f"{key}-01T00:00:00Z",
+                until=f"{key}-02T00:00:00Z",
+            )
+            for key in ("2026-01", "2026-02", "2026-03")
+        ]
+        stats = Stats("octocat", "token", _FailingSession())
+        stats.queries = mock.AsyncMock()
+        stats.queries.query.side_effect = [
+            {
+                "data": {
+                    "viewer": {
+                        "contributionsCollection": {
+                            "totalCommitContributions": 5,
+                            "restrictedContributionsCount": 0,
+                            "commitContributionsByRepository": [
+                                {
+                                    "repository": {"nameWithOwner": "example/partial"},
+                                    "contributions": {"totalCount": 3},
+                                }
+                            ],
+                        }
+                    }
+                }
+            },
+            {
+                "data": {
+                    "viewer": {
+                        "contributionsCollection": {
+                            "totalCommitContributions": 0,
+                            "restrictedContributionsCount": 2,
+                            "commitContributionsByRepository": [],
+                        }
+                    }
+                }
+            },
+            {"data": {"viewer": {"contributionsCollection": None}}},
+        ]
+
+        # Act
+        result = await stats.discover_monthly_commit_repositories(windows)
+
+        # Assert
+        self.assertEqual(
+            result.incomplete_months,
+            {"2026-01", "2026-03"},
+        )
+        self.assertEqual(result.repositories, {"example/partial"})
+
+    async def test_monthly_commit_discovery_propagates_query_failure(self):
+        # Arrange
+        window = github_stats.MonthWindow(
+            key="2026-05",
+            label="May '26",
+            since="2026-05-01T00:00:00Z",
+            until="2026-05-02T00:00:00Z",
+            is_current=True,
+        )
+        stats = Stats("octocat", "token", _FailingSession())
+        stats.queries = mock.AsyncMock()
+        stats.queries.query.side_effect = github_stats.GitHubQueryError(
+            "not accessible"
+        )
+
+        # Act / Assert
+        with self.assertRaisesRegex(
+            github_stats.GitHubQueryError,
+            "not accessible",
+        ):
+            await stats.discover_monthly_commit_repositories([window])
 
     async def test_generate_images_stops_before_rendering_when_stats_load_fails(self):
         # Arrange
@@ -1586,6 +1732,7 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
 
         # Assert
         self.assertEqual(result.counts, {"2026-05": 0})
+        self.assertEqual(result.degraded_months, {"2026-05"})
         self.assertEqual(len(stats.report.monthly_commits_degraded), 1)
         self.assertEqual(stats.report.monthly_commits_degraded[0].repo, "octocat/missing")
         self.assertEqual(stats.report.monthly_commits_degraded[0].endpoint, "commits")
@@ -1721,6 +1868,15 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(result["months"][0]["count"], 1)
             self.assertEqual(result["months"][-1]["count"], 7)
             self.assertEqual(result["months"][-1]["github_attributed_count"], 3)
+            self.assertEqual(stats.extra_repos, {"example/external"})
+            self.assertEqual(
+                result["source"]["discovery"]["contribution_repo_count"],
+                1,
+            )
+            self.assertNotIn(
+                "example/external",
+                generate_images.json.dumps(result),
+            )
 
     async def test_monthly_commit_cache_preserves_count_when_refresh_degrades(self):
         # Arrange
@@ -1757,8 +1913,185 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
 
             # Assert
             self.assertEqual(result["months"][-1]["count"], 42)
+            self.assertEqual(result["months"][-1]["scan_candidate_count"], 0)
             self.assertTrue(result["months"][-1]["scan_degraded"])
             self.assertEqual(result["source"]["degraded_months"], 1)
+
+    async def test_monthly_commit_cache_preserves_regressing_current_count(self):
+        # Arrange
+        now = dt.datetime(2026, 5, 2, 10, 30, tzinfo=dt.timezone.utc)
+        windows = github_stats.rolling_month_windows(now)
+        with TemporaryDirectory() as tmpdir:
+            cache_path = Path(tmpdir) / "generated" / "monthly-commits.json"
+            cache_path.parent.mkdir()
+            cache_path.write_text(
+                generate_images.json.dumps(
+                    {
+                        "months": [
+                            {
+                                "key": window.key,
+                                "label": window.label,
+                                "count": 42 if window.is_current else 1,
+                                "is_current": window.is_current,
+                                "github_attributed_count": 5,
+                            }
+                            for window in windows
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+            stats = _RegressingMonthlyCacheStats()
+
+            # Act
+            result = await generate_images.build_monthly_commit_cache(
+                stats,
+                now=now,
+                cache_path=str(cache_path),
+            )
+
+            # Assert
+            self.assertEqual(result["months"][-1]["count"], 42)
+            self.assertEqual(result["months"][-1]["scan_candidate_count"], 7)
+            self.assertTrue(result["months"][-1]["scan_degraded"])
+            self.assertEqual(result["source"]["degraded_months"], 1)
+            self.assertIn(
+                "candidate count 7 regressed below cached count 42",
+                result["source"]["discovery"]["warnings"][0],
+            )
+
+    async def test_monthly_commit_force_backfill_allows_complete_lower_count(self):
+        # Arrange
+        now = dt.datetime(2026, 5, 2, 10, 30, tzinfo=dt.timezone.utc)
+        windows = github_stats.rolling_month_windows(now)
+        with TemporaryDirectory() as tmpdir:
+            cache_path = Path(tmpdir) / "generated" / "monthly-commits.json"
+            cache_path.parent.mkdir()
+            cache_path.write_text(
+                generate_images.json.dumps(
+                    {
+                        "months": [
+                            {
+                                "key": window.key,
+                                "label": window.label,
+                                "count": 42,
+                                "is_current": window.is_current,
+                            }
+                            for window in windows
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            # Act
+            result = await generate_images.build_monthly_commit_cache(
+                _RegressingMonthlyCacheStats(),
+                force_backfill=True,
+                now=now,
+                cache_path=str(cache_path),
+            )
+
+            # Assert
+            self.assertEqual(result["months"][-1]["count"], 7)
+            self.assertFalse(result["months"][-1]["scan_degraded"])
+            persisted = generate_images.json.loads(
+                cache_path.read_text(encoding="utf-8")
+            )
+            self.assertEqual(persisted["months"][-1]["count"], 7)
+
+    async def test_monthly_commit_dry_build_does_not_write_cache(self):
+        # Arrange
+        now = dt.datetime(2026, 5, 2, 10, 30, tzinfo=dt.timezone.utc)
+        with TemporaryDirectory() as tmpdir:
+            cache_path = Path(tmpdir) / "monthly-commits.json"
+            original = '{"sentinel": true}\n'
+            cache_path.write_text(original, encoding="utf-8")
+
+            # Act
+            result = await generate_images.build_monthly_commit_cache(
+                _MonthlyCacheStats(),
+                force_backfill=True,
+                now=now,
+                cache_path=str(cache_path),
+                write_cache=False,
+            )
+
+            # Assert
+            self.assertEqual(cache_path.read_text(encoding="utf-8"), original)
+            self.assertEqual(len(result["months"]), 13)
+
+    async def test_incomplete_force_backfill_leaves_artifacts_untouched(self):
+        # Arrange
+        now = dt.datetime(2026, 5, 2, 10, 30, tzinfo=dt.timezone.utc)
+        with TemporaryDirectory() as tmpdir:
+            tmp_path = Path(tmpdir)
+            (tmp_path / "generated").mkdir()
+            cache_path = tmp_path / "generated" / "monthly-commits.json"
+            svg_path = tmp_path / "generated" / "monthly-commits.svg"
+            cache_path.write_text('{"sentinel": "cache"}\n', encoding="utf-8")
+            svg_path.write_text("<svg>sentinel</svg>\n", encoding="utf-8")
+            previous_cwd = Path.cwd()
+            try:
+                os.chdir(tmp_path)
+
+                # Act / Assert
+                with self.assertRaisesRegex(
+                    RuntimeError,
+                    "incomplete monthly commit backfill",
+                ):
+                    await generate_images.generate_monthly_commits(
+                        _IncompleteDiscoveryMonthlyCacheStats(),
+                        force_backfill=True,
+                        now=now,
+                        cache_path=str(cache_path),
+                    )
+            finally:
+                os.chdir(previous_cwd)
+
+            self.assertEqual(
+                cache_path.read_text(encoding="utf-8"),
+                '{"sentinel": "cache"}\n',
+            )
+            self.assertEqual(
+                svg_path.read_text(encoding="utf-8"),
+                "<svg>sentinel</svg>\n",
+            )
+
+    def test_backfill_diff_reports_raw_candidate_and_incomplete_status(self):
+        # Arrange
+        existing = {
+            "months": [
+                {"key": "2026-07", "count": 42},
+            ]
+        }
+        candidate = {
+            "source": {
+                "discovery": {
+                    "base_repo_count": 1,
+                    "contribution_repo_count": 2,
+                    "scan_repo_count": 3,
+                    "incomplete_months": ["2026-07"],
+                }
+            },
+            "months": [
+                {
+                    "key": "2026-07",
+                    "count": 42,
+                    "scan_candidate_count": 7,
+                    "github_attributed_count": 10,
+                    "scan_degraded": True,
+                }
+            ],
+        }
+
+        # Act
+        output = backfill_monthly_commits.render_backfill_diff(existing, candidate)
+
+        # Assert
+        self.assertIn("2026-07\t42\t7\t10\tincomplete", output)
+        self.assertIn("Contribution repositories discovered: 2", output)
+        self.assertIn("Incomplete months: 2026-07", output)
 
     async def test_monthly_commit_cache_force_backfill_scans_all_months(self):
         # Arrange
@@ -1799,6 +2132,55 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn('class="bar current"', output)
         self.assertIn("Apr &#x27;26", output)
         self.assertIn("12", output)
+
+    def test_monthly_commit_artifact_writer_replaces_both_outputs(self):
+        # Arrange
+        cache = {
+            "source": {"degraded_months": 0},
+            "months": [
+                {
+                    "key": "2026-05",
+                    "label": "May '26",
+                    "count": 12,
+                    "is_current": True,
+                }
+            ],
+        }
+        with TemporaryDirectory() as tmpdir:
+            tmp_path = Path(tmpdir)
+            (tmp_path / "templates").mkdir()
+            (tmp_path / "generated").mkdir()
+            (tmp_path / "templates" / "monthly-commits.svg").write_text(
+                "{{ bars }} {{ total }} {{ current_month }} {{ current_count }}",
+                encoding="utf-8",
+            )
+            cache_path = tmp_path / "generated" / "monthly-commits.json"
+            svg_path = tmp_path / "generated" / "monthly-commits.svg"
+            cache_path.write_text("old cache", encoding="utf-8")
+            svg_path.write_text("old svg", encoding="utf-8")
+            cache_path.chmod(0o640)
+            svg_path.chmod(0o644)
+            previous_cwd = Path.cwd()
+            try:
+                os.chdir(tmp_path)
+
+                # Act
+                generate_images.write_monthly_commit_artifacts(
+                    cache,
+                    cache_path=str(cache_path),
+                    svg_path=str(svg_path),
+                )
+            finally:
+                os.chdir(previous_cwd)
+
+            # Assert
+            persisted = generate_images.json.loads(
+                cache_path.read_text(encoding="utf-8")
+            )
+            self.assertEqual(persisted, cache)
+            self.assertIn("May &#x27;26", svg_path.read_text(encoding="utf-8"))
+            self.assertEqual(cache_path.stat().st_mode & 0o777, 0o640)
+            self.assertEqual(svg_path.stat().st_mode & 0o777, 0o644)
 
     def test_star_history_cache_writes_header_upserts_and_sorts(self):
         # Arrange
@@ -2892,6 +3274,18 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
                 "latest_total": 13,
                 "card_count": 3,
             },
+            "monthly_commits": {
+                "total": 42,
+                "current_month": {"count": 7},
+                "source": {
+                    "repo_count": 3,
+                    "discovery": {
+                        "contribution_repo_count": 2,
+                        "incomplete_months": ["2026-07"],
+                        "warnings": ["2026-07: candidate count regressed"],
+                    },
+                },
+            },
             "api": {
                 "total_repos": 4,
                 "traffic_degraded": [
@@ -2948,6 +3342,9 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("Star history samples: 3", summary)
         self.assertIn("Latest star snapshot: 2026-06-05 (13)", summary)
         self.assertIn("Star history cards: 3", summary)
+        self.assertIn("Monthly scan repositories: 3", summary)
+        self.assertIn("Monthly discovery incomplete: 1", summary)
+        self.assertIn("2026-07: candidate count regressed", summary)
         self.assertIn("4.3s", summary)
         self.assertNotIn("Contributor stats", summary)
 
@@ -3038,6 +3435,65 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
 
         # Act / Assert
         generate_images.validate_run_report(report)
+
+    def test_run_report_validation_strict_mode_rejects_degraded_monthly_scan(self):
+        # Arrange
+        report = {
+            "stats": {
+                "repos": 1,
+                "views": 0,
+            },
+            "monthly_commits": {
+                "current_month": {
+                    "key": "2026-07",
+                    "count": 42,
+                    "scan_degraded": True,
+                },
+                "source": {"degraded_months": 1},
+            },
+            "api": {
+                "traffic_degraded": [],
+                "monthly_commits_degraded": [],
+            },
+        }
+
+        # Act / Assert
+        with mock.patch.dict(
+            "os.environ",
+            {"STRICT_MONTHLY_COMMIT_VALIDATION": "true"},
+            clear=True,
+        ):
+            with self.assertRaisesRegex(RuntimeError, "Monthly commit"):
+                generate_images.validate_run_report(report)
+
+    def test_run_report_validation_allows_complete_monthly_scan_in_strict_mode(self):
+        # Arrange
+        report = {
+            "stats": {
+                "repos": 1,
+                "views": 0,
+            },
+            "monthly_commits": {
+                "current_month": {
+                    "key": "2026-07",
+                    "count": 42,
+                    "scan_degraded": False,
+                },
+                "source": {"degraded_months": 0},
+            },
+            "api": {
+                "traffic_degraded": [],
+                "monthly_commits_degraded": [],
+            },
+        }
+
+        # Act / Assert
+        with mock.patch.dict(
+            "os.environ",
+            {"STRICT_MONTHLY_COMMIT_VALIDATION": "true"},
+            clear=True,
+        ):
+            generate_images.validate_run_report(report)
 
     def test_env_truthy_parses_common_values(self):
         # Act / Assert

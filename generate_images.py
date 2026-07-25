@@ -7,6 +7,7 @@ import html
 import json
 import os
 import re
+import tempfile
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 import aiohttp
@@ -183,6 +184,14 @@ def render_action_summary(report: Dict[str, Any]) -> str:
     monthly = report.get("monthly_commits", {})
     monthly_total = monthly.get("total", 0)
     monthly_current = monthly.get("current_month", {})
+    monthly_source = monthly.get("source", {})
+    monthly_discovery = monthly_source.get("discovery", {})
+    monthly_discovery_warnings = monthly_discovery.get("warnings", [])
+    monthly_discovery_warning_text = (
+        "\n".join(f"- {warning}" for warning in monthly_discovery_warnings)
+        if monthly_discovery_warnings
+        else "- None"
+    )
     experimental = report.get("experimental", {})
     experimental_limited = experimental.get("limited_data", [])
     star_history = report.get("star_history", {})
@@ -199,6 +208,10 @@ def render_action_summary(report: Dict[str, Any]) -> str:
 - Merged pull requests: {stats["merged_pull_requests"]:,}
 - Monthly commits shown: {monthly_total:,}
 - Current month commits: {monthly_current.get("count", 0):,}
+- Monthly scan repositories: {monthly_source.get("repo_count", 0):,}
+- Monthly contribution repositories discovered: {monthly_discovery.get("contribution_repo_count", 0):,}
+- Monthly discovery incomplete: {len(monthly_discovery.get("incomplete_months", []))}
+- Monthly discovery warnings: {len(monthly_discovery.get("warnings", []))}
 - Repositories: {stats["repos"]:,}
 - Repository views: {stats["views"]:,}
 - Star history samples: {star_history.get("samples", 0):,}
@@ -235,6 +248,9 @@ def render_action_summary(report: Dict[str, Any]) -> str:
 ### Monthly Commit Scan Warnings
 
 {_format_degradation_items(monthly_commit_items)}
+### Monthly Discovery Warnings
+
+{monthly_discovery_warning_text}
 """
 
 
@@ -259,6 +275,20 @@ def validate_run_report(report: Dict[str, Any]) -> None:
         failures.append(
             "Repository views is zero while "
             f"{traffic_degraded_count} traffic endpoints degraded."
+        )
+
+    strict_monthly_commits = env_truthy("STRICT_MONTHLY_COMMIT_VALIDATION")
+    monthly = report.get("monthly_commits", {})
+    monthly_source = monthly.get("source", {})
+    current_month = monthly.get("current_month", {})
+    if strict_monthly_commits and (
+        current_month.get("scan_degraded")
+        or int(monthly_source.get("degraded_months", 0)) > 0
+        or len(api.get("monthly_commits_degraded", [])) > 0
+    ):
+        failures.append(
+            "Monthly commit discovery or scanning is incomplete; "
+            "generated monthly artifacts were not accepted."
         )
 
     if failures:
@@ -295,6 +325,7 @@ async def build_run_report(s: Stats) -> Dict[str, Any]:
             "total": sum(int(item.get("count", 0)) for item in months),
             "current_month": current_month,
             "month_count": len(months),
+            "source": monthly_cache.get("source", {}),
         },
         "star_history": {
             "samples": len(star_history_records),
@@ -544,9 +575,10 @@ async def build_monthly_commit_cache(
     force_backfill: bool = False,
     now: Optional[dt.datetime] = None,
     cache_path: str = MONTHLY_COMMITS_CACHE,
+    write_cache: bool = True,
 ) -> Dict[str, Any]:
     windows = rolling_month_windows(now)
-    existing = {} if force_backfill else load_monthly_commits_cache(cache_path)
+    existing = load_monthly_commits_cache(cache_path)
     existing_by_key = _monthly_cache_records(existing)
     windows_to_scan = [
         window
@@ -558,30 +590,61 @@ async def build_monthly_commit_cache(
     scanned_counts: Dict[str, int] = {}
     audit_counts: Dict[str, int] = {}
     degraded_scan_keys: Set[str] = set()
-    repo_count = len(await s.repos)
+    discovery_repo_count = 0
+    discovery_incomplete_keys: Set[str] = set()
+    warnings: List[str] = []
+    base_repos = set(await s.repos)
+    configured_extra_repos = parse_repo_list(
+        os.getenv("MONTHLY_COMMITS_EXTRA_REPOS")
+    )
+    repo_count = len(base_repos | configured_extra_repos)
     if windows_to_scan:
-        audit_counts = await s.audit_monthly_commit_counts(windows_to_scan)
+        discovery = await s.discover_monthly_commit_repositories(windows_to_scan)
+        audit_counts = discovery.attributed_counts
+        discovery_repo_count = len(discovery.repositories)
+        discovery_incomplete_keys = discovery.incomplete_months
+        degraded_scan_keys.update(discovery_incomplete_keys)
         scan_result = await s.scan_monthly_commits(
             windows_to_scan,
             identity_patterns=patterns,
-            extra_repos=parse_repo_list(os.getenv("MONTHLY_COMMITS_EXTRA_REPOS")),
+            extra_repos=discovery.repositories | configured_extra_repos,
         )
         scanned_counts = scan_result.counts
-        degraded_scan_keys = scan_result.degraded_months
+        degraded_scan_keys.update(scan_result.degraded_months)
         repo_count = scan_result.repo_count
 
     records = []
     for window in windows:
+        cached_count = int(existing_by_key.get(window.key, {}).get("count", 0))
+        maybe_scanned_count = scanned_counts.get(window.key)
+        if (
+            not force_backfill
+            and window.is_current
+            and window.key in existing_by_key
+            and maybe_scanned_count is not None
+            and maybe_scanned_count < cached_count
+        ):
+            degraded_scan_keys.add(window.key)
+            warnings.append(
+                f"{window.key}: candidate count {maybe_scanned_count} "
+                f"regressed below cached count {cached_count}"
+            )
+
         should_preserve_cached_count = (
             window.key in degraded_scan_keys and window.key in existing_by_key
         )
         if window.key in scanned_counts and not should_preserve_cached_count:
             record = _record_from_window(window, scanned_counts[window.key])
         else:
-            cached_count = int(existing_by_key.get(window.key, {}).get("count", 0))
             record = _record_from_window(window, cached_count)
         record_data = record.__dict__
         record_data["scan_degraded"] = window.key in degraded_scan_keys
+        if maybe_scanned_count is not None:
+            record_data["scan_candidate_count"] = int(maybe_scanned_count)
+        elif "scan_candidate_count" in existing_by_key.get(window.key, {}):
+            record_data["scan_candidate_count"] = int(
+                existing_by_key[window.key]["scan_candidate_count"]
+            )
         if window.key in audit_counts:
             record_data["github_attributed_count"] = audit_counts[window.key]
         else:
@@ -611,10 +674,24 @@ async def build_monthly_commit_cache(
             "scanned_months": len(windows_to_scan),
             "degraded_months": len(degraded_scan_keys),
             "degraded_repo_months": len(s.report.monthly_commits_degraded),
+            "discovery": {
+                "base_repo_count": len(base_repos),
+                "contribution_repo_count": discovery_repo_count,
+                "configured_extra_repo_count": len(configured_extra_repos),
+                "scan_repo_count": repo_count,
+                "incomplete_months": sorted(discovery_incomplete_keys),
+                "warnings": warnings,
+            },
         },
         "months": records,
     }
-    write_monthly_commits_cache(cache, cache_path)
+    if force_backfill and degraded_scan_keys and write_cache:
+        raise RuntimeError(
+            "Monthly commit backfill is incomplete for: "
+            + ", ".join(sorted(degraded_scan_keys))
+        )
+    if write_cache:
+        write_monthly_commits_cache(cache, cache_path)
     return cache
 
 
@@ -1191,19 +1268,8 @@ def _monthly_commit_bars(months: List[Dict[str, Any]]) -> str:
     return "\n".join(bars)
 
 
-async def generate_monthly_commits(
-    s: Stats,
-    force_backfill: bool = False,
-    now: Optional[dt.datetime] = None,
-    cache_path: str = MONTHLY_COMMITS_CACHE,
-) -> None:
-    cache = await build_monthly_commit_cache(
-        s,
-        force_backfill=force_backfill,
-        now=now,
-        cache_path=cache_path,
-    )
-
+def render_monthly_commits_svg(cache: Dict[str, Any]) -> str:
+    """Render the monthly commit SVG from a validated cache candidate."""
     with open("templates/monthly-commits.svg", "r") as f:
         output = f.read()
 
@@ -1220,15 +1286,68 @@ async def generate_monthly_commits(
         html.escape(str(current_month.get("label", ""))),
         output,
     )
-    output = re.sub(
+    return re.sub(
         r"{{ current_count }}",
         f"{int(current_month.get('count', 0)):,}",
         output,
     )
 
-    generate_output_folder()
-    with open("generated/monthly-commits.svg", "w") as f:
-        f.write(output)
+
+def _atomic_write_text(path: str, content: str) -> None:
+    parent = os.path.dirname(path)
+    if parent and not os.path.isdir(parent):
+        os.makedirs(parent)
+    temp_parent = parent or "."
+    target_mode = os.stat(path).st_mode & 0o777 if os.path.exists(path) else 0o644
+    temporary_path = ""
+    try:
+        with tempfile.NamedTemporaryFile(
+            "w",
+            encoding="utf-8",
+            dir=temp_parent,
+            delete=False,
+        ) as temporary_file:
+            temporary_file.write(content)
+            temporary_path = temporary_file.name
+        os.chmod(temporary_path, target_mode)
+        os.replace(temporary_path, path)
+    finally:
+        if temporary_path and os.path.exists(temporary_path):
+            os.unlink(temporary_path)
+
+
+def write_monthly_commit_artifacts(
+    cache: Dict[str, Any],
+    cache_path: str = MONTHLY_COMMITS_CACHE,
+    svg_path: str = os.path.join("generated", "monthly-commits.svg"),
+) -> None:
+    """Replace monthly JSON and SVG via same-directory atomic writes."""
+    cache_output = json.dumps(cache, indent=2) + "\n"
+    svg_output = render_monthly_commits_svg(cache)
+    _atomic_write_text(cache_path, cache_output)
+    _atomic_write_text(svg_path, svg_output)
+
+
+async def generate_monthly_commits(
+    s: Stats,
+    force_backfill: bool = False,
+    now: Optional[dt.datetime] = None,
+    cache_path: str = MONTHLY_COMMITS_CACHE,
+) -> None:
+    cache = await build_monthly_commit_cache(
+        s,
+        force_backfill=force_backfill,
+        now=now,
+        cache_path=cache_path,
+        write_cache=False,
+    )
+    degraded_months = int(cache.get("source", {}).get("degraded_months", 0))
+    if force_backfill and degraded_months > 0:
+        raise RuntimeError(
+            "Refusing to write incomplete monthly commit backfill "
+            f"({degraded_months} degraded months)."
+        )
+    write_monthly_commit_artifacts(cache, cache_path=cache_path)
 
 
 def _svg_text(value: Any) -> str:

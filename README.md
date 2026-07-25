@@ -145,6 +145,19 @@ Local generation may update `generated/*.svg`, `generated/*.json`, and
 `run-report.json`. Do not commit `.env`, and do not paste personal access
 tokens into READMEs, issues, workflow logs, or bug reports.
 
+To audit the complete rolling monthly-commit window without changing generated
+files, run:
+
+```sh
+GITHUB_ACTOR=pRizz python3 scripts/backfill_monthly_commits.py --force --dry-run
+```
+
+Provide `ACCESS_TOKEN` through a secure environment or credential manager using
+a minimally scoped token with access to the repositories the metric should
+cover. Review every month in the printed diff before omitting `--dry-run` to
+apply the backfill. Incomplete GraphQL discovery or any degraded commit request
+prevents a forced backfill from replacing the committed JSON or SVG.
+
 # Installation
 
 <!-- TODO: Add details and screenshots -->

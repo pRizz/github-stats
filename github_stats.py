@@ -135,6 +135,16 @@ class MonthlyCommitScanResult:
 
 
 @dataclass(frozen=True)
+class MonthlyCommitDiscoveryResult:
+    """Repository discovery and coverage audit for monthly commit scans."""
+
+    attributed_counts: Dict[str, int]
+    repositories: Set[str]
+    repositories_by_month: Dict[str, Set[str]]
+    incomplete_months: Set[str] = field(default_factory=set)
+
+
+@dataclass(frozen=True)
 class CommitWindowScanResult:
     counts: Dict[str, int]
     repo_count: int
@@ -1463,22 +1473,25 @@ query {{
 """
 
     @staticmethod
-    def monthly_commit_audit(windows: List[MonthWindow]) -> str:
-        by_month = "\n".join(
-            f"""
-    m{index}: contributionsCollection(
+    def monthly_commit_discovery(window: MonthWindow) -> str:
+        """Return a bounded per-month contribution repository query."""
+        return f"""
+query {{
+  viewer {{
+    contributionsCollection(
         from: "{window.since}",
         to: "{window.until}"
     ) {{
       totalCommitContributions
+      commitContributionsByRepository(maxRepositories: 100) {{
+        repository {{
+          nameWithOwner
+        }}
+        contributions {{
+          totalCount
+        }}
+      }}
     }}
-"""
-            for index, window in enumerate(windows)
-        )
-        return f"""
-query {{
-  viewer {{
-    {by_month}
   }}
 }}
 """
@@ -2065,11 +2078,7 @@ Languages:
                 self._record_rest_call(repo, "commits", result)
                 if result.degraded:
                     self._record_degradation(repo, "commits", result)
-                    if result.category in {
-                        "auth_or_permission_error",
-                        "rate_limited",
-                    }:
-                        degraded_windows.update(window.key for window in windows)
+                    degraded_windows.update(window.key for window in windows)
                     return
 
                 payload = result.payload if isinstance(result.payload, list) else []
@@ -2126,28 +2135,85 @@ Languages:
             degraded_months=scan_result.degraded_windows,
         )
 
-    async def audit_monthly_commit_counts(
+    async def discover_monthly_commit_repositories(
         self,
         windows: List[MonthWindow],
-    ) -> Dict[str, int]:
+    ) -> MonthlyCommitDiscoveryResult:
         """
-        Return GitHub-attributed commit contribution counts for comparison only.
-        """
-        raw_results = await self.queries.query(Queries.monthly_commit_audit(windows))
-        viewer = raw_results.get("data", {}).get("viewer", {})
-        if not isinstance(viewer, dict):
-            raise GitHubQueryError(
-                "GraphQL response missing monthly commit audit data"
-            )
+        Discover repositories with GitHub-attributed commits in each month.
 
-        counts = {}
-        for index, window in enumerate(windows):
-            month_data = viewer.get(f"m{index}", {})
-            if not isinstance(month_data, dict):
-                counts[window.key] = 0
-                continue
-            counts[window.key] = int(month_data.get("totalCommitContributions", 0))
-        return counts
+        Queries are intentionally issued one month at a time to keep GraphQL
+        resource use bounded during a full backfill.
+        """
+        attributed_counts: Dict[str, int] = {}
+        repositories: Set[str] = set()
+        repositories_by_month: Dict[str, Set[str]] = {}
+        incomplete_months: Set[str] = set()
+
+        for window in windows:
+            raw_results = await self.queries.query(
+                Queries.monthly_commit_discovery(window)
+            )
+            viewer = raw_results.get("data", {}).get("viewer", {})
+            collection = (
+                viewer.get("contributionsCollection", {})
+                if isinstance(viewer, dict)
+                else {}
+            )
+            if not isinstance(collection, dict):
+                collection = {}
+                incomplete_months.add(window.key)
+
+            try:
+                attributed_count = int(collection["totalCommitContributions"])
+            except (KeyError, TypeError, ValueError):
+                attributed_count = 0
+                incomplete_months.add(window.key)
+
+            raw_items = collection.get("commitContributionsByRepository")
+            if not isinstance(raw_items, list):
+                raw_items = []
+                incomplete_months.add(window.key)
+
+            month_repositories: Set[str] = set()
+            covered_contributions = 0
+            for item in raw_items:
+                if not isinstance(item, dict):
+                    incomplete_months.add(window.key)
+                    continue
+                repository = item.get("repository")
+                contributions = item.get("contributions")
+                if not isinstance(repository, dict) or not isinstance(
+                    contributions,
+                    dict,
+                ):
+                    incomplete_months.add(window.key)
+                    continue
+                name = repository.get("nameWithOwner")
+                try:
+                    contribution_count = int(contributions["totalCount"])
+                except (KeyError, TypeError, ValueError):
+                    incomplete_months.add(window.key)
+                    continue
+                if not isinstance(name, str) or not name:
+                    incomplete_months.add(window.key)
+                    continue
+                month_repositories.add(name)
+                covered_contributions += contribution_count
+
+            if covered_contributions != attributed_count:
+                incomplete_months.add(window.key)
+
+            attributed_counts[window.key] = attributed_count
+            repositories_by_month[window.key] = month_repositories
+            repositories.update(month_repositories)
+
+        return MonthlyCommitDiscoveryResult(
+            attributed_counts=attributed_counts,
+            repositories=repositories,
+            repositories_by_month=repositories_by_month,
+            incomplete_months=incomplete_months,
+        )
 
     @property
     async def views(self) -> int:

@@ -12,6 +12,7 @@ permissions:
 
 env:
   GENERATE_EXPERIMENTAL: true
+  STRICT_MONTHLY_COMMIT_VALIDATION: true
 
 jobs:
   build:
