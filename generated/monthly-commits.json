@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-24T00:54:12Z",
+  "generated_at": "2026-07-25T00:56:43Z",
   "window": {
     "months": 13,
     "timezone": "UTC",
@@ -121,7 +121,7 @@
       "count": 133,
       "is_current": true,
       "scan_degraded": false,
-      "github_attributed_count": 1957
+      "github_attributed_count": 2122
     }
   ]
 }
