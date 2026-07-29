@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-28T00:54:20Z",
+  "generated_at": "2026-07-29T00:54:45Z",
   "limited_data": [
     "repository traffic data degraded"
   ],
@@ -8,48 +8,48 @@
     "private_repositories": 0
   },
   "contribution_pulse": {
-    "total": 12108,
+    "total": 12182,
     "active_months": 13,
     "month_count": 13,
-    "average_monthly": 931.4,
+    "average_monthly": 937.1,
     "best_month": "Jul '26",
-    "best_month_count": 2694,
+    "best_month_count": 2768,
     "current_month": "Jul '26",
-    "current_month_count": 2694,
+    "current_month_count": 2768,
     "active_streak_months": 13
   },
   "contribution_mix": {
-    "commits": 8786,
+    "commits": 8798,
     "issues": 24,
     "pull_requests": 236,
     "pull_request_reviews": 2,
     "repositories": 87,
-    "restricted": 463,
-    "total": 9598
+    "restricted": 465,
+    "total": 9612
   },
   "impact": {
     "stars": 183,
-    "forks": 348,
+    "forks": 347,
     "views_14_days": 0,
     "clones_14_days": 0,
     "top_public_repo": {
       "display_name": "pRizz/CryptoNoter",
       "is_private": false,
-      "score": 545,
+      "score": 543,
       "stars": 7,
-      "forks": 269
+      "forks": 268
     }
   },
   "language_momentum": [
     {
       "language": "C",
-      "percent": 29.11,
+      "percent": 29.09,
       "color": "#555555",
       "repos": 29
     },
     {
       "language": "C++",
-      "percent": 24.12,
+      "percent": 24.1,
       "color": "#f34b7d",
       "repos": 25
     },
@@ -61,7 +61,7 @@
     },
     {
       "language": "Python",
-      "percent": 9.98,
+      "percent": 10.04,
       "color": "#3572A5",
       "repos": 51
     },
@@ -79,7 +79,7 @@
     },
     {
       "language": "JavaScript",
-      "percent": 3.7,
+      "percent": 3.69,
       "color": "#f1e05a",
       "repos": 164
     },
@@ -108,10 +108,10 @@
   },
   "personal_bests": {
     "best_month": "Jul '26",
-    "best_month_count": 2694,
+    "best_month_count": 2768,
     "active_streak_months": 13,
     "top_public_repo": "pRizz/CryptoNoter",
-    "top_public_repo_score": 545
+    "top_public_repo_score": 543
   },
   "trading_card": {
     "activity_score": 100,
@@ -125,9 +125,9 @@
       {
         "display_name": "pRizz/CryptoNoter",
         "is_private": false,
-        "score": 545,
+        "score": 543,
         "stars": 7,
-        "forks": 269
+        "forks": 268
       },
       {
         "display_name": "pRizz/Chatangle",
@@ -174,33 +174,33 @@
         "key": "trailing_30_days",
         "label": "30 days",
         "days": 30,
-        "commits": 259,
-        "per_hour": 0.3597,
-        "per_day": 8.63,
-        "per_week": 60.43,
-        "per_month": 259.0,
+        "commits": 320,
+        "per_hour": 0.4444,
+        "per_day": 10.67,
+        "per_week": 74.67,
+        "per_month": 320.0,
         "scan_degraded": false
       },
       {
         "key": "trailing_180_days",
         "label": "6 months",
         "days": 180,
-        "commits": 4258,
-        "per_hour": 0.9856,
-        "per_day": 23.66,
-        "per_week": 165.59,
-        "per_month": 709.67,
+        "commits": 4252,
+        "per_hour": 0.9843,
+        "per_day": 23.62,
+        "per_week": 165.36,
+        "per_month": 708.67,
         "scan_degraded": false
       },
       {
         "key": "trailing_365_days",
         "label": "365 days",
         "days": 365,
-        "commits": 6394,
-        "per_hour": 0.7299,
-        "per_day": 17.52,
-        "per_week": 122.62,
-        "per_month": 525.53,
+        "commits": 6455,
+        "per_hour": 0.7369,
+        "per_day": 17.68,
+        "per_week": 123.79,
+        "per_month": 530.55,
         "scan_degraded": false
       }
     ],
@@ -216,8 +216,8 @@
       "counting": "daily_aggregate_stargazer_snapshot",
       "path": "generated/star-history.csv",
       "timezone": "UTC",
-      "samples": 46,
-      "latest_date": "2026-07-28",
+      "samples": 47,
+      "latest_date": "2026-07-29",
       "latest_total": 183
     },
     "windows": [
@@ -228,150 +228,150 @@
         "bucket_days": 1,
         "latest_total": 183,
         "delta": 3,
-        "latest_date": "2026-07-28",
+        "latest_date": "2026-07-29",
         "sample_count": 24,
         "raw_sample_count": 24,
         "points": [
           {
-            "date": "2026-06-29",
+            "date": "2026-06-30",
             "offset_days": 0,
             "total_stargazers": 180,
             "repo_count": 105
           },
           {
-            "date": "2026-06-30",
+            "date": "2026-07-01",
             "offset_days": 1,
             "total_stargazers": 180,
             "repo_count": 105
           },
           {
-            "date": "2026-07-01",
+            "date": "2026-07-02",
             "offset_days": 2,
             "total_stargazers": 180,
             "repo_count": 105
           },
           {
-            "date": "2026-07-02",
+            "date": "2026-07-03",
             "offset_days": 3,
             "total_stargazers": 180,
             "repo_count": 105
           },
           {
-            "date": "2026-07-03",
+            "date": "2026-07-04",
             "offset_days": 4,
             "total_stargazers": 180,
             "repo_count": 105
           },
           {
-            "date": "2026-07-04",
+            "date": "2026-07-05",
             "offset_days": 5,
             "total_stargazers": 180,
             "repo_count": 105
           },
           {
-            "date": "2026-07-05",
+            "date": "2026-07-06",
             "offset_days": 6,
             "total_stargazers": 180,
             "repo_count": 105
           },
           {
-            "date": "2026-07-06",
+            "date": "2026-07-07",
             "offset_days": 7,
             "total_stargazers": 180,
             "repo_count": 105
           },
           {
-            "date": "2026-07-07",
+            "date": "2026-07-08",
             "offset_days": 8,
             "total_stargazers": 180,
             "repo_count": 105
           },
           {
-            "date": "2026-07-08",
+            "date": "2026-07-09",
             "offset_days": 9,
             "total_stargazers": 180,
             "repo_count": 105
           },
           {
-            "date": "2026-07-09",
+            "date": "2026-07-10",
             "offset_days": 10,
             "total_stargazers": 180,
             "repo_count": 105
           },
           {
-            "date": "2026-07-10",
+            "date": "2026-07-11",
             "offset_days": 11,
             "total_stargazers": 180,
             "repo_count": 105
           },
           {
-            "date": "2026-07-11",
-            "offset_days": 12,
-            "total_stargazers": 180,
-            "repo_count": 105
-          },
-          {
             "date": "2026-07-13",
-            "offset_days": 14,
+            "offset_days": 13,
             "total_stargazers": 180,
             "repo_count": 105
           },
           {
             "date": "2026-07-14",
-            "offset_days": 15,
+            "offset_days": 14,
             "total_stargazers": 180,
             "repo_count": 106
           },
           {
             "date": "2026-07-15",
-            "offset_days": 16,
+            "offset_days": 15,
             "total_stargazers": 180,
             "repo_count": 106
           },
           {
             "date": "2026-07-16",
-            "offset_days": 17,
+            "offset_days": 16,
             "total_stargazers": 180,
             "repo_count": 106
           },
           {
             "date": "2026-07-22",
-            "offset_days": 23,
+            "offset_days": 22,
             "total_stargazers": 180,
             "repo_count": 106
           },
           {
             "date": "2026-07-23",
-            "offset_days": 24,
+            "offset_days": 23,
             "total_stargazers": 181,
             "repo_count": 106
           },
           {
             "date": "2026-07-24",
-            "offset_days": 25,
+            "offset_days": 24,
             "total_stargazers": 182,
             "repo_count": 106
           },
           {
             "date": "2026-07-25",
-            "offset_days": 26,
+            "offset_days": 25,
             "total_stargazers": 183,
             "repo_count": 106
           },
           {
             "date": "2026-07-26",
-            "offset_days": 27,
+            "offset_days": 26,
             "total_stargazers": 183,
             "repo_count": 106
           },
           {
             "date": "2026-07-27",
-            "offset_days": 28,
+            "offset_days": 27,
             "total_stargazers": 183,
             "repo_count": 106
           },
           {
             "date": "2026-07-28",
+            "offset_days": 28,
+            "total_stargazers": 183,
+            "repo_count": 106
+          },
+          {
+            "date": "2026-07-29",
             "offset_days": 29,
             "total_stargazers": 183,
             "repo_count": 106
@@ -385,108 +385,108 @@
         "bucket_days": 3,
         "latest_total": 183,
         "delta": 3,
-        "latest_date": "2026-07-28",
+        "latest_date": "2026-07-29",
         "sample_count": 17,
-        "raw_sample_count": 46,
+        "raw_sample_count": 47,
         "points": [
           {
-            "date": "2026-06-07",
+            "date": "2026-06-08",
             "offset_days": 38,
             "total_stargazers": 180,
             "repo_count": 104
           },
           {
-            "date": "2026-06-10",
+            "date": "2026-06-11",
             "offset_days": 41,
             "total_stargazers": 179,
             "repo_count": 104
           },
           {
-            "date": "2026-06-13",
+            "date": "2026-06-14",
             "offset_days": 44,
             "total_stargazers": 179,
             "repo_count": 104
           },
           {
-            "date": "2026-06-16",
+            "date": "2026-06-17",
             "offset_days": 47,
             "total_stargazers": 179,
             "repo_count": 104
           },
           {
-            "date": "2026-06-19",
+            "date": "2026-06-20",
             "offset_days": 50,
-            "total_stargazers": 179,
+            "total_stargazers": 180,
             "repo_count": 104
           },
           {
-            "date": "2026-06-22",
+            "date": "2026-06-23",
             "offset_days": 53,
             "total_stargazers": 180,
             "repo_count": 104
           },
           {
             "date": "2026-06-25",
-            "offset_days": 56,
+            "offset_days": 55,
             "total_stargazers": 180,
             "repo_count": 105
           },
           {
-            "date": "2026-06-28",
+            "date": "2026-06-29",
             "offset_days": 59,
             "total_stargazers": 180,
             "repo_count": 105
           },
           {
-            "date": "2026-07-01",
+            "date": "2026-07-02",
             "offset_days": 62,
             "total_stargazers": 180,
             "repo_count": 105
           },
           {
-            "date": "2026-07-04",
+            "date": "2026-07-05",
             "offset_days": 65,
             "total_stargazers": 180,
             "repo_count": 105
           },
           {
-            "date": "2026-07-07",
+            "date": "2026-07-08",
             "offset_days": 68,
             "total_stargazers": 180,
             "repo_count": 105
           },
           {
-            "date": "2026-07-10",
+            "date": "2026-07-11",
             "offset_days": 71,
             "total_stargazers": 180,
             "repo_count": 105
           },
           {
-            "date": "2026-07-13",
+            "date": "2026-07-14",
             "offset_days": 74,
             "total_stargazers": 180,
-            "repo_count": 105
+            "repo_count": 106
           },
           {
             "date": "2026-07-16",
-            "offset_days": 77,
+            "offset_days": 76,
             "total_stargazers": 180,
             "repo_count": 106
           },
           {
-            "date": "2026-07-22",
+            "date": "2026-07-23",
             "offset_days": 83,
-            "total_stargazers": 180,
+            "total_stargazers": 181,
             "repo_count": 106
           },
           {
-            "date": "2026-07-25",
+            "date": "2026-07-26",
             "offset_days": 86,
             "total_stargazers": 183,
             "repo_count": 106
           },
           {
-            "date": "2026-07-28",
+            "date": "2026-07-29",
             "offset_days": 89,
             "total_stargazers": 183,
             "repo_count": 106
@@ -500,60 +500,60 @@
         "bucket_days": 7,
         "latest_total": 183,
         "delta": 3,
-        "latest_date": "2026-07-28",
+        "latest_date": "2026-07-29",
         "sample_count": 9,
-        "raw_sample_count": 46,
+        "raw_sample_count": 47,
         "points": [
           {
-            "date": "2026-06-08",
+            "date": "2026-06-09",
             "offset_days": 314,
             "total_stargazers": 180,
             "repo_count": 104
           },
           {
-            "date": "2026-06-15",
+            "date": "2026-06-16",
             "offset_days": 321,
             "total_stargazers": 179,
             "repo_count": 104
           },
           {
-            "date": "2026-06-22",
+            "date": "2026-06-23",
             "offset_days": 328,
             "total_stargazers": 180,
             "repo_count": 104
           },
           {
-            "date": "2026-06-29",
+            "date": "2026-06-30",
             "offset_days": 335,
             "total_stargazers": 180,
             "repo_count": 105
           },
           {
-            "date": "2026-07-06",
+            "date": "2026-07-07",
             "offset_days": 342,
             "total_stargazers": 180,
             "repo_count": 105
           },
           {
-            "date": "2026-07-13",
+            "date": "2026-07-14",
             "offset_days": 349,
-            "total_stargazers": 180,
-            "repo_count": 105
-          },
-          {
-            "date": "2026-07-16",
-            "offset_days": 352,
             "total_stargazers": 180,
             "repo_count": 106
           },
           {
-            "date": "2026-07-27",
+            "date": "2026-07-16",
+            "offset_days": 351,
+            "total_stargazers": 180,
+            "repo_count": 106
+          },
+          {
+            "date": "2026-07-28",
             "offset_days": 363,
             "total_stargazers": 183,
             "repo_count": 106
           },
           {
-            "date": "2026-07-28",
+            "date": "2026-07-29",
             "offset_days": 364,
             "total_stargazers": 183,
             "repo_count": 106
@@ -564,63 +564,6 @@
   },
   "repositories": [
     {
-      "display_name": "pRizz/Prusa-Firmware-Buddy",
-      "is_owned_by_viewer": true,
-      "is_private": false,
-      "is_fork": true,
-      "is_archived": false,
-      "stargazers": 0,
-      "forks": 0,
-      "updated_at": "2026-07-27T16:16:25Z",
-      "pushed_at": "2026-07-27T16:15:48Z",
-      "open_issues": 0,
-      "open_pull_requests": 0,
-      "releases": 0,
-      "tags": 113,
-      "languages": {
-        "C": {
-          "size": 73536237,
-          "color": "#555555"
-        },
-        "C++": {
-          "size": 26711359,
-          "color": "#f34b7d"
-        },
-        "G-code": {
-          "size": 3922294,
-          "color": "#D08CF2"
-        },
-        "Python": {
-          "size": 3298080,
-          "color": "#3572A5"
-        },
-        "Assembly": {
-          "size": 982660,
-          "color": "#6E4C13"
-        },
-        "CMake": {
-          "size": 785944,
-          "color": "#DA3434"
-        },
-        "Linker Script": {
-          "size": 726262,
-          "color": null
-        },
-        "Makefile": {
-          "size": 398066,
-          "color": "#427819"
-        },
-        "Rust": {
-          "size": 380789,
-          "color": "#dea584"
-        },
-        "CSS": {
-          "size": 293798,
-          "color": "#663399"
-        }
-      }
-    },
-    {
       "display_name": "pRizz/pRizz",
       "is_owned_by_viewer": true,
       "is_private": false,
@@ -628,8 +571,8 @@
       "is_archived": false,
       "stargazers": 0,
       "forks": 0,
-      "updated_at": "2026-07-27T15:20:33Z",
-      "pushed_at": "2026-07-27T15:18:36Z",
+      "updated_at": "2026-07-28T15:14:01Z",
+      "pushed_at": "2026-07-28T15:06:31Z",
       "open_issues": 0,
       "open_pull_requests": 0,
       "releases": 0,
@@ -653,90 +596,20 @@
       "is_archived": false,
       "stargazers": 0,
       "forks": 0,
-      "updated_at": "2026-07-27T15:08:56Z",
-      "pushed_at": "2026-07-27T15:05:39Z",
+      "updated_at": "2026-07-28T15:01:55Z",
+      "pushed_at": "2026-07-28T14:54:12Z",
       "open_issues": 0,
       "open_pull_requests": 0,
       "releases": 0,
       "tags": 2,
       "languages": {
         "TypeScript": {
-          "size": 431194,
+          "size": 434536,
           "color": "#3178c6"
         },
         "Shell": {
           "size": 11281,
           "color": "#89e051"
-        }
-      }
-    },
-    {
-      "display_name": "pRizz/yolo-port",
-      "is_owned_by_viewer": true,
-      "is_private": false,
-      "is_fork": false,
-      "is_archived": false,
-      "stargazers": 0,
-      "forks": 0,
-      "updated_at": "2026-07-27T15:08:11Z",
-      "pushed_at": "2026-07-27T15:04:28Z",
-      "open_issues": 0,
-      "open_pull_requests": 0,
-      "releases": 0,
-      "tags": 0,
-      "languages": {
-        "TypeScript": {
-          "size": 294971,
-          "color": "#3178c6"
-        },
-        "Shell": {
-          "size": 42675,
-          "color": "#89e051"
-        },
-        "JavaScript": {
-          "size": 7019,
-          "color": "#f1e05a"
-        },
-        "Go Template": {
-          "size": 1588,
-          "color": "#00ADD8"
-        }
-      }
-    },
-    {
-      "display_name": "pRizz/zeckendorf-circuit-playground",
-      "is_owned_by_viewer": true,
-      "is_private": false,
-      "is_fork": false,
-      "is_archived": false,
-      "stargazers": 0,
-      "forks": 0,
-      "updated_at": "2026-07-27T15:07:43Z",
-      "pushed_at": "2026-07-27T15:03:43Z",
-      "open_issues": 0,
-      "open_pull_requests": 0,
-      "releases": 0,
-      "tags": 0,
-      "languages": {
-        "TypeScript": {
-          "size": 156792,
-          "color": "#3178c6"
-        },
-        "CSS": {
-          "size": 19218,
-          "color": "#663399"
-        },
-        "Shell": {
-          "size": 11281,
-          "color": "#89e051"
-        },
-        "HTML": {
-          "size": 642,
-          "color": "#e34c26"
-        },
-        "JavaScript": {
-          "size": 83,
-          "color": "#f1e05a"
         }
       }
     },
@@ -748,15 +621,15 @@
       "is_archived": false,
       "stargazers": 0,
       "forks": 0,
-      "updated_at": "2026-07-27T15:05:06Z",
-      "pushed_at": "2026-07-27T15:03:49Z",
+      "updated_at": "2026-07-28T15:00:53Z",
+      "pushed_at": "2026-07-28T14:52:59Z",
       "open_issues": 0,
       "open_pull_requests": 0,
       "releases": 0,
       "tags": 0,
       "languages": {
         "TypeScript": {
-          "size": 523616,
+          "size": 526958,
           "color": "#3178c6"
         },
         "Shell": {
@@ -778,6 +651,166 @@
       }
     },
     {
+      "display_name": "pRizz/zeckendorf-circuit-playground",
+      "is_owned_by_viewer": true,
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-07-28T14:59:43Z",
+      "pushed_at": "2026-07-28T14:52:52Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 160134,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 19218,
+          "color": "#663399"
+        },
+        "Shell": {
+          "size": 11281,
+          "color": "#89e051"
+        },
+        "HTML": {
+          "size": 642,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 83,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/yolo-port",
+      "is_owned_by_viewer": true,
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-07-28T14:59:07Z",
+      "pushed_at": "2026-07-28T14:53:11Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 298313,
+          "color": "#3178c6"
+        },
+        "Shell": {
+          "size": 42675,
+          "color": "#89e051"
+        },
+        "JavaScript": {
+          "size": 7019,
+          "color": "#f1e05a"
+        },
+        "Go Template": {
+          "size": 1588,
+          "color": "#00ADD8"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/bright-builds-portfolio-website",
+      "is_owned_by_viewer": true,
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-07-28T14:56:24Z",
+      "pushed_at": "2026-07-28T14:50:06Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 5,
+      "languages": {
+        "TypeScript": {
+          "size": 778321,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 18472,
+          "color": "#663399"
+        },
+        "Shell": {
+          "size": 11281,
+          "color": "#89e051"
+        },
+        "JavaScript": {
+          "size": 83,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/Prusa-Firmware-Buddy",
+      "is_owned_by_viewer": true,
+      "is_private": false,
+      "is_fork": true,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-07-28T14:55:40Z",
+      "pushed_at": "2026-07-28T14:52:40Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 113,
+      "languages": {
+        "C": {
+          "size": 73536237,
+          "color": "#555555"
+        },
+        "C++": {
+          "size": 26695703,
+          "color": "#f34b7d"
+        },
+        "G-code": {
+          "size": 3922294,
+          "color": "#D08CF2"
+        },
+        "Python": {
+          "size": 3534016,
+          "color": "#3572A5"
+        },
+        "Assembly": {
+          "size": 982660,
+          "color": "#6E4C13"
+        },
+        "CMake": {
+          "size": 788588,
+          "color": "#DA3434"
+        },
+        "Linker Script": {
+          "size": 726262,
+          "color": null
+        },
+        "Makefile": {
+          "size": 398066,
+          "color": "#427819"
+        },
+        "Rust": {
+          "size": 377816,
+          "color": "#dea584"
+        },
+        "CSS": {
+          "size": 293798,
+          "color": "#663399"
+        }
+      }
+    },
+    {
       "display_name": "pRizz/open-links",
       "is_owned_by_viewer": true,
       "is_private": false,
@@ -785,15 +818,15 @@
       "is_archived": false,
       "stargazers": 2,
       "forks": 1,
-      "updated_at": "2026-07-27T15:04:06Z",
-      "pushed_at": "2026-07-27T15:01:55Z",
+      "updated_at": "2026-07-28T14:54:14Z",
+      "pushed_at": "2026-07-28T14:51:37Z",
       "open_issues": 0,
       "open_pull_requests": 0,
       "releases": 0,
       "tags": 3,
       "languages": {
         "TypeScript": {
-          "size": 3076798,
+          "size": 3080140,
           "color": "#3178c6"
         },
         "CSS": {
@@ -819,68 +852,6 @@
       }
     },
     {
-      "display_name": "pRizz/zeckendorf",
-      "is_owned_by_viewer": true,
-      "is_private": false,
-      "is_fork": false,
-      "is_archived": false,
-      "stargazers": 2,
-      "forks": 0,
-      "updated_at": "2026-07-27T15:02:50Z",
-      "pushed_at": "2026-07-27T14:57:17Z",
-      "open_issues": 0,
-      "open_pull_requests": 1,
-      "releases": 0,
-      "tags": 14,
-      "languages": {
-        "Rust": {
-          "size": 139078,
-          "color": "#dea584"
-        },
-        "TypeScript": {
-          "size": 23889,
-          "color": "#3178c6"
-        },
-        "Shell": {
-          "size": 17811,
-          "color": "#89e051"
-        }
-      }
-    },
-    {
-      "display_name": "pRizz/bright-builds-portfolio-website",
-      "is_owned_by_viewer": true,
-      "is_private": false,
-      "is_fork": false,
-      "is_archived": false,
-      "stargazers": 0,
-      "forks": 0,
-      "updated_at": "2026-07-27T15:01:39Z",
-      "pushed_at": "2026-07-27T15:00:27Z",
-      "open_issues": 0,
-      "open_pull_requests": 0,
-      "releases": 0,
-      "tags": 5,
-      "languages": {
-        "TypeScript": {
-          "size": 774979,
-          "color": "#3178c6"
-        },
-        "CSS": {
-          "size": 18472,
-          "color": "#663399"
-        },
-        "Shell": {
-          "size": 11281,
-          "color": "#89e051"
-        },
-        "JavaScript": {
-          "size": 83,
-          "color": "#f1e05a"
-        }
-      }
-    },
-    {
       "display_name": "pRizz/bitcoin-bond-proposal",
       "is_owned_by_viewer": true,
       "is_private": false,
@@ -888,15 +859,15 @@
       "is_archived": false,
       "stargazers": 0,
       "forks": 0,
-      "updated_at": "2026-07-27T15:00:18Z",
-      "pushed_at": "2026-07-27T14:56:08Z",
+      "updated_at": "2026-07-28T14:51:43Z",
+      "pushed_at": "2026-07-28T14:46:21Z",
       "open_issues": 0,
       "open_pull_requests": 0,
       "releases": 0,
       "tags": 3,
       "languages": {
         "TypeScript": {
-          "size": 213183,
+          "size": 216525,
           "color": "#3178c6"
         },
         "Shell": {
@@ -910,6 +881,35 @@
       }
     },
     {
+      "display_name": "pRizz/zeckendorf",
+      "is_owned_by_viewer": true,
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 2,
+      "forks": 0,
+      "updated_at": "2026-07-28T14:51:16Z",
+      "pushed_at": "2026-07-28T14:47:13Z",
+      "open_issues": 0,
+      "open_pull_requests": 1,
+      "releases": 0,
+      "tags": 14,
+      "languages": {
+        "Rust": {
+          "size": 139078,
+          "color": "#dea584"
+        },
+        "TypeScript": {
+          "size": 27231,
+          "color": "#3178c6"
+        },
+        "Shell": {
+          "size": 17811,
+          "color": "#89e051"
+        }
+      }
+    },
+    {
       "display_name": "pRizz/github-stats",
       "is_owned_by_viewer": true,
       "is_private": false,
@@ -917,8 +917,8 @@
       "is_archived": false,
       "stargazers": 0,
       "forks": 0,
-      "updated_at": "2026-07-27T01:13:32Z",
-      "pushed_at": "2026-07-27T01:13:26Z",
+      "updated_at": "2026-07-28T01:05:43Z",
+      "pushed_at": "2026-07-28T01:05:38Z",
       "open_issues": 0,
       "open_pull_requests": 0,
       "releases": 0,
@@ -987,7 +987,7 @@
       "is_fork": false,
       "is_archived": false,
       "stargazers": 7,
-      "forks": 269,
+      "forks": 268,
       "updated_at": "2026-07-24T14:55:03Z",
       "pushed_at": "2017-12-14T22:08:12Z",
       "open_issues": 0,
