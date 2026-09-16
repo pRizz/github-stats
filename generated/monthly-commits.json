@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-15T04:51:15Z",
+  "generated_at": "2026-09-16T04:47:53Z",
   "window": {
     "months": 13,
     "timezone": "UTC",
@@ -13,15 +13,15 @@
       "prizz",
       "pRizz"
     ],
-    "repo_count": 267,
+    "repo_count": 268,
     "scanned_months": 1,
     "degraded_months": 0,
     "degraded_repo_months": 0,
     "discovery": {
-      "base_repo_count": 263,
+      "base_repo_count": 264,
       "contribution_repo_count": 4,
       "configured_extra_repo_count": 0,
-      "scan_repo_count": 267,
+      "scan_repo_count": 268,
       "incomplete_months": [],
       "warnings": []
     }
@@ -128,11 +128,11 @@
     {
       "key": "2026-09",
       "label": "Sep '26",
-      "count": 232,
+      "count": 238,
       "is_current": true,
       "scan_degraded": false,
-      "scan_candidate_count": 232,
-      "github_attributed_count": 232
+      "scan_candidate_count": 238,
+      "github_attributed_count": 238
     }
   ]
 }
