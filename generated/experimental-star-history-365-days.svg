@@ -23,28 +23,28 @@ svg { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial
 <text class="title" x="21" y="36">Owned Stars: 365 days</text>
 <text class="subtitle" x="21" y="55">187 total; +7 in window</text>
 <line class="axis" x1="24" y1="156" x2="336" y2="156" />
-<path class="chart-line" d="M 221.1 146.2 L 227.1 156.0 L 233.1 146.2 L 239.1 146.2 L 245.1 146.2 L 250.3 146.2 L 254.6 146.2 L 263.1 117.0 L 269.1 126.8 L 275.1 126.8 L 281.1 126.8 L 287.1 117.0 L 293.1 117.0 L 299.1 117.0 L 305.1 107.2 L 311.1 107.2 L 317.1 107.2 L 323.1 97.5 L 329.1 97.5 L 335.1 78.0 L 336.0 78.0" />
-<circle class="chart-point" cx="221.1" cy="146.2" r="3.5" style="animation-delay: 0ms"><title>2026-06-07: 180 stars</title></circle>
-<circle class="chart-point" cx="227.1" cy="156.0" r="3.5" style="animation-delay: 55ms"><title>2026-06-14: 179 stars</title></circle>
-<circle class="chart-point" cx="233.1" cy="146.2" r="3.5" style="animation-delay: 110ms"><title>2026-06-21: 180 stars</title></circle>
-<circle class="chart-point" cx="239.1" cy="146.2" r="3.5" style="animation-delay: 165ms"><title>2026-06-28: 180 stars</title></circle>
-<circle class="chart-point" cx="245.1" cy="146.2" r="3.5" style="animation-delay: 220ms"><title>2026-07-05: 180 stars</title></circle>
-<circle class="chart-point" cx="250.3" cy="146.2" r="3.5" style="animation-delay: 275ms"><title>2026-07-11: 180 stars</title></circle>
-<circle class="chart-point" cx="254.6" cy="146.2" r="3.5" style="animation-delay: 330ms"><title>2026-07-16: 180 stars</title></circle>
-<circle class="chart-point" cx="263.1" cy="117.0" r="3.5" style="animation-delay: 385ms"><title>2026-07-26: 183 stars</title></circle>
-<circle class="chart-point" cx="269.1" cy="126.8" r="3.5" style="animation-delay: 440ms"><title>2026-08-02: 182 stars</title></circle>
-<circle class="chart-point" cx="275.1" cy="126.8" r="3.5" style="animation-delay: 495ms"><title>2026-08-09: 182 stars</title></circle>
-<circle class="chart-point" cx="281.1" cy="126.8" r="3.5" style="animation-delay: 550ms"><title>2026-08-16: 182 stars</title></circle>
-<circle class="chart-point" cx="287.1" cy="117.0" r="3.5" style="animation-delay: 605ms"><title>2026-08-23: 183 stars</title></circle>
-<circle class="chart-point" cx="293.1" cy="117.0" r="3.5" style="animation-delay: 660ms"><title>2026-08-30: 183 stars</title></circle>
-<circle class="chart-point" cx="299.1" cy="117.0" r="3.5" style="animation-delay: 715ms"><title>2026-09-06: 183 stars</title></circle>
-<circle class="chart-point" cx="305.1" cy="107.2" r="3.5" style="animation-delay: 770ms"><title>2026-09-13: 184 stars</title></circle>
-<circle class="chart-point" cx="311.1" cy="107.2" r="3.5" style="animation-delay: 825ms"><title>2026-09-20: 184 stars</title></circle>
-<circle class="chart-point" cx="317.1" cy="107.2" r="3.5" style="animation-delay: 880ms"><title>2026-09-27: 184 stars</title></circle>
-<circle class="chart-point" cx="323.1" cy="97.5" r="3.5" style="animation-delay: 935ms"><title>2026-10-04: 185 stars</title></circle>
-<circle class="chart-point" cx="329.1" cy="97.5" r="3.5" style="animation-delay: 990ms"><title>2026-10-11: 185 stars</title></circle>
-<circle class="chart-point" cx="335.1" cy="78.0" r="3.5" style="animation-delay: 1045ms"><title>2026-10-18: 187 stars</title></circle>
-<circle class="chart-point" cx="336.0" cy="78.0" r="3.5" style="animation-delay: 1100ms"><title>2026-10-19: 187 stars</title></circle>
+<path class="chart-line" d="M 221.1 146.2 L 227.1 156.0 L 233.1 146.2 L 239.1 146.2 L 245.1 146.2 L 251.1 146.2 L 253.7 146.2 L 263.1 117.0 L 269.1 126.8 L 275.1 126.8 L 281.1 126.8 L 287.1 117.0 L 293.1 117.0 L 299.1 117.0 L 305.1 107.2 L 311.1 107.2 L 317.1 107.2 L 323.1 97.5 L 329.1 97.5 L 335.1 78.0 L 336.0 78.0" />
+<circle class="chart-point" cx="221.1" cy="146.2" r="3.5" style="animation-delay: 0ms"><title>2026-06-08: 180 stars</title></circle>
+<circle class="chart-point" cx="227.1" cy="156.0" r="3.5" style="animation-delay: 55ms"><title>2026-06-15: 179 stars</title></circle>
+<circle class="chart-point" cx="233.1" cy="146.2" r="3.5" style="animation-delay: 110ms"><title>2026-06-22: 180 stars</title></circle>
+<circle class="chart-point" cx="239.1" cy="146.2" r="3.5" style="animation-delay: 165ms"><title>2026-06-29: 180 stars</title></circle>
+<circle class="chart-point" cx="245.1" cy="146.2" r="3.5" style="animation-delay: 220ms"><title>2026-07-06: 180 stars</title></circle>
+<circle class="chart-point" cx="251.1" cy="146.2" r="3.5" style="animation-delay: 275ms"><title>2026-07-13: 180 stars</title></circle>
+<circle class="chart-point" cx="253.7" cy="146.2" r="3.5" style="animation-delay: 330ms"><title>2026-07-16: 180 stars</title></circle>
+<circle class="chart-point" cx="263.1" cy="117.0" r="3.5" style="animation-delay: 385ms"><title>2026-07-27: 183 stars</title></circle>
+<circle class="chart-point" cx="269.1" cy="126.8" r="3.5" style="animation-delay: 440ms"><title>2026-08-03: 182 stars</title></circle>
+<circle class="chart-point" cx="275.1" cy="126.8" r="3.5" style="animation-delay: 495ms"><title>2026-08-10: 182 stars</title></circle>
+<circle class="chart-point" cx="281.1" cy="126.8" r="3.5" style="animation-delay: 550ms"><title>2026-08-17: 182 stars</title></circle>
+<circle class="chart-point" cx="287.1" cy="117.0" r="3.5" style="animation-delay: 605ms"><title>2026-08-24: 183 stars</title></circle>
+<circle class="chart-point" cx="293.1" cy="117.0" r="3.5" style="animation-delay: 660ms"><title>2026-08-31: 183 stars</title></circle>
+<circle class="chart-point" cx="299.1" cy="117.0" r="3.5" style="animation-delay: 715ms"><title>2026-09-07: 183 stars</title></circle>
+<circle class="chart-point" cx="305.1" cy="107.2" r="3.5" style="animation-delay: 770ms"><title>2026-09-14: 184 stars</title></circle>
+<circle class="chart-point" cx="311.1" cy="107.2" r="3.5" style="animation-delay: 825ms"><title>2026-09-21: 184 stars</title></circle>
+<circle class="chart-point" cx="317.1" cy="107.2" r="3.5" style="animation-delay: 880ms"><title>2026-09-28: 184 stars</title></circle>
+<circle class="chart-point" cx="323.1" cy="97.5" r="3.5" style="animation-delay: 935ms"><title>2026-10-05: 185 stars</title></circle>
+<circle class="chart-point" cx="329.1" cy="97.5" r="3.5" style="animation-delay: 990ms"><title>2026-10-12: 185 stars</title></circle>
+<circle class="chart-point" cx="335.1" cy="78.0" r="3.5" style="animation-delay: 1045ms"><title>2026-10-19: 187 stars</title></circle>
+<circle class="chart-point" cx="336.0" cy="78.0" r="3.5" style="animation-delay: 1100ms"><title>2026-10-20: 187 stars</title></circle>
 <text class="endpoint-label" x="215.1" y="138.2" text-anchor="end">180</text>
 <text class="endpoint-label" x="330.0" y="70.0" text-anchor="end">187</text>
 <g class="summary-row"><text class="label" x="21" y="181">Latest</text><text class="value" x="106" y="181" text-anchor="end">187</text><text class="label" x="141" y="181">Change</text><text class="value" x="229" y="181" text-anchor="end">+7</text><text class="label" x="265" y="181">Samples</text><text class="value" x="339" y="181" text-anchor="end">21</text></g>
