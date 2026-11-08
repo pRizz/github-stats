@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-28T05:34:52Z",
+  "generated_at": "2026-11-08T17:53:40Z",
   "limited_data": [
     "repository traffic data degraded"
   ],
@@ -8,28 +8,28 @@
     "private_repositories": 0
   },
   "contribution_pulse": {
-    "total": 16110,
+    "total": 16263,
     "active_months": 13,
     "month_count": 13,
-    "average_monthly": 1239.2,
+    "average_monthly": 1251.0,
     "best_month": "Jul '26",
     "best_month_count": 2906,
-    "current_month": "Oct '26",
-    "current_month_count": 1448,
+    "current_month": "Nov '26",
+    "current_month_count": 187,
     "active_streak_months": 13
   },
   "contribution_mix": {
-    "commits": 12732,
-    "issues": 41,
-    "pull_requests": 307,
-    "pull_request_reviews": 2,
-    "repositories": 86,
-    "restricted": 666,
-    "total": 13834
+    "commits": 12843,
+    "issues": 46,
+    "pull_requests": 313,
+    "pull_request_reviews": 3,
+    "repositories": 88,
+    "restricted": 671,
+    "total": 13964
   },
   "impact": {
     "stars": 188,
-    "forks": 344,
+    "forks": 345,
     "views_14_days": 0,
     "clones_14_days": 0,
     "top_public_repo": {
@@ -43,68 +43,68 @@
   "language_momentum": [
     {
       "language": "C",
-      "percent": 33.87,
+      "percent": 32.79,
       "color": "#555555",
-      "repos": 32
+      "repos": 33
     },
     {
       "language": "TypeScript",
-      "percent": 17.3,
+      "percent": 18.19,
       "color": "#3178c6",
-      "repos": 81
+      "repos": 84
     },
     {
       "language": "C++",
-      "percent": 17.23,
+      "percent": 16.2,
       "color": "#f34b7d",
-      "repos": 27
+      "repos": 30
     },
     {
       "language": "Python",
-      "percent": 7.76,
+      "percent": 8.07,
       "color": "#3572A5",
-      "repos": 55
+      "repos": 58
     },
     {
       "language": "Rust",
-      "percent": 7.33,
+      "percent": 7.67,
       "color": "#dea584",
       "repos": 36
     },
     {
       "language": "JavaScript",
-      "percent": 3.45,
+      "percent": 3.72,
       "color": "#f1e05a",
       "repos": 166
     },
     {
       "language": "HTML",
-      "percent": 2.86,
+      "percent": 3.02,
       "color": "#e34c26",
-      "repos": 123
+      "repos": 124
     },
     {
       "language": "Swift",
-      "percent": 2.18,
+      "percent": 2.3,
       "color": "#F05138",
       "repos": 9
     }
   ],
   "collaboration": {
-    "merged_pull_requests": 322,
-    "pull_request_reviews": 2,
-    "issues": 41,
-    "owned_repositories": 267,
+    "merged_pull_requests": 323,
+    "pull_request_reviews": 3,
+    "issues": 46,
+    "owned_repositories": 272,
     "external_repositories": 0
   },
   "maintainer_health": {
-    "open_issues": 95,
+    "open_issues": 97,
     "open_pull_requests": 180,
-    "recently_updated": 18,
-    "stale_repositories": 147,
+    "recently_updated": 21,
+    "stale_repositories": 148,
     "archived_repositories": 0,
     "release_repositories": 0,
-    "tagged_repositories": 98
+    "tagged_repositories": 102
   },
   "personal_bests": {
     "best_month": "Jul '26",
@@ -116,7 +116,7 @@
   "trading_card": {
     "activity_score": 100,
     "impact_score": 44,
-    "collaboration_score": 70,
+    "collaboration_score": 72,
     "breadth_score": 100,
     "primary_language": "C"
   },
@@ -165,7 +165,7 @@
         "forks": 11
       }
     ],
-    "public_repositories": 107,
+    "public_repositories": 109,
     "private_repositories": 0
   },
   "commit_velocity": {
@@ -174,40 +174,40 @@
         "key": "trailing_30_days",
         "label": "30 days",
         "days": 30,
-        "commits": 181,
-        "per_hour": 0.2514,
-        "per_day": 6.03,
-        "per_week": 42.23,
-        "per_month": 181.0,
+        "commits": 298,
+        "per_hour": 0.4139,
+        "per_day": 9.93,
+        "per_week": 69.53,
+        "per_month": 298.0,
         "scan_degraded": false
       },
       {
         "key": "trailing_180_days",
         "label": "6 months",
         "days": 180,
-        "commits": 2126,
-        "per_hour": 0.4921,
-        "per_day": 11.81,
-        "per_week": 82.68,
-        "per_month": 354.33,
+        "commits": 2029,
+        "per_hour": 0.4697,
+        "per_day": 11.27,
+        "per_week": 78.91,
+        "per_month": 338.17,
         "scan_degraded": false
       },
       {
         "key": "trailing_365_days",
         "label": "365 days",
         "days": 365,
-        "commits": 6725,
-        "per_hour": 0.7677,
-        "per_day": 18.42,
-        "per_week": 128.97,
-        "per_month": 552.74,
+        "commits": 6894,
+        "per_hour": 0.787,
+        "per_day": 18.89,
+        "per_week": 132.21,
+        "per_month": 566.63,
         "scan_degraded": false
       }
     ],
     "source": {
       "counting": "rest_commits_identity_scan",
       "timezone": "UTC",
-      "repo_count": 267,
+      "repo_count": 272,
       "degraded_windows": 0
     }
   },
@@ -216,8 +216,8 @@
       "counting": "daily_aggregate_stargazer_snapshot",
       "path": "generated/star-history.csv",
       "timezone": "UTC",
-      "samples": 137,
-      "latest_date": "2026-10-28",
+      "samples": 138,
+      "latest_date": "2026-11-08",
       "latest_total": 188
     },
     "windows": [
@@ -227,184 +227,124 @@
         "days": 30,
         "bucket_days": 1,
         "latest_total": 188,
-        "delta": 4,
-        "latest_date": "2026-10-28",
-        "sample_count": 29,
-        "raw_sample_count": 29,
+        "delta": 3,
+        "latest_date": "2026-11-08",
+        "sample_count": 19,
+        "raw_sample_count": 19,
         "points": [
           {
-            "date": "2026-09-29",
-            "offset_days": 0,
-            "total_stargazers": 184,
-            "repo_count": 106
-          },
-          {
-            "date": "2026-09-30",
-            "offset_days": 1,
-            "total_stargazers": 184,
-            "repo_count": 106
-          },
-          {
-            "date": "2026-10-01",
-            "offset_days": 2,
-            "total_stargazers": 184,
-            "repo_count": 106
-          },
-          {
-            "date": "2026-10-02",
-            "offset_days": 3,
-            "total_stargazers": 185,
-            "repo_count": 106
-          },
-          {
-            "date": "2026-10-03",
-            "offset_days": 4,
-            "total_stargazers": 185,
-            "repo_count": 106
-          },
-          {
-            "date": "2026-10-04",
-            "offset_days": 5,
-            "total_stargazers": 185,
-            "repo_count": 106
-          },
-          {
-            "date": "2026-10-05",
-            "offset_days": 6,
-            "total_stargazers": 185,
-            "repo_count": 107
-          },
-          {
-            "date": "2026-10-06",
-            "offset_days": 7,
-            "total_stargazers": 185,
-            "repo_count": 107
-          },
-          {
-            "date": "2026-10-07",
-            "offset_days": 8,
-            "total_stargazers": 185,
-            "repo_count": 107
-          },
-          {
-            "date": "2026-10-08",
-            "offset_days": 9,
-            "total_stargazers": 185,
-            "repo_count": 107
-          },
-          {
-            "date": "2026-10-09",
-            "offset_days": 10,
-            "total_stargazers": 185,
-            "repo_count": 107
-          },
-          {
             "date": "2026-10-10",
-            "offset_days": 11,
+            "offset_days": 0,
             "total_stargazers": 185,
             "repo_count": 107
           },
           {
             "date": "2026-10-11",
-            "offset_days": 12,
+            "offset_days": 1,
             "total_stargazers": 185,
             "repo_count": 107
           },
           {
             "date": "2026-10-12",
-            "offset_days": 13,
+            "offset_days": 2,
             "total_stargazers": 185,
             "repo_count": 107
           },
           {
             "date": "2026-10-13",
-            "offset_days": 14,
+            "offset_days": 3,
             "total_stargazers": 185,
             "repo_count": 107
           },
           {
             "date": "2026-10-14",
-            "offset_days": 15,
+            "offset_days": 4,
             "total_stargazers": 186,
             "repo_count": 107
           },
           {
             "date": "2026-10-16",
-            "offset_days": 17,
+            "offset_days": 6,
             "total_stargazers": 187,
             "repo_count": 107
           },
           {
             "date": "2026-10-17",
-            "offset_days": 18,
+            "offset_days": 7,
             "total_stargazers": 187,
             "repo_count": 107
           },
           {
             "date": "2026-10-18",
-            "offset_days": 19,
+            "offset_days": 8,
             "total_stargazers": 187,
             "repo_count": 107
           },
           {
             "date": "2026-10-19",
-            "offset_days": 20,
+            "offset_days": 9,
             "total_stargazers": 187,
             "repo_count": 107
           },
           {
             "date": "2026-10-20",
-            "offset_days": 21,
+            "offset_days": 10,
             "total_stargazers": 187,
             "repo_count": 107
           },
           {
             "date": "2026-10-21",
-            "offset_days": 22,
+            "offset_days": 11,
             "total_stargazers": 187,
             "repo_count": 107
           },
           {
             "date": "2026-10-22",
-            "offset_days": 23,
+            "offset_days": 12,
             "total_stargazers": 188,
             "repo_count": 107
           },
           {
             "date": "2026-10-23",
-            "offset_days": 24,
+            "offset_days": 13,
             "total_stargazers": 188,
             "repo_count": 107
           },
           {
             "date": "2026-10-24",
-            "offset_days": 25,
+            "offset_days": 14,
             "total_stargazers": 188,
             "repo_count": 107
           },
           {
             "date": "2026-10-25",
-            "offset_days": 26,
+            "offset_days": 15,
             "total_stargazers": 188,
             "repo_count": 107
           },
           {
             "date": "2026-10-26",
-            "offset_days": 27,
+            "offset_days": 16,
             "total_stargazers": 188,
             "repo_count": 107
           },
           {
             "date": "2026-10-27",
-            "offset_days": 28,
+            "offset_days": 17,
             "total_stargazers": 188,
             "repo_count": 107
           },
           {
             "date": "2026-10-28",
-            "offset_days": 29,
+            "offset_days": 18,
             "total_stargazers": 188,
             "repo_count": 107
+          },
+          {
+            "date": "2026-11-08",
+            "offset_days": 29,
+            "total_stargazers": 188,
+            "repo_count": 109
           }
         ]
       },
@@ -415,189 +355,177 @@
         "bucket_days": 3,
         "latest_total": 188,
         "delta": 6,
-        "latest_date": "2026-10-28",
-        "sample_count": 30,
-        "raw_sample_count": 89,
+        "latest_date": "2026-11-08",
+        "sample_count": 28,
+        "raw_sample_count": 79,
         "points": [
           {
-            "date": "2026-08-02",
+            "date": "2026-08-13",
             "offset_days": 2,
             "total_stargazers": 182,
             "repo_count": 106
           },
           {
-            "date": "2026-08-05",
+            "date": "2026-08-16",
             "offset_days": 5,
             "total_stargazers": 182,
             "repo_count": 106
           },
           {
-            "date": "2026-08-08",
+            "date": "2026-08-19",
             "offset_days": 8,
             "total_stargazers": 182,
             "repo_count": 106
           },
           {
-            "date": "2026-08-11",
+            "date": "2026-08-22",
             "offset_days": 11,
-            "total_stargazers": 182,
+            "total_stargazers": 183,
             "repo_count": 106
           },
           {
-            "date": "2026-08-14",
+            "date": "2026-08-25",
             "offset_days": 14,
-            "total_stargazers": 182,
+            "total_stargazers": 183,
             "repo_count": 106
           },
           {
-            "date": "2026-08-17",
+            "date": "2026-08-28",
             "offset_days": 17,
-            "total_stargazers": 182,
+            "total_stargazers": 183,
             "repo_count": 106
           },
           {
-            "date": "2026-08-20",
+            "date": "2026-08-31",
             "offset_days": 20,
-            "total_stargazers": 182,
+            "total_stargazers": 183,
             "repo_count": 106
           },
           {
-            "date": "2026-08-23",
+            "date": "2026-09-03",
             "offset_days": 23,
             "total_stargazers": 183,
             "repo_count": 106
           },
           {
-            "date": "2026-08-26",
+            "date": "2026-09-06",
             "offset_days": 26,
             "total_stargazers": 183,
             "repo_count": 106
           },
           {
-            "date": "2026-08-29",
+            "date": "2026-09-09",
             "offset_days": 29,
             "total_stargazers": 183,
             "repo_count": 106
           },
           {
-            "date": "2026-09-01",
+            "date": "2026-09-12",
             "offset_days": 32,
-            "total_stargazers": 183,
+            "total_stargazers": 184,
             "repo_count": 106
           },
           {
-            "date": "2026-09-04",
+            "date": "2026-09-15",
             "offset_days": 35,
-            "total_stargazers": 183,
+            "total_stargazers": 184,
             "repo_count": 106
           },
           {
-            "date": "2026-09-07",
+            "date": "2026-09-18",
             "offset_days": 38,
-            "total_stargazers": 183,
+            "total_stargazers": 184,
             "repo_count": 106
           },
           {
-            "date": "2026-09-10",
+            "date": "2026-09-21",
             "offset_days": 41,
-            "total_stargazers": 183,
+            "total_stargazers": 184,
             "repo_count": 106
           },
           {
-            "date": "2026-09-13",
+            "date": "2026-09-24",
             "offset_days": 44,
             "total_stargazers": 184,
             "repo_count": 106
           },
           {
-            "date": "2026-09-16",
+            "date": "2026-09-27",
             "offset_days": 47,
             "total_stargazers": 184,
             "repo_count": 106
           },
           {
-            "date": "2026-09-19",
+            "date": "2026-09-30",
             "offset_days": 50,
             "total_stargazers": 184,
             "repo_count": 106
           },
           {
-            "date": "2026-09-22",
+            "date": "2026-10-03",
             "offset_days": 53,
-            "total_stargazers": 184,
+            "total_stargazers": 185,
             "repo_count": 106
           },
           {
-            "date": "2026-09-25",
+            "date": "2026-10-06",
             "offset_days": 56,
-            "total_stargazers": 184,
-            "repo_count": 106
+            "total_stargazers": 185,
+            "repo_count": 107
           },
           {
-            "date": "2026-09-28",
+            "date": "2026-10-09",
             "offset_days": 59,
-            "total_stargazers": 184,
-            "repo_count": 106
+            "total_stargazers": 185,
+            "repo_count": 107
           },
           {
-            "date": "2026-10-01",
+            "date": "2026-10-12",
             "offset_days": 62,
-            "total_stargazers": 184,
-            "repo_count": 106
-          },
-          {
-            "date": "2026-10-04",
-            "offset_days": 65,
             "total_stargazers": 185,
-            "repo_count": 106
+            "repo_count": 107
           },
           {
-            "date": "2026-10-07",
+            "date": "2026-10-14",
+            "offset_days": 64,
+            "total_stargazers": 186,
+            "repo_count": 107
+          },
+          {
+            "date": "2026-10-18",
             "offset_days": 68,
-            "total_stargazers": 185,
+            "total_stargazers": 187,
             "repo_count": 107
           },
           {
-            "date": "2026-10-10",
+            "date": "2026-10-21",
             "offset_days": 71,
-            "total_stargazers": 185,
+            "total_stargazers": 187,
             "repo_count": 107
           },
           {
-            "date": "2026-10-13",
+            "date": "2026-10-24",
             "offset_days": 74,
-            "total_stargazers": 185,
-            "repo_count": 107
-          },
-          {
-            "date": "2026-10-16",
-            "offset_days": 77,
-            "total_stargazers": 187,
-            "repo_count": 107
-          },
-          {
-            "date": "2026-10-19",
-            "offset_days": 80,
-            "total_stargazers": 187,
-            "repo_count": 107
-          },
-          {
-            "date": "2026-10-22",
-            "offset_days": 83,
             "total_stargazers": 188,
             "repo_count": 107
           },
           {
-            "date": "2026-10-25",
-            "offset_days": 86,
+            "date": "2026-10-27",
+            "offset_days": 77,
             "total_stargazers": 188,
             "repo_count": 107
           },
           {
             "date": "2026-10-28",
-            "offset_days": 89,
+            "offset_days": 78,
             "total_stargazers": 188,
             "repo_count": 107
+          },
+          {
+            "date": "2026-11-08",
+            "offset_days": 89,
+            "total_stargazers": 188,
+            "repo_count": 109
           }
         ]
       },
@@ -608,141 +536,147 @@
         "bucket_days": 7,
         "latest_total": 188,
         "delta": 8,
-        "latest_date": "2026-10-28",
-        "sample_count": 22,
-        "raw_sample_count": 137,
+        "latest_date": "2026-11-08",
+        "sample_count": 23,
+        "raw_sample_count": 138,
         "points": [
           {
-            "date": "2026-06-09",
+            "date": "2026-06-06",
+            "offset_days": 209,
+            "total_stargazers": 180,
+            "repo_count": 104
+          },
+          {
+            "date": "2026-06-13",
+            "offset_days": 216,
+            "total_stargazers": 179,
+            "repo_count": 104
+          },
+          {
+            "date": "2026-06-20",
             "offset_days": 223,
             "total_stargazers": 180,
             "repo_count": 104
           },
           {
-            "date": "2026-06-16",
+            "date": "2026-06-27",
             "offset_days": 230,
-            "total_stargazers": 179,
-            "repo_count": 104
+            "total_stargazers": 180,
+            "repo_count": 105
           },
           {
-            "date": "2026-06-23",
+            "date": "2026-07-04",
             "offset_days": 237,
             "total_stargazers": 180,
-            "repo_count": 104
+            "repo_count": 105
           },
           {
-            "date": "2026-06-30",
+            "date": "2026-07-11",
             "offset_days": 244,
             "total_stargazers": 180,
             "repo_count": 105
           },
           {
-            "date": "2026-07-07",
-            "offset_days": 251,
-            "total_stargazers": 180,
-            "repo_count": 105
-          },
-          {
-            "date": "2026-07-14",
-            "offset_days": 258,
-            "total_stargazers": 180,
-            "repo_count": 106
-          },
-          {
             "date": "2026-07-16",
-            "offset_days": 260,
+            "offset_days": 249,
             "total_stargazers": 180,
             "repo_count": 106
           },
           {
-            "date": "2026-07-28",
-            "offset_days": 272,
+            "date": "2026-07-25",
+            "offset_days": 258,
             "total_stargazers": 183,
             "repo_count": 106
           },
           {
-            "date": "2026-08-04",
+            "date": "2026-08-01",
+            "offset_days": 265,
+            "total_stargazers": 182,
+            "repo_count": 106
+          },
+          {
+            "date": "2026-08-08",
+            "offset_days": 272,
+            "total_stargazers": 182,
+            "repo_count": 106
+          },
+          {
+            "date": "2026-08-15",
             "offset_days": 279,
             "total_stargazers": 182,
             "repo_count": 106
           },
           {
-            "date": "2026-08-11",
+            "date": "2026-08-22",
             "offset_days": 286,
-            "total_stargazers": 182,
+            "total_stargazers": 183,
             "repo_count": 106
           },
           {
-            "date": "2026-08-18",
+            "date": "2026-08-29",
             "offset_days": 293,
-            "total_stargazers": 182,
+            "total_stargazers": 183,
             "repo_count": 106
           },
           {
-            "date": "2026-08-25",
+            "date": "2026-09-05",
             "offset_days": 300,
             "total_stargazers": 183,
             "repo_count": 106
           },
           {
-            "date": "2026-09-01",
+            "date": "2026-09-12",
             "offset_days": 307,
-            "total_stargazers": 183,
+            "total_stargazers": 184,
             "repo_count": 106
           },
           {
-            "date": "2026-09-08",
+            "date": "2026-09-19",
             "offset_days": 314,
-            "total_stargazers": 183,
+            "total_stargazers": 184,
             "repo_count": 106
           },
           {
-            "date": "2026-09-15",
+            "date": "2026-09-26",
             "offset_days": 321,
             "total_stargazers": 184,
             "repo_count": 106
           },
           {
-            "date": "2026-09-22",
+            "date": "2026-10-03",
             "offset_days": 328,
-            "total_stargazers": 184,
+            "total_stargazers": 185,
             "repo_count": 106
           },
           {
-            "date": "2026-09-29",
+            "date": "2026-10-10",
             "offset_days": 335,
-            "total_stargazers": 184,
-            "repo_count": 106
+            "total_stargazers": 185,
+            "repo_count": 107
           },
           {
-            "date": "2026-10-06",
+            "date": "2026-10-17",
             "offset_days": 342,
-            "total_stargazers": 185,
-            "repo_count": 107
-          },
-          {
-            "date": "2026-10-13",
-            "offset_days": 349,
-            "total_stargazers": 185,
-            "repo_count": 107
-          },
-          {
-            "date": "2026-10-20",
-            "offset_days": 356,
             "total_stargazers": 187,
             "repo_count": 107
           },
           {
-            "date": "2026-10-27",
-            "offset_days": 363,
+            "date": "2026-10-24",
+            "offset_days": 349,
             "total_stargazers": 188,
             "repo_count": 107
           },
           {
             "date": "2026-10-28",
-            "offset_days": 364,
+            "offset_days": 353,
             "total_stargazers": 188,
             "repo_count": 107
+          },
+          {
+            "date": "2026-11-08",
+            "offset_days": 364,
+            "total_stargazers": 188,
+            "repo_count": 109
           }
         ]
       }
@@ -750,59 +684,23 @@
   },
   "repositories": [
     {
-      "display_name": "pRizz/Iron-Sights",
+      "display_name": "pRizz/github-stats",
       "is_owned_by_viewer": true,
       "is_private": false,
-      "is_fork": true,
+      "is_fork": false,
       "is_archived": false,
       "stargazers": 0,
       "forks": 0,
-      "updated_at": "2026-10-28T04:46:59Z",
-      "pushed_at": "2026-10-28T04:50:13Z",
+      "updated_at": "2026-11-08T17:48:00Z",
+      "pushed_at": "2026-11-08T17:47:56Z",
       "open_issues": 0,
       "open_pull_requests": 0,
       "releases": 0,
-      "tags": 72,
+      "tags": 0,
       "languages": {
-        "C": {
-          "size": 37794220,
-          "color": "#555555"
-        },
-        "C++": {
-          "size": 2175126,
-          "color": "#f34b7d"
-        },
         "Python": {
-          "size": 592524,
+          "size": 304712,
           "color": "#3572A5"
-        },
-        "TypeScript": {
-          "size": 288704,
-          "color": "#3178c6"
-        },
-        "JavaScript": {
-          "size": 235462,
-          "color": "#f1e05a"
-        },
-        "HTML": {
-          "size": 229838,
-          "color": "#e34c26"
-        },
-        "Assembly": {
-          "size": 161015,
-          "color": "#6E4C13"
-        },
-        "C#": {
-          "size": 145393,
-          "color": "#7355dd"
-        },
-        "CMake": {
-          "size": 84301,
-          "color": "#DA3434"
-        },
-        "Shell": {
-          "size": 61655,
-          "color": "#89e051"
         }
       }
     },
@@ -814,8 +712,8 @@
       "is_archived": false,
       "stargazers": 0,
       "forks": 0,
-      "updated_at": "2026-10-27T19:27:15Z",
-      "pushed_at": "2026-10-27T19:27:11Z",
+      "updated_at": "2026-11-08T17:25:28Z",
+      "pushed_at": "2026-11-08T17:25:24Z",
       "open_issues": 0,
       "open_pull_requests": 0,
       "releases": 0,
@@ -832,23 +730,384 @@
       }
     },
     {
-      "display_name": "pRizz/github-stats",
+      "display_name": "pRizz/halftone-qr-studio",
+      "is_owned_by_viewer": true,
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 1,
+      "updated_at": "2026-11-08T17:17:16Z",
+      "pushed_at": "2026-11-08T17:17:13Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 54621,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 6240,
+          "color": "#663399"
+        },
+        "HTML": {
+          "size": 419,
+          "color": "#e34c26"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/Iron-Sights",
+      "is_owned_by_viewer": true,
+      "is_private": false,
+      "is_fork": true,
+      "is_archived": false,
+      "stargazers": 2,
+      "forks": 0,
+      "updated_at": "2026-11-08T17:05:52Z",
+      "pushed_at": "2026-11-08T17:08:10Z",
+      "open_issues": 2,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 201,
+      "languages": {
+        "C": {
+          "size": 38114702,
+          "color": "#555555"
+        },
+        "C++": {
+          "size": 1999310,
+          "color": "#f34b7d"
+        },
+        "Python": {
+          "size": 703451,
+          "color": "#3572A5"
+        },
+        "JavaScript": {
+          "size": 443251,
+          "color": "#f1e05a"
+        },
+        "TypeScript": {
+          "size": 367280,
+          "color": "#3178c6"
+        },
+        "HTML": {
+          "size": 230629,
+          "color": "#e34c26"
+        },
+        "Assembly": {
+          "size": 161015,
+          "color": "#6E4C13"
+        },
+        "C#": {
+          "size": 145393,
+          "color": "#7355dd"
+        },
+        "CMake": {
+          "size": 91627,
+          "color": "#DA3434"
+        },
+        "Shell": {
+          "size": 76371,
+          "color": "#89e051"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/007Nightfire-XBERecomp",
+      "is_owned_by_viewer": true,
+      "is_private": false,
+      "is_fork": true,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-11-07T21:56:27Z",
+      "pushed_at": "2026-11-05T20:18:02Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 2,
+      "languages": {
+        "C++": {
+          "size": 2065700,
+          "color": "#f34b7d"
+        },
+        "CMake": {
+          "size": 8829,
+          "color": "#DA3434"
+        },
+        "Batchfile": {
+          "size": 6710,
+          "color": "#C1F12E"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/nightfire-recomp",
+      "is_owned_by_viewer": true,
+      "is_private": false,
+      "is_fork": true,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-11-07T21:52:05Z",
+      "pushed_at": "2026-11-04T15:00:18Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 5,
+      "languages": {
+        "C++": {
+          "size": 513364,
+          "color": "#f34b7d"
+        },
+        "Batchfile": {
+          "size": 9180,
+          "color": "#C1F12E"
+        },
+        "CMake": {
+          "size": 3221,
+          "color": "#DA3434"
+        },
+        "Shell": {
+          "size": 1344,
+          "color": "#89e051"
+        },
+        "Python": {
+          "size": 486,
+          "color": "#3572A5"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/free-the-world",
       "is_owned_by_viewer": true,
       "is_private": false,
       "is_fork": false,
       "is_archived": false,
       "stargazers": 0,
       "forks": 0,
-      "updated_at": "2026-10-27T05:10:28Z",
-      "pushed_at": "2026-10-27T05:10:24Z",
+      "updated_at": "2026-11-07T13:04:03Z",
+      "pushed_at": "2026-11-07T13:04:00Z",
       "open_issues": 0,
       "open_pull_requests": 0,
       "releases": 0,
       "tags": 0,
       "languages": {
+        "TypeScript": {
+          "size": 18281263,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 5736,
+          "color": "#663399"
+        },
+        "Shell": {
+          "size": 829,
+          "color": "#89e051"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/iron-sights-assets",
+      "is_owned_by_viewer": true,
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-11-07T00:40:10Z",
+      "pushed_at": "2026-11-07T00:40:46Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 4,
+      "languages": {
         "Python": {
-          "size": 299480,
+          "size": 97217,
           "color": "#3572A5"
+        },
+        "TypeScript": {
+          "size": 16924,
+          "color": "#3178c6"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/open-links-sites",
+      "is_owned_by_viewer": true,
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-11-04T23:24:13Z",
+      "pushed_at": "2026-11-04T23:24:09Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 0,
+      "languages": {
+        "TypeScript": {
+          "size": 527010,
+          "color": "#3178c6"
+        },
+        "Shell": {
+          "size": 16805,
+          "color": "#89e051"
+        },
+        "CSS": {
+          "size": 13544,
+          "color": "#663399"
+        },
+        "HTML": {
+          "size": 714,
+          "color": "#e34c26"
+        },
+        "JavaScript": {
+          "size": 83,
+          "color": "#f1e05a"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/open-links",
+      "is_owned_by_viewer": true,
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 2,
+      "forks": 1,
+      "updated_at": "2026-11-04T20:38:58Z",
+      "pushed_at": "2026-11-04T20:38:54Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 3,
+      "languages": {
+        "TypeScript": {
+          "size": 3252706,
+          "color": "#3178c6"
+        },
+        "CSS": {
+          "size": 97274,
+          "color": "#663399"
+        },
+        "Shell": {
+          "size": 53482,
+          "color": "#89e051"
+        },
+        "JavaScript": {
+          "size": 36715,
+          "color": "#f1e05a"
+        },
+        "HTML": {
+          "size": 2536,
+          "color": "#e34c26"
+        },
+        "Dockerfile": {
+          "size": 1948,
+          "color": "#384d54"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/SVG-Navigator---Chrome-Extension",
+      "is_owned_by_viewer": true,
+      "is_private": false,
+      "is_fork": false,
+      "is_archived": false,
+      "stargazers": 18,
+      "forks": 7,
+      "updated_at": "2026-11-04T20:36:29Z",
+      "pushed_at": "2026-11-04T20:36:25Z",
+      "open_issues": 2,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 34,
+      "languages": {
+        "TypeScript": {
+          "size": 444805,
+          "color": "#3178c6"
+        },
+        "HTML": {
+          "size": 26808,
+          "color": "#e34c26"
+        },
+        "Shell": {
+          "size": 11301,
+          "color": "#89e051"
+        },
+        "CSS": {
+          "size": 8779,
+          "color": "#663399"
+        },
+        "JavaScript": {
+          "size": 6000,
+          "color": "#f1e05a"
+        },
+        "Swift": {
+          "size": 3614,
+          "color": "#F05138"
+        }
+      }
+    },
+    {
+      "display_name": "pRizz/perfect_dark",
+      "is_owned_by_viewer": true,
+      "is_private": false,
+      "is_fork": true,
+      "is_archived": false,
+      "stargazers": 0,
+      "forks": 0,
+      "updated_at": "2026-10-31T20:29:59Z",
+      "pushed_at": "2026-10-31T20:29:55Z",
+      "open_issues": 0,
+      "open_pull_requests": 0,
+      "releases": 0,
+      "tags": 2,
+      "languages": {
+        "C": {
+          "size": 14449400,
+          "color": "#555555"
+        },
+        "Linker Script": {
+          "size": 696355,
+          "color": null
+        },
+        "Python": {
+          "size": 665163,
+          "color": "#3572A5"
+        },
+        "C++": {
+          "size": 408683,
+          "color": "#f34b7d"
+        },
+        "Assembly": {
+          "size": 385342,
+          "color": "#6E4C13"
+        },
+        "CMake": {
+          "size": 23954,
+          "color": "#DA3434"
+        },
+        "TypeScript": {
+          "size": 16924,
+          "color": "#3178c6"
+        },
+        "Shell": {
+          "size": 1922,
+          "color": "#89e051"
+        },
+        "Makefile": {
+          "size": 121,
+          "color": "#427819"
+        },
+        "BitBake": {
+          "size": 59,
+          "color": "#00bce4"
         }
       }
     },
@@ -882,35 +1141,6 @@
       }
     },
     {
-      "display_name": "pRizz/free-the-world",
-      "is_owned_by_viewer": true,
-      "is_private": false,
-      "is_fork": false,
-      "is_archived": false,
-      "stargazers": 0,
-      "forks": 0,
-      "updated_at": "2026-10-24T11:03:37Z",
-      "pushed_at": "2026-10-24T11:03:33Z",
-      "open_issues": 0,
-      "open_pull_requests": 0,
-      "releases": 0,
-      "tags": 0,
-      "languages": {
-        "TypeScript": {
-          "size": 18281586,
-          "color": "#3178c6"
-        },
-        "CSS": {
-          "size": 5736,
-          "color": "#663399"
-        },
-        "Shell": {
-          "size": 829,
-          "color": "#89e051"
-        }
-      }
-    },
-    {
       "display_name": "pRizz/apple-notes-exporter-rs",
       "is_owned_by_viewer": true,
       "is_private": false,
@@ -932,47 +1162,6 @@
         "Shell": {
           "size": 1009,
           "color": "#89e051"
-        }
-      }
-    },
-    {
-      "display_name": "pRizz/SVG-Navigator---Chrome-Extension",
-      "is_owned_by_viewer": true,
-      "is_private": false,
-      "is_fork": false,
-      "is_archived": false,
-      "stargazers": 18,
-      "forks": 7,
-      "updated_at": "2026-10-20T17:02:22Z",
-      "pushed_at": "2026-10-20T17:02:18Z",
-      "open_issues": 2,
-      "open_pull_requests": 0,
-      "releases": 0,
-      "tags": 34,
-      "languages": {
-        "TypeScript": {
-          "size": 444805,
-          "color": "#3178c6"
-        },
-        "HTML": {
-          "size": 26808,
-          "color": "#e34c26"
-        },
-        "Shell": {
-          "size": 11281,
-          "color": "#89e051"
-        },
-        "CSS": {
-          "size": 8779,
-          "color": "#663399"
-        },
-        "JavaScript": {
-          "size": 6000,
-          "color": "#f1e05a"
-        },
-        "Swift": {
-          "size": 3614,
-          "color": "#F05138"
         }
       }
     },
@@ -1002,84 +1191,6 @@
         "HTML": {
           "size": 2366,
           "color": "#e34c26"
-        }
-      }
-    },
-    {
-      "display_name": "pRizz/open-links-sites",
-      "is_owned_by_viewer": true,
-      "is_private": false,
-      "is_fork": false,
-      "is_archived": false,
-      "stargazers": 0,
-      "forks": 0,
-      "updated_at": "2026-10-06T14:53:57Z",
-      "pushed_at": "2026-10-06T14:53:53Z",
-      "open_issues": 0,
-      "open_pull_requests": 0,
-      "releases": 0,
-      "tags": 0,
-      "languages": {
-        "TypeScript": {
-          "size": 527010,
-          "color": "#3178c6"
-        },
-        "Shell": {
-          "size": 16785,
-          "color": "#89e051"
-        },
-        "CSS": {
-          "size": 13544,
-          "color": "#663399"
-        },
-        "HTML": {
-          "size": 714,
-          "color": "#e34c26"
-        },
-        "JavaScript": {
-          "size": 83,
-          "color": "#f1e05a"
-        }
-      }
-    },
-    {
-      "display_name": "pRizz/open-links",
-      "is_owned_by_viewer": true,
-      "is_private": false,
-      "is_fork": false,
-      "is_archived": false,
-      "stargazers": 2,
-      "forks": 1,
-      "updated_at": "2026-10-06T13:58:53Z",
-      "pushed_at": "2026-10-06T13:58:49Z",
-      "open_issues": 0,
-      "open_pull_requests": 0,
-      "releases": 0,
-      "tags": 3,
-      "languages": {
-        "TypeScript": {
-          "size": 3252706,
-          "color": "#3178c6"
-        },
-        "CSS": {
-          "size": 97274,
-          "color": "#663399"
-        },
-        "Shell": {
-          "size": 53462,
-          "color": "#89e051"
-        },
-        "JavaScript": {
-          "size": 36715,
-          "color": "#f1e05a"
-        },
-        "HTML": {
-          "size": 2536,
-          "color": "#e34c26"
-        },
-        "Dockerfile": {
-          "size": 1948,
-          "color": "#384d54"
         }
       }
     },
@@ -1244,7 +1355,7 @@
       "stargazers": 20,
       "forks": 4,
       "updated_at": "2026-09-10T05:43:30Z",
-      "pushed_at": "2026-10-26T16:04:18Z",
+      "pushed_at": "2026-11-02T19:24:45Z",
       "open_issues": 10,
       "open_pull_requests": 4,
       "releases": 0,
