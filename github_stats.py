@@ -258,23 +258,34 @@ def _parse_float_header(value: Optional[str]) -> Optional[float]:
         return None
 
 
-def _retry_delay(headers: Any, attempt: int, default: float = 2.0) -> float:
+def _retry_delay(
+    headers: Any,
+    attempt: int,
+    default: float = 2.0,
+    rate_limited: bool = False,
+) -> float:
     """
     Seconds to wait before retrying. Prefer GitHub's rate-limit headers.
     """
     retry_after = _parse_float_header(_header_value(headers, "Retry-After"))
     if retry_after is not None:
-        return max(1.0, min(retry_after, 60.0))
+        return max(1.0, retry_after)
 
     reset_epoch = _parse_float_header(_header_value(headers, "x-ratelimit-reset"))
     remaining = _header_value(headers, "x-ratelimit-remaining")
     if reset_epoch is not None and remaining == "0":
-        return max(1.0, min(reset_epoch - time.time(), 60.0))
+        return max(1.0, reset_epoch - time.time())
+
+    if rate_limited:
+        return 60.0 * (2 ** min(attempt - 1, 10))
 
     return min(default * (1.15 ** min(attempt - 1, 10)), 20.0)
 
 def _looks_rate_limited(status: int, headers: Any, body_preview: str) -> bool:
-    if status not in {403, 429}:
+    # A 429 can report heavy server load without rate-limit headers or wording.
+    if status == 429:
+        return True
+    if status != 403:
         return False
     if _header_value(headers, "Retry-After") is not None:
         return True
@@ -744,7 +755,10 @@ class Queries(object):
                     "GraphQL",
                 )
                 if decision.retryable:
-                    delay = _retry_delay(r_async.headers, attempt)
+                    delay = _retry_delay(
+                        r_async.headers, attempt,
+                        rate_limited=decision.category == "rate_limited",
+                    )
                     delay = min(delay, max(0.0, deadline - time.monotonic()))
                     if delay <= 0:
                         break
@@ -797,7 +811,10 @@ class Queries(object):
                     "GraphQL fallback",
                 )
                 if decision.retryable:
-                    delay = _retry_delay(r_requests.headers, attempt)
+                    delay = _retry_delay(
+                        r_requests.headers, attempt,
+                        rate_limited=decision.category == "rate_limited",
+                    )
                     delay = min(delay, max(0.0, deadline - time.monotonic()))
                     if delay <= 0:
                         break
@@ -926,7 +943,10 @@ class Queries(object):
                 last_preview = preview
 
                 if decision.retryable:
-                    delay = _retry_delay(r_async.headers, attempt)
+                    delay = _retry_delay(
+                        r_async.headers, attempt,
+                        rate_limited=decision.category == "rate_limited",
+                    )
                     delay = min(delay, max(0.0, deadline - time.monotonic()))
                     if delay <= 0:
                         if _can_degrade_rest_status(normalized, decision):
@@ -1048,7 +1068,10 @@ class Queries(object):
                 last_preview = preview
 
                 if decision.retryable:
-                    delay = _retry_delay(r_requests.headers, attempt)
+                    delay = _retry_delay(
+                        r_requests.headers, attempt,
+                        rate_limited=decision.category == "rate_limited",
+                    )
                     delay = min(delay, max(0.0, deadline - time.monotonic()))
                     if delay <= 0:
                         if _can_degrade_rest_status(normalized, decision):

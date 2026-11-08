@@ -16,17 +16,20 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
 
     steps:
     # Check out repository under $GITHUB_WORKSPACE, so the job can access it
     - uses: actions/checkout@v6
 
-    # Run using Python 3.8 for consistency and aiohttp
-    - name: Set up Python 3.8
+    # Do not upload the checked-in report if this run fails before writing one.
+    - name: Remove previous run report
+      run: rm -f run-report.json
+
+    - name: Set up Python 3.12
       uses: actions/setup-python@v6
       with:
-        python-version: '3.8'
+        python-version: '3.12'
         architecture: 'x64'
         cache: 'pip'
 

@@ -1335,6 +1335,108 @@ class GithubStatsTests(unittest.IsolatedAsyncioTestCase):
         # Assert
         self.assertEqual(result, [])
 
+    async def test_rest_query_retries_headerless_429_then_recovers(self):
+        for transport in ("aiohttp", "requests"):
+            with self.subTest(transport=transport):
+                payload = [{"sha": "recovered"}]
+                responses = [
+                    _FakeResponse(
+                        429,
+                        text=(
+                            '{"message":"The request could not be processed '
+                            'due to heavy server load. Please try again."}'
+                        ),
+                    ),
+                    _FakeResponse(200, payload=payload),
+                ]
+                # A 429 remains retryable even with primary quota left.
+                responses[0].headers = {"x-ratelimit-remaining": "4999"}
+                session = mock.Mock()
+                session.get = mock.AsyncMock(side_effect=responses)
+                if transport == "requests":
+                    session = _FailingSession()
+                    responses = [
+                        _FakeRequestsResponse(
+                            item.status, payload=item._payload,
+                            text=item.text, headers=item.headers,
+                        )
+                        for item in responses
+                    ]
+                queries = Queries("octocat", "token", session)
+
+                with mock.patch(
+                    "github_stats.requests.get", side_effect=responses
+                ) as fallback, mock.patch(
+                    "github_stats.asyncio.sleep", mock.AsyncMock()
+                ) as sleep:
+                    result = await queries.query_rest_with_outcome(
+                        "/repos/octocat/hello/commits", max_wait_seconds=180.0
+                    )
+
+                self.assertEqual(result.payload, payload)
+                self.assertFalse(result.degraded)
+                self.assertEqual(result.retry_count, 1)
+                self.assertEqual(result.attempts, 2)
+                sleep.assert_awaited_once_with(60.0)
+                if transport == "aiohttp":
+                    fallback.assert_not_called()
+                    self.assertEqual(session.get.await_count, 2)
+                else:
+                    self.assertEqual(fallback.call_count, 2)
+
+    async def test_rest_query_degrades_headerless_429_at_retry_deadline(self):
+        for transport in ("aiohttp", "requests"):
+            with self.subTest(transport=transport):
+                response = _FakeResponse(429, text="heavy server load")
+                session = mock.Mock()
+                session.get = mock.AsyncMock(return_value=response)
+                if transport == "requests":
+                    session = _FailingSession()
+                queries = Queries("octocat", "token", session)
+
+                with mock.patch(
+                    "github_stats.requests.get",
+                    return_value=_FakeRequestsResponse(
+                        429, text="heavy server load"
+                    ),
+                ) as fallback, mock.patch(
+                    "github_stats.asyncio.sleep", mock.AsyncMock()
+                ) as sleep:
+                    result = await queries.query_rest_with_outcome(
+                        "/repos/octocat/hello/commits", max_wait_seconds=0.0
+                    )
+
+                self.assertEqual(result.payload, [])
+                self.assertTrue(result.degraded)
+                self.assertEqual(result.status, 429)
+                self.assertEqual(result.category, "rate_limited")
+                self.assertEqual(result.retry_count, 0)
+                sleep.assert_not_awaited()
+                if transport == "aiohttp":
+                    fallback.assert_not_called()
+                    session.get.assert_awaited_once()
+                else:
+                    fallback.assert_called_once()
+
+    def test_rate_limit_retry_delay_respects_headers_and_backs_off(self):
+        self.assertEqual(
+            github_stats._retry_delay({"Retry-After": "120"}, 1), 120.0
+        )
+        with mock.patch("github_stats.time.time", return_value=1000.0):
+            self.assertEqual(
+                github_stats._retry_delay(
+                    {"x-ratelimit-remaining": "0", "x-ratelimit-reset": "1120"},
+                    1,
+                ),
+                120.0,
+            )
+        self.assertEqual(
+            github_stats._retry_delay({}, 1, rate_limited=True), 60.0
+        )
+        self.assertEqual(
+            github_stats._retry_delay({}, 2, rate_limited=True), 120.0
+        )
+
     async def test_rest_query_returns_empty_for_inaccessible_traffic_views(self):
         # Arrange
         queries = Queries("octocat", "token", _FailingSession())
