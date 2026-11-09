@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-08T17:53:40Z",
+  "generated_at": "2026-11-09T06:13:17Z",
   "window": {
     "months": 13,
     "timezone": "UTC",
@@ -19,7 +19,7 @@
     "degraded_repo_months": 0,
     "discovery": {
       "base_repo_count": 272,
-      "contribution_repo_count": 8,
+      "contribution_repo_count": 9,
       "configured_extra_repo_count": 0,
       "scan_repo_count": 276,
       "incomplete_months": [],
@@ -130,11 +130,11 @@
     {
       "key": "2026-11",
       "label": "Nov '26",
-      "count": 187,
+      "count": 233,
       "is_current": true,
       "scan_degraded": false,
-      "scan_candidate_count": 187,
-      "github_attributed_count": 85
+      "scan_candidate_count": 233,
+      "github_attributed_count": 116
     }
   ]
 }
