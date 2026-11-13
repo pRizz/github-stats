@@ -94,7 +94,7 @@ g {
 </style>
 <rect x="5" y="5" id="background" />
 <text class="title" x="21" y="36">Monthly Commits</text>
-<text class="subtitle" x="21" y="55">16,331 commits over 13 months; Nov &#x27;26 has 255</text>
+<text class="subtitle" x="21" y="55">16,350 commits over 13 months; Nov &#x27;26 has 274</text>
 <line class="axis" x1="21" y1="154" x2="339" y2="154" />
 <g style="animation-delay: 0ms"><title>Nov &#x27;25: 13 commits</title><rect class="bar" x="27" y="150" width="14" height="3" rx="2" /><text class="count" x="34.0" y="145" text-anchor="middle">13</text><text class="month" x="34.0" y="174" text-anchor="end" transform="rotate(-35 34.0 174)">Nov &#x27;25</text></g>
 <g style="animation-delay: 75ms"><title>Dec &#x27;25: 106 commits</title><rect class="bar" x="51" y="150" width="14" height="3" rx="2" /><text class="count" x="58.0" y="145" text-anchor="middle">106</text><text class="month" x="58.0" y="174" text-anchor="end" transform="rotate(-35 58.0 174)">Dec &#x27;25</text></g>
@@ -108,5 +108,5 @@ g {
 <g style="animation-delay: 675ms"><title>Aug &#x27;26: 1,264 commits</title><rect class="bar" x="243" y="117" width="14" height="36" rx="2" /><text class="count" x="250.0" y="112" text-anchor="middle">1,264</text><text class="month" x="250.0" y="174" text-anchor="end" transform="rotate(-35 250.0 174)">Aug &#x27;26</text></g>
 <g style="animation-delay: 750ms"><title>Sep &#x27;26: 1,243 commits</title><rect class="bar" x="267" y="118" width="14" height="35" rx="2" /><text class="count" x="274.0" y="113" text-anchor="middle">1,243</text><text class="month" x="274.0" y="174" text-anchor="end" transform="rotate(-35 274.0 174)">Sep &#x27;26</text></g>
 <g style="animation-delay: 825ms"><title>Oct &#x27;26: 1,448 commits</title><rect class="bar" x="291" y="112" width="14" height="41" rx="2" /><text class="count" x="298.0" y="107" text-anchor="middle">1,448</text><text class="month" x="298.0" y="174" text-anchor="end" transform="rotate(-35 298.0 174)">Oct &#x27;26</text></g>
-<g style="animation-delay: 900ms"><title>Nov &#x27;26: 255 commits</title><rect class="bar current" x="315" y="146" width="14" height="7" rx="2" /><text class="count" x="322.0" y="141" text-anchor="middle">255</text><text class="month" x="322.0" y="174" text-anchor="end" transform="rotate(-35 322.0 174)">Nov &#x27;26</text></g>
+<g style="animation-delay: 900ms"><title>Nov &#x27;26: 274 commits</title><rect class="bar current" x="315" y="145" width="14" height="8" rx="2" /><text class="count" x="322.0" y="140" text-anchor="middle">274</text><text class="month" x="322.0" y="174" text-anchor="end" transform="rotate(-35 322.0 174)">Nov &#x27;26</text></g>
 </svg>
