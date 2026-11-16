@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-15T06:21:05Z",
+  "generated_at": "2026-11-16T06:19:39Z",
   "window": {
     "months": 13,
     "timezone": "UTC",
@@ -130,11 +130,11 @@
     {
       "key": "2026-11",
       "label": "Nov '26",
-      "count": 309,
+      "count": 380,
       "is_current": true,
       "scan_degraded": false,
-      "scan_candidate_count": 309,
-      "github_attributed_count": 156
+      "scan_candidate_count": 380,
+      "github_attributed_count": 181
     }
   ]
 }
