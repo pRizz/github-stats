@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-27T08:18:24Z",
+  "generated_at": "2026-11-28T07:41:59Z",
   "limited_data": [
     "repository traffic data degraded"
   ],
@@ -8,24 +8,24 @@
     "private_repositories": 0
   },
   "contribution_pulse": {
-    "total": 16818,
+    "total": 16894,
     "active_months": 13,
     "month_count": 13,
-    "average_monthly": 1293.7,
+    "average_monthly": 1299.5,
     "best_month": "Jul '26",
     "best_month_count": 2906,
     "current_month": "Nov '26",
-    "current_month_count": 742,
+    "current_month_count": 818,
     "active_streak_months": 13
   },
   "contribution_mix": {
-    "commits": 12988,
+    "commits": 13024,
     "issues": 46,
     "pull_requests": 313,
     "pull_request_reviews": 3,
     "repositories": 88,
-    "restricted": 696,
-    "total": 14134
+    "restricted": 697,
+    "total": 14171
   },
   "impact": {
     "stars": 188,
@@ -43,31 +43,31 @@
   "language_momentum": [
     {
       "language": "C",
-      "percent": 33.04,
+      "percent": 33.06,
       "color": "#555555",
       "repos": 33
     },
     {
       "language": "TypeScript",
-      "percent": 18.01,
+      "percent": 17.99,
       "color": "#3178c6",
       "repos": 84
     },
     {
       "language": "C++",
-      "percent": 16.12,
+      "percent": 16.11,
       "color": "#f34b7d",
       "repos": 30
     },
     {
       "language": "Python",
-      "percent": 8.35,
+      "percent": 8.37,
       "color": "#3572A5",
       "repos": 58
     },
     {
       "language": "Rust",
-      "percent": 7.6,
+      "percent": 7.59,
       "color": "#dea584",
       "repos": 36
     },
@@ -79,13 +79,13 @@
     },
     {
       "language": "HTML",
-      "percent": 2.99,
+      "percent": 2.98,
       "color": "#e34c26",
       "repos": 124
     },
     {
       "language": "Swift",
-      "percent": 2.24,
+      "percent": 2.23,
       "color": "#F05138",
       "repos": 9
     }
@@ -174,33 +174,33 @@
         "key": "trailing_30_days",
         "label": "30 days",
         "days": 30,
-        "commits": 584,
-        "per_hour": 0.8111,
-        "per_day": 19.47,
-        "per_week": 136.27,
-        "per_month": 584.0,
+        "commits": 615,
+        "per_hour": 0.8542,
+        "per_day": 20.5,
+        "per_week": 143.5,
+        "per_month": 615.0,
         "scan_degraded": false
       },
       {
         "key": "trailing_180_days",
         "label": "6 months",
         "days": 180,
-        "commits": 2267,
-        "per_hour": 0.5248,
-        "per_day": 12.59,
-        "per_week": 88.16,
-        "per_month": 377.83,
+        "commits": 2234,
+        "per_hour": 0.5171,
+        "per_day": 12.41,
+        "per_week": 86.88,
+        "per_month": 372.33,
         "scan_degraded": false
       },
       {
         "key": "trailing_365_days",
         "label": "365 days",
         "days": 365,
-        "commits": 7309,
-        "per_hour": 0.8344,
-        "per_day": 20.02,
-        "per_week": 140.17,
-        "per_month": 600.74,
+        "commits": 7349,
+        "per_hour": 0.8389,
+        "per_day": 20.13,
+        "per_week": 140.94,
+        "per_month": 604.03,
         "scan_degraded": false
       }
     ],
@@ -216,8 +216,8 @@
       "counting": "daily_aggregate_stargazer_snapshot",
       "path": "generated/star-history.csv",
       "timezone": "UTC",
-      "samples": 156,
-      "latest_date": "2026-11-27",
+      "samples": 157,
+      "latest_date": "2026-11-28",
       "latest_total": 188
     },
     "windows": [
@@ -228,120 +228,126 @@
         "bucket_days": 1,
         "latest_total": 188,
         "delta": 0,
-        "latest_date": "2026-11-27",
-        "sample_count": 19,
-        "raw_sample_count": 19,
+        "latest_date": "2026-11-28",
+        "sample_count": 20,
+        "raw_sample_count": 20,
         "points": [
           {
             "date": "2026-11-08",
-            "offset_days": 10,
+            "offset_days": 9,
             "total_stargazers": 188,
             "repo_count": 109
           },
           {
             "date": "2026-11-09",
-            "offset_days": 11,
+            "offset_days": 10,
             "total_stargazers": 188,
             "repo_count": 109
           },
           {
             "date": "2026-11-10",
-            "offset_days": 12,
+            "offset_days": 11,
             "total_stargazers": 188,
             "repo_count": 109
           },
           {
             "date": "2026-11-11",
-            "offset_days": 13,
+            "offset_days": 12,
             "total_stargazers": 188,
             "repo_count": 109
           },
           {
             "date": "2026-11-13",
-            "offset_days": 15,
+            "offset_days": 14,
             "total_stargazers": 189,
             "repo_count": 109
           },
           {
             "date": "2026-11-14",
-            "offset_days": 16,
+            "offset_days": 15,
             "total_stargazers": 189,
             "repo_count": 109
           },
           {
             "date": "2026-11-15",
-            "offset_days": 17,
+            "offset_days": 16,
             "total_stargazers": 189,
             "repo_count": 109
           },
           {
             "date": "2026-11-16",
-            "offset_days": 18,
+            "offset_days": 17,
             "total_stargazers": 189,
             "repo_count": 109
           },
           {
             "date": "2026-11-17",
-            "offset_days": 19,
+            "offset_days": 18,
             "total_stargazers": 189,
             "repo_count": 109
           },
           {
             "date": "2026-11-18",
-            "offset_days": 20,
+            "offset_days": 19,
             "total_stargazers": 189,
             "repo_count": 109
           },
           {
             "date": "2026-11-19",
-            "offset_days": 21,
+            "offset_days": 20,
             "total_stargazers": 189,
             "repo_count": 109
           },
           {
             "date": "2026-11-20",
-            "offset_days": 22,
+            "offset_days": 21,
             "total_stargazers": 188,
             "repo_count": 109
           },
           {
             "date": "2026-11-21",
-            "offset_days": 23,
+            "offset_days": 22,
             "total_stargazers": 188,
             "repo_count": 109
           },
           {
             "date": "2026-11-22",
-            "offset_days": 24,
+            "offset_days": 23,
             "total_stargazers": 188,
             "repo_count": 109
           },
           {
             "date": "2026-11-23",
-            "offset_days": 25,
+            "offset_days": 24,
             "total_stargazers": 188,
             "repo_count": 109
           },
           {
             "date": "2026-11-24",
-            "offset_days": 26,
+            "offset_days": 25,
             "total_stargazers": 188,
             "repo_count": 109
           },
           {
             "date": "2026-11-25",
-            "offset_days": 27,
+            "offset_days": 26,
             "total_stargazers": 188,
             "repo_count": 109
           },
           {
             "date": "2026-11-26",
-            "offset_days": 28,
+            "offset_days": 27,
             "total_stargazers": 188,
             "repo_count": 109
           },
           {
             "date": "2026-11-27",
+            "offset_days": 28,
+            "total_stargazers": 188,
+            "repo_count": 109
+          },
+          {
+            "date": "2026-11-28",
             "offset_days": 29,
             "total_stargazers": 188,
             "repo_count": 109
@@ -355,168 +361,168 @@
         "bucket_days": 3,
         "latest_total": 188,
         "delta": 5,
-        "latest_date": "2026-11-27",
+        "latest_date": "2026-11-28",
         "sample_count": 27,
         "raw_sample_count": 78,
         "points": [
           {
-            "date": "2026-09-01",
+            "date": "2026-09-02",
             "offset_days": 2,
             "total_stargazers": 183,
             "repo_count": 106
           },
           {
-            "date": "2026-09-04",
+            "date": "2026-09-05",
             "offset_days": 5,
             "total_stargazers": 183,
             "repo_count": 106
           },
           {
-            "date": "2026-09-07",
+            "date": "2026-09-08",
             "offset_days": 8,
             "total_stargazers": 183,
             "repo_count": 106
           },
           {
-            "date": "2026-09-10",
+            "date": "2026-09-11",
             "offset_days": 11,
-            "total_stargazers": 183,
+            "total_stargazers": 184,
             "repo_count": 106
           },
           {
-            "date": "2026-09-13",
+            "date": "2026-09-14",
             "offset_days": 14,
             "total_stargazers": 184,
             "repo_count": 106
           },
           {
-            "date": "2026-09-16",
+            "date": "2026-09-17",
             "offset_days": 17,
             "total_stargazers": 184,
             "repo_count": 106
           },
           {
-            "date": "2026-09-19",
+            "date": "2026-09-20",
             "offset_days": 20,
             "total_stargazers": 184,
             "repo_count": 106
           },
           {
-            "date": "2026-09-22",
+            "date": "2026-09-23",
             "offset_days": 23,
             "total_stargazers": 184,
             "repo_count": 106
           },
           {
-            "date": "2026-09-25",
+            "date": "2026-09-26",
             "offset_days": 26,
             "total_stargazers": 184,
             "repo_count": 106
           },
           {
-            "date": "2026-09-28",
+            "date": "2026-09-29",
             "offset_days": 29,
             "total_stargazers": 184,
             "repo_count": 106
           },
           {
-            "date": "2026-10-01",
+            "date": "2026-10-02",
             "offset_days": 32,
-            "total_stargazers": 184,
-            "repo_count": 106
-          },
-          {
-            "date": "2026-10-04",
-            "offset_days": 35,
             "total_stargazers": 185,
             "repo_count": 106
           },
           {
-            "date": "2026-10-07",
+            "date": "2026-10-05",
+            "offset_days": 35,
+            "total_stargazers": 185,
+            "repo_count": 107
+          },
+          {
+            "date": "2026-10-08",
             "offset_days": 38,
             "total_stargazers": 185,
             "repo_count": 107
           },
           {
-            "date": "2026-10-10",
+            "date": "2026-10-11",
             "offset_days": 41,
             "total_stargazers": 185,
             "repo_count": 107
           },
           {
-            "date": "2026-10-13",
+            "date": "2026-10-14",
             "offset_days": 44,
-            "total_stargazers": 185,
+            "total_stargazers": 186,
             "repo_count": 107
           },
           {
-            "date": "2026-10-16",
+            "date": "2026-10-17",
             "offset_days": 47,
             "total_stargazers": 187,
             "repo_count": 107
           },
           {
-            "date": "2026-10-19",
+            "date": "2026-10-20",
             "offset_days": 50,
             "total_stargazers": 187,
             "repo_count": 107
           },
           {
-            "date": "2026-10-22",
+            "date": "2026-10-23",
             "offset_days": 53,
             "total_stargazers": 188,
             "repo_count": 107
           },
           {
-            "date": "2026-10-25",
+            "date": "2026-10-26",
             "offset_days": 56,
             "total_stargazers": 188,
             "repo_count": 107
           },
           {
             "date": "2026-10-28",
-            "offset_days": 59,
+            "offset_days": 58,
             "total_stargazers": 188,
             "repo_count": 107
           },
           {
-            "date": "2026-11-09",
+            "date": "2026-11-10",
             "offset_days": 71,
             "total_stargazers": 188,
             "repo_count": 109
           },
           {
-            "date": "2026-11-11",
-            "offset_days": 73,
-            "total_stargazers": 188,
+            "date": "2026-11-13",
+            "offset_days": 74,
+            "total_stargazers": 189,
             "repo_count": 109
           },
           {
-            "date": "2026-11-15",
+            "date": "2026-11-16",
             "offset_days": 77,
             "total_stargazers": 189,
             "repo_count": 109
           },
           {
-            "date": "2026-11-18",
+            "date": "2026-11-19",
             "offset_days": 80,
             "total_stargazers": 189,
             "repo_count": 109
           },
           {
-            "date": "2026-11-21",
+            "date": "2026-11-22",
             "offset_days": 83,
             "total_stargazers": 188,
             "repo_count": 109
           },
           {
-            "date": "2026-11-24",
+            "date": "2026-11-25",
             "offset_days": 86,
             "total_stargazers": 188,
             "repo_count": 109
           },
           {
-            "date": "2026-11-27",
+            "date": "2026-11-28",
             "offset_days": 89,
             "total_stargazers": 188,
             "repo_count": 109
@@ -530,156 +536,156 @@
         "bucket_days": 7,
         "latest_total": 188,
         "delta": 9,
-        "latest_date": "2026-11-27",
+        "latest_date": "2026-11-28",
         "sample_count": 25,
-        "raw_sample_count": 156,
+        "raw_sample_count": 157,
         "points": [
           {
-            "date": "2026-06-11",
+            "date": "2026-06-12",
             "offset_days": 195,
             "total_stargazers": 179,
             "repo_count": 104
           },
           {
-            "date": "2026-06-18",
+            "date": "2026-06-19",
             "offset_days": 202,
             "total_stargazers": 179,
             "repo_count": 104
           },
           {
             "date": "2026-06-25",
-            "offset_days": 209,
+            "offset_days": 208,
             "total_stargazers": 180,
             "repo_count": 105
           },
           {
-            "date": "2026-07-02",
+            "date": "2026-07-03",
             "offset_days": 216,
             "total_stargazers": 180,
             "repo_count": 105
           },
           {
-            "date": "2026-07-09",
+            "date": "2026-07-10",
             "offset_days": 223,
             "total_stargazers": 180,
             "repo_count": 105
           },
           {
             "date": "2026-07-16",
-            "offset_days": 230,
+            "offset_days": 229,
             "total_stargazers": 180,
             "repo_count": 106
           },
           {
-            "date": "2026-07-23",
+            "date": "2026-07-24",
             "offset_days": 237,
-            "total_stargazers": 181,
+            "total_stargazers": 182,
             "repo_count": 106
           },
           {
-            "date": "2026-07-30",
+            "date": "2026-07-31",
             "offset_days": 244,
             "total_stargazers": 182,
             "repo_count": 106
           },
           {
-            "date": "2026-08-06",
+            "date": "2026-08-07",
             "offset_days": 251,
             "total_stargazers": 182,
             "repo_count": 106
           },
           {
-            "date": "2026-08-13",
+            "date": "2026-08-14",
             "offset_days": 258,
             "total_stargazers": 182,
             "repo_count": 106
           },
           {
-            "date": "2026-08-20",
+            "date": "2026-08-21",
             "offset_days": 265,
-            "total_stargazers": 182,
+            "total_stargazers": 183,
             "repo_count": 106
           },
           {
-            "date": "2026-08-27",
+            "date": "2026-08-28",
             "offset_days": 272,
             "total_stargazers": 183,
             "repo_count": 106
           },
           {
-            "date": "2026-09-03",
+            "date": "2026-09-04",
             "offset_days": 279,
             "total_stargazers": 183,
             "repo_count": 106
           },
           {
-            "date": "2026-09-10",
+            "date": "2026-09-11",
             "offset_days": 286,
-            "total_stargazers": 183,
+            "total_stargazers": 184,
             "repo_count": 106
           },
           {
-            "date": "2026-09-17",
+            "date": "2026-09-18",
             "offset_days": 293,
             "total_stargazers": 184,
             "repo_count": 106
           },
           {
-            "date": "2026-09-24",
+            "date": "2026-09-25",
             "offset_days": 300,
             "total_stargazers": 184,
             "repo_count": 106
           },
           {
-            "date": "2026-10-01",
+            "date": "2026-10-02",
             "offset_days": 307,
-            "total_stargazers": 184,
+            "total_stargazers": 185,
             "repo_count": 106
           },
           {
-            "date": "2026-10-08",
+            "date": "2026-10-09",
             "offset_days": 314,
             "total_stargazers": 185,
             "repo_count": 107
           },
           {
-            "date": "2026-10-14",
-            "offset_days": 320,
-            "total_stargazers": 186,
+            "date": "2026-10-16",
+            "offset_days": 321,
+            "total_stargazers": 187,
             "repo_count": 107
           },
           {
-            "date": "2026-10-22",
+            "date": "2026-10-23",
             "offset_days": 328,
             "total_stargazers": 188,
             "repo_count": 107
           },
           {
             "date": "2026-10-28",
-            "offset_days": 334,
+            "offset_days": 333,
             "total_stargazers": 188,
             "repo_count": 107
           },
           {
-            "date": "2026-11-11",
-            "offset_days": 348,
-            "total_stargazers": 188,
-            "repo_count": 109
-          },
-          {
-            "date": "2026-11-19",
-            "offset_days": 356,
+            "date": "2026-11-13",
+            "offset_days": 349,
             "total_stargazers": 189,
             "repo_count": 109
           },
           {
-            "date": "2026-11-26",
-            "offset_days": 363,
+            "date": "2026-11-20",
+            "offset_days": 356,
             "total_stargazers": 188,
             "repo_count": 109
           },
           {
             "date": "2026-11-27",
+            "offset_days": 363,
+            "total_stargazers": 188,
+            "repo_count": 109
+          },
+          {
+            "date": "2026-11-28",
             "offset_days": 364,
             "total_stargazers": 188,
             "repo_count": 109
@@ -698,22 +704,22 @@
       "stargazers": 9,
       "forks": 0,
       "updated_at": "2026-11-25T15:27:16Z",
-      "pushed_at": "2026-11-27T02:19:48Z",
+      "pushed_at": "2026-11-28T05:51:53Z",
       "open_issues": 7,
       "open_pull_requests": 0,
       "releases": 0,
-      "tags": 390,
+      "tags": 422,
       "languages": {
         "C": {
-          "size": 39975110,
+          "size": 40132675,
           "color": "#555555"
         },
         "C++": {
-          "size": 2276179,
+          "size": 2280206,
           "color": "#f34b7d"
         },
         "Python": {
-          "size": 1731777,
+          "size": 1803613,
           "color": "#3572A5"
         },
         "JavaScript": {
@@ -729,7 +735,7 @@
           "color": "#e34c26"
         },
         "Shell": {
-          "size": 186854,
+          "size": 218663,
           "color": "#89e051"
         },
         "Assembly": {
@@ -741,7 +747,7 @@
           "color": "#7355dd"
         },
         "CMake": {
-          "size": 105548,
+          "size": 116177,
           "color": "#DA3434"
         }
       }
@@ -796,7 +802,7 @@
       "stargazers": 0,
       "forks": 0,
       "updated_at": "2026-11-11T22:59:25Z",
-      "pushed_at": "2026-11-26T23:53:23Z",
+      "pushed_at": "2026-11-27T23:29:25Z",
       "open_issues": 0,
       "open_pull_requests": 0,
       "releases": 0,
@@ -821,7 +827,7 @@
       "stargazers": 0,
       "forks": 0,
       "updated_at": "2026-11-11T19:27:43Z",
-      "pushed_at": "2026-11-26T22:53:41Z",
+      "pushed_at": "2026-11-27T23:17:57Z",
       "open_issues": 0,
       "open_pull_requests": 0,
       "releases": 0,
@@ -887,7 +893,7 @@
       "stargazers": 2,
       "forks": 1,
       "updated_at": "2026-11-11T16:04:44Z",
-      "pushed_at": "2026-11-26T17:41:28Z",
+      "pushed_at": "2026-11-27T17:20:17Z",
       "open_issues": 0,
       "open_pull_requests": 0,
       "releases": 0,
@@ -928,7 +934,7 @@
       "stargazers": 0,
       "forks": 0,
       "updated_at": "2026-11-11T07:16:00Z",
-      "pushed_at": "2026-11-26T08:20:24Z",
+      "pushed_at": "2026-11-27T08:28:32Z",
       "open_issues": 0,
       "open_pull_requests": 0,
       "releases": 0,
